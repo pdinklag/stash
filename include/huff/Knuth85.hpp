@@ -3,64 +3,16 @@
 #include <utility>
 #include <vector>
 
+#include <huff/DynamicHuffmanBase.hpp>
 #include <io/bitistream.hpp>
 #include <io/bitostream.hpp>
 
 namespace huff {
 
 // dynamic (online) Huffman coding according to [Knuth, 1985]
-class Knuth85Coder {
+class Knuth85Coder : public DynamicHuffmanBase {
 private:
-    static constexpr size_t MAX_SYMS = 256ULL;
-    static constexpr size_t MAX_NODES = 512ULL;
-
-private:
-    struct node_t {
-        size_t weight;
-        size_t rank;
-        
-        node_t* parent;
-        bool bit;
-
-        node_t* left;
-        node_t* right;
-
-        uint8_t sym;
-
-        inline bool leaf() {
-            return !(left || right);
-        }
-    };
-
-    node_t m_nodes[MAX_NODES];
-    size_t m_num_nodes;
-    
-    node_t* m_leaves[MAX_SYMS];
-    node_t* m_root;
-
-    inline node_t* node(size_t v) {
-        return &m_nodes[v];
-    }
-
-    inline const node_t* node(size_t v) const {
-        return &m_nodes[v];
-    }
-
-    inline void replace(node_t* u, node_t* v) {
-        u->parent = v->parent;
-        u->rank = v->rank;
-        u->bit = v->bit;
-
-        if(u->parent) {
-            if(u->bit) {
-                u->parent->right = u;
-            } else {
-                u->parent->left = u;
-            }
-        }
-    }
-
-    inline Knuth85Coder() {
+    inline Knuth85Coder() : DynamicHuffmanBase() {
         // init tree with NYT node
         m_num_nodes = 1;
         m_nodes[0] = node_t{ 0, 0, nullptr, 0, nullptr, nullptr, 0 };
