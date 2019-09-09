@@ -5,7 +5,7 @@
 
 #include <io/bitostream.hpp>
 
-#define DEBUG_KNUTH_85
+//#define DEBUG_KNUTH_85
 
 #include <cassert>
 #include <iostream>
@@ -29,6 +29,8 @@ private:
         node_t* left;
         node_t* right;
 
+        uint8_t sym;
+
         inline bool leaf() {
             return !(left || right);
         }
@@ -41,6 +43,10 @@ private:
     node_t* m_root;
 
     inline node_t* node(size_t v) {
+        return &m_nodes[v];
+    }
+
+    inline const node_t* node(size_t v) const {
         return &m_nodes[v];
     }
 
@@ -62,7 +68,7 @@ public:
     inline Knuth85Coder() {
         // init tree with NYT node
         m_num_nodes = 1;
-        m_nodes[0] = node_t{ 0, 0, nullptr, 0, nullptr, nullptr };
+        m_nodes[0] = node_t{ 0, 0, nullptr, 0, nullptr, nullptr, 0 };
         m_root = node(0);
 
         // initialize symbol index
@@ -71,12 +77,12 @@ public:
         }
     }
 
-    inline void encode(BitOStream& out, uint8_t c) {
+    inline void encode(BitOStream& out, uint8_t c) const {
         #ifdef DEBUG_KNUTH_85
         std::cout << "encode: '" << c << "'";
         #endif
         
-        node_t* q = m_leaves[c];
+        const node_t* q = m_leaves[c];
         bool is_nyt;
         if(q) {
             is_nyt = false;
@@ -96,12 +102,12 @@ public:
         // encode symbol unless it is the first
         if(!(is_nyt && m_num_nodes == 1)) {
             std::vector<bool> bits;
-            for(node_t* v = q; v != m_root; v = v->parent) {
+            for(const node_t* v = q; v != m_root; v = v->parent) {
                 bits.push_back(v->bit);
             }
 
             #ifdef DEBUG_KNUTH_85
-            node_t* x = m_root;
+            const node_t* x = m_root;
             std::cout << " ";
             #endif
             for(size_t i = bits.size(); i > 0; i--) {
@@ -131,6 +137,28 @@ public:
         #endif
     }
 
+    inline uint8_t decode(BitIStream& in) const {
+        if(m_num_nodes == 1) {
+            // first character
+            return in.template read_binary<uint8_t>();
+        } else {        
+            node_t* v = m_root;
+            while(!v->leaf()) {
+                v = in.read_bit() ? v->right : v->left;
+            }
+
+            uint8_t c;
+            if(v == &m_nodes[0]) {
+                // NYT
+                return in.template read_binary<uint8_t>();
+            } else {
+                return v->sym;
+            }
+            
+            return c;
+        }
+    }
+
     inline void increment(uint8_t c) {
         // find or create leaf for c
         node_t* nyt = node(0);
@@ -155,7 +183,7 @@ public:
             m_leaves[c] = q;
 
             // initialize v by replacing NYT
-            *v = node_t { 0, 2, nyt->parent, nyt->bit, nyt, q };
+            *v = node_t { 0, 2, nyt->parent, nyt->bit, nyt, q, 0 };
             if(nyt->parent) nyt->parent->left = v;
 
             // make NYT left child of v
@@ -166,7 +194,7 @@ public:
             if(m_root == nyt) m_root = v;
 
             // initialize q as right child of v
-            *q = node_t { 0, 1, v, 1, nullptr, nullptr };
+            *q = node_t { 0, 1, v, 1, nullptr, nullptr, c };
         }
 
         // if q is the sibling of NYT, we need to move it elsewhere
@@ -186,10 +214,6 @@ public:
 
             if(u != q) {
                 // interchange q and u
-                #ifdef DEBUG_KNUTH_85
-                std::cout << "interchange (leaf): " << q->rank << " and " << u->rank << std::endl;
-                #endif
-                
                 node_t temp_u = *u;
                 replace(u, q);
                 replace(q, &temp_u);
@@ -217,18 +241,9 @@ public:
 
             if(u != v) {
                 // interchange u and v
-                #ifdef DEBUG_KNUTH_85
-                std::cout << "interchange (inner): " << v->rank << " and " << u->rank << std::endl;
-                //std::cout << "\tBEFORE: u=" << *u << ", v=" << *v << std::endl;
-                #endif
-                
                 node_t temp_u = *u;
                 replace(u, v);
                 replace(v, &temp_u);
-
-                #ifdef DEBUG_KNUTH_85
-                //std::cout << "\tAFTER: u=" << *u << ", v=" << *v << std::endl;
-                #endif
             }
         }
 
