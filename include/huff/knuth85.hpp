@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 
+#include <io/bitistream.hpp>
 #include <io/bitostream.hpp>
 
 namespace huff {
@@ -59,7 +60,6 @@ private:
         }
     }
 
-public:
     inline Knuth85Coder() {
         // init tree with NYT node
         m_num_nodes = 1;
@@ -70,6 +70,13 @@ public:
         for(size_t c = 0; c < MAX_SYMS; c++) {
             m_leaves[c] = nullptr;
         }
+    }
+
+public:
+    inline Knuth85Coder(const std::string& s, BitOStream& out) : Knuth85Coder() {
+    }
+
+    inline Knuth85Coder(BitIStream& in) : Knuth85Coder() {
     }
 
     inline void encode(BitOStream& out, uint8_t c) const {
@@ -122,7 +129,7 @@ public:
         }
     }
 
-    inline void increment(uint8_t c) {
+    inline void update(uint8_t c) {
         // find or create leaf for c
         node_t* nyt = node(0);
         
