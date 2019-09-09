@@ -146,7 +146,7 @@ public:
     inline void write_gamma(T value) {
         assert(value > T(0));
 
-        const auto m = tlx::integer_log2_ceil(value) - 1;
+        const auto m = tlx::integer_log2_floor(value);
         write_unary(m);
         if(m > 0) write_binary(value, m); // cut off leading 1
     }
@@ -155,8 +155,8 @@ public:
     inline void write_delta(T value) {
         assert(value > T(0));
 
-        auto m = tlx::integer_log2_ceil(value) - 1;
-        write_gamma(m+1);
+        auto m = tlx::integer_log2_floor(value);
+        write_gamma(m+1); // cannot encode zero
         if(m > 0) write_binary(value, m); // cut off leading 1
     }
 

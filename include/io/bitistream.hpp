@@ -98,7 +98,7 @@ public:
         }
     }
 
-    template<class T>
+    template<class T = uint64_t>
     inline T read_binary(size_t bits = sizeof(T) * CHAR_BIT) {
         assert(bits <= 64ULL);
 
@@ -168,16 +168,16 @@ public:
         }
     }
 
-    template<typename T>
+    template<typename T = uint64_t>
     inline T read_unary() {
         T v = 0;
         while(!read_bit()) ++v;
         return v;
     }
 
-    template<typename T>
+    template<typename T = uint64_t>
     inline T read_gamma() {
-        auto m = read_unary<size_t>();
+        auto m = read_unary<>();
         if(m > 0) {
             return T((1ULL << m) | read_binary<uint64_t>(m));
         } else {
@@ -185,9 +185,9 @@ public:
         }
     }
 
-    template<typename T>
+    template<typename T = uint64_t>
     inline T read_delta() {
-        auto m = read_gamma<size_t>() - 1;
+        auto m = read_gamma<>() - 1;
         if(m > 0) {
             return T((1ULL << m) | read_binary<uint64_t>(m));
         } else {
@@ -195,10 +195,10 @@ public:
         }
     }
 
-    template<typename T>
+    template<typename T = uint64_t>
     inline T read_rice(uint8_t p) {
-        const auto q = read_gamma<uint64_t>() - 1;
-        const auto r = read_binary<uint64_t>(p);
+        const auto q = read_gamma<>() - 1;
+        const auto r = read_binary<>(p);
         return T(q * (1ULL << p) + r);
     }
 
