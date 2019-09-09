@@ -40,7 +40,7 @@ void test(const std::string& input, const std::string& filename) {
 }
 
 int main(int argc, char** argv) {
-    //test<huff::Huffman52Coder>("bananas&ananas", "huff52");
-    //test<huff::Knuth85Coder>("bananas&ananas", "knuth85");
+    test<huff::Huffman52Coder>("bananas&ananas", "huff52");
+    test<huff::Knuth85Coder>("bananas&ananas", "knuth85");
     test<huff::ForwardCoder>("bananas&ananas", "fwd");
 }
