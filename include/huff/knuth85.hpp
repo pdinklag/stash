@@ -5,11 +5,6 @@
 
 #include <io/bitostream.hpp>
 
-//#define DEBUG_KNUTH_85
-
-#include <cassert>
-#include <iostream>
-
 namespace huff {
 
 // dynamic (online) Huffman coding according to [Knuth, 1985]
@@ -78,10 +73,6 @@ public:
     }
 
     inline void encode(BitOStream& out, uint8_t c) const {
-        #ifdef DEBUG_KNUTH_85
-        std::cout << "encode: '" << c << "'";
-        #endif
-        
         const node_t* q = m_leaves[c];
         bool is_nyt;
         if(q) {
@@ -89,15 +80,7 @@ public:
         } else {
             q = node(0);
             is_nyt = true;
-
-            #ifdef DEBUG_KNUTH_85
-            std::cout << " (NYT)";
-            #endif
         }
-
-        #ifdef DEBUG_KNUTH_85
-        std::cout << std::endl << "->";
-        #endif
 
         // encode symbol unless it is the first
         if(!(is_nyt && m_num_nodes == 1)) {
@@ -106,35 +89,15 @@ public:
                 bits.push_back(v->bit);
             }
 
-            #ifdef DEBUG_KNUTH_85
-            const node_t* x = m_root;
-            std::cout << " ";
-            #endif
             for(size_t i = bits.size(); i > 0; i--) {
                 out.write_bit(bits[i-1]);
-                
-                #ifdef DEBUG_KNUTH_85
-                x = bits[i-1] ? x->right : x->left;
-                std::cout << size_t(bits[i-1]);
-                #endif
             }
-
-            #ifdef DEBUG_KNUTH_85
-            assert(x == q);
-            #endif
         }
 
         // if symbol is NYT, encode ASCII encoding
         if(is_nyt) {
             out.write_binary(c);
-            #ifdef DEBUG_KNUTH_85
-            std::cout << " ASCII('" << c << "')";
-            #endif
         }
-
-        #ifdef DEBUG_KNUTH_85
-        std::cout << std::endl;
-        #endif
     }
 
     inline uint8_t decode(BitIStream& in) const {
