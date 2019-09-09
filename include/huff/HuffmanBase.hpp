@@ -4,6 +4,9 @@
 #include <queue>
 #include <utility>
 
+#include <io/BitIStream.hpp>
+#include <io/BitOStream.hpp>
+
 namespace huff {
 
 class HuffmanBase {

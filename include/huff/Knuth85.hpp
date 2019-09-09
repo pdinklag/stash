@@ -4,8 +4,8 @@
 #include <vector>
 
 #include <huff/DynamicHuffmanBase.hpp>
-#include <io/bitistream.hpp>
-#include <io/bitostream.hpp>
+#include <io/BitIStream.hpp>
+#include <io/BitOStream.hpp>
 
 namespace huff {
 

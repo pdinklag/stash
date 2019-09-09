@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include <rapl/reader.hpp>
-#include <rapl/power.hpp>
-#include <util/time.hpp>
+#include <rapl/Reader.hpp>
+#include <rapl/Power.hpp>
+#include <util/Time.hpp>
 
 #include <algorithm>
 #include <unordered_set>

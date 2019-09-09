@@ -1,10 +1,7 @@
 #pragma once
 
 #include <vector>
-
 #include <huff/HuffmanBase.hpp>
-#include <io/bitistream.hpp>
-#include <io/bitostream.hpp>
 
 namespace huff {
 

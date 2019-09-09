@@ -1,7 +1,7 @@
 #pragma once
 
-#include <rapl/energy.hpp>
-#include <rapl/error.hpp>
+#include <rapl/Energy.hpp>
+#include <rapl/Error.hpp>
 
 #include <powercap/powercap-rapl.h>
 

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <io/bitostream.hpp>
-#include <io/bitistream.hpp>
+#include <io/BitOStream.hpp>
+#include <io/BitIStream.hpp>
 
 #include <huff/Huffman52.hpp>
 #include <huff/Knuth85.hpp>
