@@ -32,11 +32,26 @@ struct Power {
         };
     }
 
+    inline Power& operator+=(const Power& other) {
+        core   += other.core;
+        uncore += other.uncore;
+        dram   += other.dram;
+        return *this;
+    }
+
     inline Power operator-(const Power& other) {
         return Power {
             core   - other.core,
             uncore - other.uncore,
             dram   - other.dram
+        };
+    }
+
+    inline Power operator/(double d) {
+        return Power {
+            core   / d,
+            uncore / d,
+            dram   / d
         };
     }
 };

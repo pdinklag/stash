@@ -9,23 +9,6 @@
 #include <random>
 #include <unistd.h>
 
-rapl::Power noise(const rapl::Reader& r, const size_t num = 5) {
-    rapl::Power p;
-    for(size_t i = 0; i < num; i++) {
-        auto t0 = time();
-        auto e0 = r.read();
-        
-        sleep(1);
-        
-        p = p + rapl::Power(r.read() - e0, time() - t0);
-    }
-    
-    return rapl::Power(
-        p.core   / double(num),
-        p.uncore / double(num),
-        p.dram   / double(num));
-}
-
 volatile int x;
 
 rapl::Power test_add(const rapl::Reader& r, const int* a, size_t n) {
@@ -55,18 +38,24 @@ rapl::Power test_mul(const rapl::Reader& r, const int* a, size_t n) {
     return rapl::Power(r.read() - e0, time() - t0);
 }
 
+rapl::Power test_sleep(const rapl::Reader& r, size_t iterations = 5) {
+    rapl::Power p;
+    for(size_t i = 0; i < iterations; i++) {
+        auto t0 = time();
+        auto e0 = r.read();
+        usleep(250'000);
+        p += rapl::Power(r.read() - e0, time() - t0);
+    }
+    return p / double(iterations);
+}
+
 int main(int argc, char** argv) {
     rapl::Reader r(0);
 
-    const size_t n = 1'000'000;
-    const size_t iterations = 250;
+    const size_t n = 10'000'000;
+    const size_t iterations = 100;
     
     int* a = new int[n];
-
-    std::cout << "# noise: ";
-    std::cout.flush();
-    rapl::Power p_noise;// = noise(r);
-    std::cout << p_noise.total() << std::endl;;
 
     for(size_t it = 0; it < iterations; it++) {
     
@@ -82,17 +71,19 @@ int main(int argc, char** argv) {
                 a[i] = uniform_dist(e);
             }
 
-            p_random = rapl::Power(r.read() - e0, time() - t0) - p_noise;
+            p_random = rapl::Power(r.read() - e0, time() - t0);
         }
 
-        auto p_add = test_add(r, a, n) - p_noise;
-        auto p_xor = test_xor(r, a, n) - p_noise;
-        auto p_mul = test_mul(r, a, n) - p_noise;
+        auto p_sleep = test_sleep(r);
+        auto p_add = test_add(r, a, n);
+        auto p_xor = test_xor(r, a, n);
+        auto p_mul = test_mul(r, a, n);
 
-        std::cout << "RESULT op=rnd it=" << (it+1) << " power=" << p_random.total() << std::endl;
-        std::cout << "RESULT op=add it=" << (it+1) << " power=" << p_add.total() << std::endl;
-        std::cout << "RESULT op=xor it=" << (it+1) << " power=" << p_xor.total() << std::endl;
-        std::cout << "RESULT op=mul it=" << (it+1) << " power=" << p_mul.total() << std::endl;
+        std::cout << "RESULT op=sleep it=" << (it+1) << " power=" << p_sleep.total() << std::endl;
+        std::cout << "RESULT op=rnd it=" << (it+1) << " power=" << p_random.total() << " power_denoise=" << (p_random.total() - p_sleep.total()) << std::endl;
+        std::cout << "RESULT op=add it=" << (it+1) << " power=" << p_add.total() << " power_denoise=" << (p_add.total() - p_sleep.total()) << std::endl;
+        std::cout << "RESULT op=xor it=" << (it+1) << " power=" << p_xor.total() << " power_denoise=" << (p_xor.total() - p_sleep.total()) << std::endl;
+        std::cout << "RESULT op=mul it=" << (it+1) << " power=" << p_mul.total() << " power_denoise=" << (p_mul.total() - p_sleep.total()) << std::endl;
     }
 
     delete[] a;
