@@ -6,6 +6,7 @@
 
 #include <huff/Huffman52.hpp>
 #include <huff/Knuth85.hpp>
+#include <huff/Forward.hpp>
 
 template<typename coder_t>
 void test(const std::string& input, const std::string& filename) {
@@ -29,7 +30,7 @@ void test(const std::string& input, const std::string& filename) {
         BitIStream in(f);
         coder_t decoder(in);
 
-        while(!in.eof()) {
+        while(!decoder.eof(in)) {
             const uint8_t c = decoder.decode(in);
             std::cout << c;
             decoder.update(c);
@@ -39,6 +40,7 @@ void test(const std::string& input, const std::string& filename) {
 }
 
 int main(int argc, char** argv) {
-    test<huff::Huffman52Coder>("bananas&ananas", "huff52");
-    test<huff::Knuth85Coder>("bananas&ananas", "knuth85");
+    //test<huff::Huffman52Coder>("bananas&ananas", "huff52");
+    //test<huff::Knuth85Coder>("bananas&ananas", "knuth85");
+    test<huff::ForwardCoder>("bananas&ananas", "fwd");
 }

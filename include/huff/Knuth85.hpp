@@ -3,16 +3,16 @@
 #include <utility>
 #include <vector>
 
-#include <huff/DynamicHuffmanBase.hpp>
+#include <huff/HuffmanBase.hpp>
 #include <io/BitIStream.hpp>
 #include <io/BitOStream.hpp>
 
 namespace huff {
 
 // dynamic (online) Huffman coding according to [Knuth, 1985]
-class Knuth85Coder : public DynamicHuffmanBase {
+class Knuth85Coder : public HuffmanBase {
 private:
-    inline Knuth85Coder() : DynamicHuffmanBase() {
+    inline Knuth85Coder() : HuffmanBase() {
         // init tree with NYT node
         m_num_nodes = 1;
         m_nodes[0] = node_t{ 0, 0, nullptr, 0, nullptr, nullptr, 0 };

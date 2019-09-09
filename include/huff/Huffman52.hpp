@@ -7,7 +7,7 @@ namespace huff {
 
 // Huffman coder based on [Huffman, 1952]
 class Huffman52Coder : public HuffmanBase {
-private:
+protected:
     inline Huffman52Coder() : HuffmanBase() {
         // initialize
         for(size_t c = 0; c < MAX_SYMS; c++) {

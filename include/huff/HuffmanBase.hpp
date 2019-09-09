@@ -91,7 +91,26 @@ protected:
         assert(queue.empty());
     }
 
+    inline void replace(node_t* u, node_t* v) {
+        u->parent = v->parent;
+        u->rank = v->rank;
+        u->bit = v->bit;
+
+        if(u->parent) {
+            if(u->bit) {
+                u->parent->right = u;
+            } else {
+                u->parent->left = u;
+            }
+        }
+    }
+
     inline HuffmanBase() {
+    }
+
+public:
+    inline bool eof(BitIStream& in) const {
+        return in.eof();
     }
 };
 
