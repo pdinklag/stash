@@ -9,7 +9,7 @@
 
 namespace huff {
 
-// forward dynamic Huffman coding according to [Klein, 2019]
+// forward dynamic Huffman coding according to [Klein et al., 2019]
 class ForwardCoder : public Huffman52Coder {
 private:
     inline ForwardCoder() : Huffman52Coder() {
@@ -34,7 +34,7 @@ public:
 
     inline void encode(BitOStream& out, uint8_t c) const {
         if(m_root->leaf()) {
-            // only root is left, and its unique, no need to encode
+            // only root is left, and it's unique, no need to encode
         } else {
             // same as Huffman52
             Huffman52Coder::encode(out, c);
@@ -78,34 +78,41 @@ public:
 
         node_t* p = m_leaves[c];
         if(p == m_root) {
-            // last symbol
-            m_root = nullptr;
-            m_leaves[c] = nullptr;
-        } else if(p->weight == 0) {
+            // decrease weight, didn't happen above!
+            assert(p->weight);
+            --p->weight;
+        }
+        
+        if(p->weight == 0) {
             // last occurrence of c
-            
-            // must have a parent, otherwise it's the root already
-            node_t* parent = p->parent;
-            assert(parent);
-
-            // "delete" p and its parent by setting infinite weights
-            p->weight = SIZE_MAX;
-            parent->weight = SIZE_MAX;
-            m_leaves[c] = nullptr;
-
-            node_t* sibling = p->bit ? parent->left : parent->right;
-
-            sibling->parent = parent->parent;
-            sibling->bit = parent->bit;
-            if(sibling->parent) {
-                if(sibling->bit) {
-                    sibling->parent->right = sibling;
-                } else {
-                    sibling->parent->left = sibling;
-                }
+            if(p == m_root) {
+                // last symbol
+                m_leaves[c] = nullptr;
+                m_root = nullptr;
             } else {
-                assert(m_root == parent);
-                m_root = sibling;
+                // must have a parent, otherwise it's the root already
+                node_t* parent = p->parent;
+                assert(parent);
+
+                // "delete" p and its parent by setting infinite weights
+                p->weight = SIZE_MAX;
+                parent->weight = SIZE_MAX;
+                m_leaves[c] = nullptr;
+
+                node_t* sibling = p->bit ? parent->left : parent->right;
+
+                sibling->parent = parent->parent;
+                sibling->bit = parent->bit;
+                if(sibling->parent) {
+                    if(sibling->bit) {
+                        sibling->parent->right = sibling;
+                    } else {
+                        sibling->parent->left = sibling;
+                    }
+                } else {
+                    assert(m_root == parent);
+                    m_root = sibling;
+                }
             }
         }
     }

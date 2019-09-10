@@ -69,15 +69,12 @@ public:
                 v = in.read_bit() ? v->right : v->left;
             }
 
-            uint8_t c;
-            if(v == &m_nodes[0]) {
+            if(v == node(0)) {
                 // NYT
                 return in.template read_binary<uint8_t>();
             } else {
                 return v->sym;
             }
-            
-            return c;
         }
     }
 
