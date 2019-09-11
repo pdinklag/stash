@@ -1,13 +1,11 @@
 #pragma once
 
-#include <io/BitIStream.hpp>
-#include <io/BitOStream.hpp>
+#include <code/CoderBase.hpp>
 
 template<size_t m_bits = 64>
-class BinaryCoder {
+class BinaryCoder : public CoderBase {
 public:
-    inline BinaryCoder() {
-    }
+    using CoderBase::CoderBase;
 
     template<typename T>
     void encode(BitOStream& out, T value) {

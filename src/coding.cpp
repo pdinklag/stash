@@ -5,6 +5,8 @@
 #include <code/ASCII.hpp>
 #include <code/Binary.hpp>
 #include <code/Delta.hpp>
+#include <code/Delta0.hpp>
+#include <code/MTF.hpp>
 
 #include <io/BitOStream.hpp>
 #include <io/BitIStream.hpp>
@@ -59,7 +61,7 @@ void test(const std::string& input, const std::string& filename) {
 int main(int argc, char** argv) {
     //std::string text("bananas&ananas");
     std::string text("ss&bnnnn$aaaaaa");
-    
+    test<ASCIICoder>(text, "ascii");
     test<huff::Huffman52Coder<ASCIICoder, DeltaCoder>>(text, "huff52_ascii");
     test<huff::Huffman52Coder<DeltaCoder, DeltaCoder>>(text, "huff52_delta");
     test<huff::Knuth85Coder<ASCIICoder>>(text, "knuth85_ascii");
@@ -68,4 +70,5 @@ int main(int argc, char** argv) {
     test<huff::ForwardCoder<DeltaCoder, DeltaCoder>>(text, "fwd_delta");
     test<huff::HybridCoder<ASCIICoder, DeltaCoder>>(text, "hybrid_ascii");
     test<huff::HybridCoder<DeltaCoder, DeltaCoder>>(text, "hybrid_delta");
+    test<MTFCoder<Delta0Coder, ASCIICoder, DeltaCoder>>(text, "mtf_delta");
 }
