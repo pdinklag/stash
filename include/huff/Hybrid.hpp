@@ -95,20 +95,23 @@ public:
                 m_freq_coder.encode(out, m_hist[c]);
             }
         }
+
+        // update
+        update(c);
     }
 
     inline uint8_t decode(BitIStream& in) {
+        uint8_t c;
         if(in.eof()) {
             // last symbol
             assert(m_root && m_root->leaf());
-            return m_root->sym;
+            c = m_root->sym;
         } else {
             // nearly the same as Knuth85
             if(m_num_nodes == 1) {
                 // first character
-                const uint8_t c = m_sym_coder.template decode<uint8_t>(in);
+                c = m_sym_coder.template decode<uint8_t>(in);
                 m_hist[c] = m_freq_coder.template decode<>(in);
-                return c;
             } else {
                 node_t* v = m_root;
                 while(!v->leaf()) {
@@ -117,18 +120,23 @@ public:
 
                 if(v == node(0)) {
                     // NYT
-                    const uint8_t c = m_sym_coder.template decode<uint8_t>(in);
+                    c = m_sym_coder.template decode<uint8_t>(in);
                     m_hist[c] = m_freq_coder.template decode<>(in);
-                    return c;
                 } else {
-                    return v->sym;
+                    c = v->sym;
                 }
             }
         }
+
+        // update
+        update(c);
+        return c;
     }
 
 private:
     inline void decrease(node_t* leaf) {
+        assert(leaf->leaf());
+        
         // practically the same as Forward::update
         for(node_t* p = leaf; p; p = p->parent) {
             // find lowest ranked node with same weight as p
@@ -143,12 +151,15 @@ private:
             }
 
             if(p != q) {
+                assert(q != m_root);
+                
                 // interchange p and q
                 node_t temp_q = *q;
                 replace(q, p);
                 replace(p, &temp_q);
             }
 
+            assert(p->weight > 0);
             --p->weight;
         }
 
@@ -167,9 +178,12 @@ private:
                 // "delete" p and its parent by setting infinite weights
                 p->weight = SIZE_MAX;
                 parent->weight = SIZE_MAX;
-                if(leaf != node(0)) m_leaves[leaf->sym] = nullptr;
+                if(p != node(0)) {
+                    m_leaves[p->sym] = nullptr;
+                }
 
                 node_t* sibling = p->bit ? parent->left : parent->right;
+                assert(sibling);
 
                 sibling->parent = parent->parent;
                 sibling->bit = parent->bit;
@@ -181,6 +195,7 @@ private:
                     }
                 } else {
                     assert(m_root == parent);
+                    assert(!sibling->parent);
                     m_root = sibling;
                 }
             }
@@ -228,6 +243,7 @@ private:
             v->bit = 0;
 
             if(v == m_root) {
+                assert(!u->parent);
                 m_root = u;
             }
 
@@ -247,7 +263,6 @@ private:
         }
     }
 
-public:
     inline void update(uint8_t c) {
         if(m_leaves[c]) {
             decrease(m_leaves[c]);

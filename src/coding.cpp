@@ -26,12 +26,7 @@ void test(const std::string& input, const std::string& filename) {
         coder_t coder(input, out);
         for(size_t i = 0; i < input.size(); i++) {
             const uint8_t c = input[i];
-            
             coder.encode(out, c);
-            
-            if(i+1 < input.size()) {
-                coder.update(c);
-            }
         }
 
         std::cout << out.bits_written() << " bits, decode ";
@@ -45,7 +40,6 @@ void test(const std::string& input, const std::string& filename) {
         while(!decoder.eof(in)) {
             const uint8_t c = decoder.decode(in);
             ss << c;
-            decoder.update(c);
         }
 
         std::string result = ss.str();

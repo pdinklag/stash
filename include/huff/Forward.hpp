@@ -49,19 +49,28 @@ public:
             // same as Huffman52
             Base::encode(out, c);
         }
+
+        // decrease weight
+        decrease(c);
     }
 
     inline uint8_t decode(BitIStream& in) {
+        uint8_t c;
         if(m_root->leaf()) {
             // only root is left, report its symbol
-            return m_root->sym;
+            c = m_root->sym;
         } else {
             // same as Huffman52
-            return Base::decode(in);
+            c = Base::decode(in);
         }
+
+        // decrease weight
+        decrease(c);
+        return c;
     }
 
-    inline void update(uint8_t c) {
+private:
+    inline void decrease(uint8_t c) {
         assert(m_leaves[c]);
         
         for(node_t* p = m_leaves[c]; p; p = p->parent) {

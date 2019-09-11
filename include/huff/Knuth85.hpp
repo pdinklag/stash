@@ -60,12 +60,16 @@ public:
         if(is_nyt) {
             m_sym_coder.encode(out, c);
         }
+
+        // increase weight
+        increase(c);
     }
 
     inline uint8_t decode(BitIStream& in) {
+        uint8_t c;
         if(m_num_nodes == 1) {
             // first character
-            return m_sym_coder.template decode<uint8_t>(in);
+            c = m_sym_coder.template decode<uint8_t>(in);
         } else {        
             node_t* v = m_root;
             while(!v->leaf()) {
@@ -74,14 +78,19 @@ public:
 
             if(v == node(0)) {
                 // NYT
-                return m_sym_coder.template decode<uint8_t>(in);
+                c = m_sym_coder.template decode<uint8_t>(in);
             } else {
-                return v->sym;
+                c = v->sym;
             }
         }
+
+        // increase weight
+        increase(c);
+        return c;
     }
 
-    inline void update(uint8_t c) {
+private:
+    inline void increase(uint8_t c) {
         // find or create leaf for c
         node_t* nyt = node(0);
         

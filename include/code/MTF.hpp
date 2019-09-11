@@ -48,21 +48,24 @@ public:
         return in.eof();
     }
 
-    void encode(BitOStream& out, uint8_t c) {
+    inline void encode(BitOStream& out, uint8_t c) {
         // look for c
         for(size_t x = 0; x < m_sigma; x++) {
             if(m_syms[x] == c) {
                 m_coder.encode(out, x);
-                return;
+                break;
             }
         }
+        update(c);
+    }
+    
+    inline uint8_t decode(BitIStream& in) {
+        uint8_t c = m_syms[m_coder.template decode<uint8_t>(in)];
+        update(c);
+        return c;
     }
 
-    template<typename T = uint64_t>
-    T decode(BitIStream& in) {
-        return m_syms[m_coder.template decode<uint8_t>(in)];
-    }
-
+private:
     inline void update(uint8_t c) {
         // find c
         size_t rank = SIZE_MAX;

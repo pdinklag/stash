@@ -17,8 +17,4 @@ public:
     inline bool eof(BitIStream& in) {
         return in.eof();
     }
-    
-    template<typename T>
-    inline void update(T x) {
-    }
 };
