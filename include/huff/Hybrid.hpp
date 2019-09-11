@@ -126,14 +126,14 @@ public:
 private:
     inline void decrease(node_t* leaf) {
         // practically the same as Forward::update
-        for(node_t* p = leaf; p != m_root; p = p->parent) {
+        for(node_t* p = leaf; p; p = p->parent) {
             // find lowest ranked node with same weight as p
             node_t* q = p;
             const size_t w = p->weight;
             
             for(size_t i = 0; i < m_num_nodes; i++) {
                 node_t* x = node(i);
-                if(x->rank < p->rank && x->weight == w) {
+                if(x->rank < q->rank && x->weight == w) {
                     q = x;
                 }
             }
@@ -149,12 +149,6 @@ private:
         }
 
         node_t* p = leaf;
-        if(p == m_root) {
-            // decrease weight, didn't happen above!
-            assert(p->weight);
-            --p->weight;
-        }
-        
         if(p->weight == 0) {
             // last occurrence of the character
             if(p == m_root) {

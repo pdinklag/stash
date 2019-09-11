@@ -78,10 +78,13 @@ public:
         std::vector<bool> bits;
         for(const node_t* v = q; v != m_root; v = v->parent) {
             bits.push_back(v->bit);
+            
         }
 
+        const node_t* x = m_root;
         for(size_t i = bits.size(); i > 0; i--) {
             out.write_bit(bits[i-1]);
+            x = bits[i-1] ? x->right : x->left;
         }
     }
 

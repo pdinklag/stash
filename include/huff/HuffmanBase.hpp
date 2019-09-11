@@ -69,7 +69,7 @@ protected:
             if(r->weight < l->weight) {
                 std::swap(l, r);
             }
-
+            
             // determine ranks
             l->rank = next_rank++;  
             r->rank = next_rank++;

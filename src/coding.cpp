@@ -42,10 +42,11 @@ void test(const std::string& input, const std::string& filename) {
             decoder.update(c);
         }
 
+        std::string result = ss.str();
         if(ss.str() == input) {
             std::cout << "SUCCESS";
         } else {
-            std::cout << "FAIL";
+            std::cout << "FAIL: " << result;
         }
         std::cout << std::endl;
     }

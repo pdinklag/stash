@@ -54,14 +54,14 @@ public:
     inline void update(uint8_t c) {
         assert(m_leaves[c]);
         
-        for(node_t* p = m_leaves[c]; p != m_root; p = p->parent) {
-            // find lowest ranked node with same weight as p
+        for(node_t* p = m_leaves[c]; p; p = p->parent) {
+            // find lowest ranked node q with same weight as p
             node_t* q = p;
             const size_t w = p->weight;
             
             for(size_t i = 0; i < m_num_nodes; i++) {
                 node_t* x = node(i);
-                if(x->rank < p->rank && x->weight == w) {
+                if(x->rank < q->rank && x->weight == w) {
                     q = x;
                 }
             }
@@ -77,12 +77,6 @@ public:
         }
 
         node_t* p = m_leaves[c];
-        if(p == m_root) {
-            // decrease weight, didn't happen above!
-            assert(p->weight);
-            --p->weight;
-        }
-        
         if(p->weight == 0) {
             // last occurrence of c
             if(p == m_root) {
