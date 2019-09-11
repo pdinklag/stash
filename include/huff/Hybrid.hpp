@@ -10,8 +10,12 @@
 namespace huff {
 
 // forward dynamic Huffman coding according to [Fruchtman et al., 2019]
+template<typename sym_coder_t, typename freq_coder_t>
 class HybridCoder : public HuffmanBase {
 private:
+    sym_coder_t  m_sym_coder;
+    freq_coder_t m_freq_coder;
+
     size_t m_hist[MAX_SYMS];
 
     inline HybridCoder() : HuffmanBase() {
@@ -38,12 +42,12 @@ public:
         m_root = node(0);
 
         // write sigma
-        out.write_delta(sigma);
+        m_freq_coder.encode(out, sigma);
     }
 
     inline HybridCoder(BitIStream& in) : HybridCoder() {
         // read sigma
-        const size_t sigma = in.read_delta<>();
+        const size_t sigma = m_freq_coder.template decode<>(in);
         
         // init tree with NYT node
         m_num_nodes = 1;
@@ -59,7 +63,7 @@ public:
         }
     }
 
-    inline void encode(BitOStream& out, uint8_t c) const {
+    inline void encode(BitOStream& out, uint8_t c) {
         const node_t* q = m_leaves[c];
         if(q == m_root) {
             // only symbol in existance, no need to encode
@@ -87,8 +91,8 @@ public:
 
             // if symbol is NYT, encode ASCII encoding AND frequency
             if(is_nyt) {
-                out.write_binary(c);
-                out.write_delta(m_hist[c]);
+                m_sym_coder.encode(out, c);
+                m_freq_coder.encode(out, m_hist[c]);
             }
         }
     }
@@ -102,8 +106,8 @@ public:
             // nearly the same as Knuth85
             if(m_num_nodes == 1) {
                 // first character
-                const uint8_t c = in.template read_binary<uint8_t>();
-                m_hist[c] = in.read_delta<>();
+                const uint8_t c = m_sym_coder.template decode<uint8_t>(in);
+                m_hist[c] = m_freq_coder.template decode<>(in);
                 return c;
             } else {
                 node_t* v = m_root;
@@ -113,8 +117,8 @@ public:
 
                 if(v == node(0)) {
                     // NYT
-                    const uint8_t c = in.template read_binary<uint8_t>();
-                    m_hist[c] = in.read_delta<>();
+                    const uint8_t c = m_sym_coder.template decode<uint8_t>(in);
+                    m_hist[c] = m_freq_coder.template decode<>(in);
                     return c;
                 } else {
                     return v->sym;

@@ -2,6 +2,10 @@
 #include <fstream>
 #include <sstream>
 
+#include <code/ASCII.hpp>
+#include <code/Binary.hpp>
+#include <code/Delta.hpp>
+
 #include <io/BitOStream.hpp>
 #include <io/BitIStream.hpp>
 
@@ -56,8 +60,12 @@ int main(int argc, char** argv) {
     //std::string text("bananas&ananas");
     std::string text("ss&bnnnn$aaaaaa");
     
-    test<huff::Huffman52Coder>(text, "huff52");
-    test<huff::Knuth85Coder>(text, "knuth85");
-    test<huff::ForwardCoder>(text, "fwd");
-    test<huff::HybridCoder>(text, "hybrid");
+    test<huff::Huffman52Coder<ASCIICoder, DeltaCoder>>(text, "huff52_ascii");
+    test<huff::Huffman52Coder<DeltaCoder, DeltaCoder>>(text, "huff52_delta");
+    test<huff::Knuth85Coder<ASCIICoder>>(text, "knuth85_ascii");
+    test<huff::Knuth85Coder<DeltaCoder>>(text, "knuth85_delta");
+    test<huff::ForwardCoder<ASCIICoder, DeltaCoder>>(text, "fwd_ascii");
+    test<huff::ForwardCoder<DeltaCoder, DeltaCoder>>(text, "fwd_delta");
+    test<huff::HybridCoder<ASCIICoder, DeltaCoder>>(text, "hybrid_ascii");
+    test<huff::HybridCoder<DeltaCoder, DeltaCoder>>(text, "hybrid_delta");
 }

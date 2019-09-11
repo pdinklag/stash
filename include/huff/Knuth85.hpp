@@ -10,8 +10,11 @@
 namespace huff {
 
 // dynamic (online) Huffman coding according to [Knuth, 1985]
+template<typename sym_coder_t>
 class Knuth85Coder : public HuffmanBase {
 private:
+    sym_coder_t m_sym_coder;
+
     inline Knuth85Coder() : HuffmanBase() {
         // init tree with NYT node
         m_num_nodes = 1;
@@ -31,7 +34,7 @@ public:
     inline Knuth85Coder(BitIStream& in) : Knuth85Coder() {
     }
 
-    inline void encode(BitOStream& out, uint8_t c) const {
+    inline void encode(BitOStream& out, uint8_t c) {
         const node_t* q = m_leaves[c];
         bool is_nyt;
         if(q) {
@@ -55,14 +58,14 @@ public:
 
         // if symbol is NYT, encode ASCII encoding
         if(is_nyt) {
-            out.write_binary(c);
+            m_sym_coder.encode(out, c);
         }
     }
 
-    inline uint8_t decode(BitIStream& in) const {
+    inline uint8_t decode(BitIStream& in) {
         if(m_num_nodes == 1) {
             // first character
-            return in.template read_binary<uint8_t>();
+            return m_sym_coder.template decode<uint8_t>(in);
         } else {        
             node_t* v = m_root;
             while(!v->leaf()) {
@@ -71,7 +74,7 @@ public:
 
             if(v == node(0)) {
                 // NYT
-                return in.template read_binary<uint8_t>();
+                return m_sym_coder.template decode<uint8_t>(in);
             } else {
                 return v->sym;
             }

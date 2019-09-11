@@ -10,17 +10,27 @@
 namespace huff {
 
 // forward dynamic Huffman coding according to [Klein et al., 2019]
-class ForwardCoder : public Huffman52Coder {
+template<typename sym_coder_t, typename freq_coder_t>
+class ForwardCoder : public Huffman52Coder<sym_coder_t, freq_coder_t> {
 private:
-    inline ForwardCoder() : Huffman52Coder() {
+    using Base = Huffman52Coder<sym_coder_t, freq_coder_t>;
+    using node_t = typename Base::node_t;
+
+    using Base::node;
+    using Base::replace;
+    using Base::m_root;
+    using Base::m_leaves;
+    using Base::m_num_nodes;
+
+    inline ForwardCoder() : Base() {
     }
 
 public:
-    inline ForwardCoder(const std::string& s, BitOStream& out) : Huffman52Coder(s, out) {
+    inline ForwardCoder(const std::string& s, BitOStream& out) : Base(s, out) {
         // same as Huffman52
     }
 
-    inline ForwardCoder(BitIStream& in) : Huffman52Coder(in) {
+    inline ForwardCoder(BitIStream& in) : Base(in) {
         // same as Huffman52
     }
 
@@ -32,22 +42,22 @@ public:
         }
     }
 
-    inline void encode(BitOStream& out, uint8_t c) const {
+    inline void encode(BitOStream& out, uint8_t c) {
         if(m_root->leaf()) {
             // only root is left, and it's unique, no need to encode
         } else {
             // same as Huffman52
-            Huffman52Coder::encode(out, c);
+            Base::encode(out, c);
         }
     }
 
-    inline uint8_t decode(BitIStream& in) const {
+    inline uint8_t decode(BitIStream& in) {
         if(m_root->leaf()) {
             // only root is left, report its symbol
             return m_root->sym;
         } else {
             // same as Huffman52
-            return Huffman52Coder::decode(in);
+            return Base::decode(in);
         }
     }
 

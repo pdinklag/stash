@@ -6,8 +6,12 @@
 namespace huff {
 
 // Huffman coder based on [Huffman, 1952]
+template<typename sym_coder_t, typename freq_coder_t>
 class Huffman52Coder : public HuffmanBase {
 protected:
+    sym_coder_t  m_sym_coder;
+    freq_coder_t m_freq_coder;
+
     inline Huffman52Coder() : HuffmanBase() {
         // initialize
         for(size_t c = 0; c < MAX_SYMS; c++) {
@@ -41,8 +45,8 @@ public:
                 assert(q->weight > 0);
                 queue.push(q);
                 
-                out.write_binary(uint8_t(c));
-                out.write_delta(q->weight);
+                m_sym_coder.encode(out, c);
+                m_freq_coder.encode(out, q->weight);
             }
         }
 
@@ -56,8 +60,8 @@ public:
 
         const size_t sigma = in.read_delta<>();
         for(size_t i = 0; i < sigma; i++) {
-            const uint8_t c = in.template read_binary<uint8_t>();
-            const size_t w = in.read_delta();
+            const uint8_t c = m_sym_coder.template decode<uint8_t>(in);
+            const size_t w = m_freq_coder.template decode<>(in);
 
             node_t* q = node(m_num_nodes++);
             *q = node_t { w, 0, nullptr, 0, nullptr, nullptr, c };
@@ -70,7 +74,7 @@ public:
         build_tree(queue);
     }
 
-    inline void encode(BitOStream& out, uint8_t c) const {
+    inline void encode(BitOStream& out, uint8_t c) {
         const node_t* q = m_leaves[c];
         assert(q != nullptr);
 
@@ -88,7 +92,7 @@ public:
         }
     }
 
-    inline uint8_t decode(BitIStream& in) const {
+    inline uint8_t decode(BitIStream& in) {
         node_t* v = m_root;
         while(!v->leaf()) {
             v = in.read_bit() ? v->right : v->left;
