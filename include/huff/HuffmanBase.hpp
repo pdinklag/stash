@@ -12,7 +12,7 @@ namespace huff {
 class HuffmanBase {
 protected:
     static constexpr size_t MAX_SYMS = 256ULL;
-    static constexpr size_t MAX_NODES = 512ULL;
+    static constexpr size_t MAX_NODES = 514ULL; // 2 * 257 (all bytes + NYT)
 
     struct node_t {
         size_t weight;

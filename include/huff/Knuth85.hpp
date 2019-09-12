@@ -132,7 +132,7 @@ private:
         // by the structure of ranks, q is the sibling of NYT
         // if and only if its rank is 1
         if(q->rank == 1) {
-            // identify the leaf of highest rank  with the same weight as q
+            // identify the leaf of highest rank with the same weight as q
             // denote it as u
             const size_t w = q->weight;
             node_t* u = q;
