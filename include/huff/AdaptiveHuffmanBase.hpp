@@ -1,29 +1,28 @@
 #pragma once
 
-#include <vector>
 #include <huff/HuffmanBase.hpp>
+#include <io/BitOStream.hpp>
 
 namespace huff {
 
-// Huffman coder based on [Huffman, 1952]
-template<typename sym_coder_t, typename freq_coder_t>
-class Huffman52Coder : public HuffmanBase {
-private:
-    sym_coder_t  m_sym_coder;
-    freq_coder_t m_freq_coder;
+class AdaptiveHuffmanBase : public HuffmanBase {
+protected:
+    node_t* m_rank_map[MAX_NODES];
 
-    inline Huffman52Coder() : HuffmanBase() {
-        // initialize
-        for(size_t c = 0; c < MAX_SYMS; c++) {
-            m_leaves[c] = nullptr;
-        }
-        m_num_nodes = 0;
+    inline void set_rank(node_t* v, size_t rank, bool initial) {
+        assert(rank < MAX_NODES);
+
+        if(!initial) m_rank_map[v->rank] = nullptr;
+        v->rank = rank;
+        m_rank_map[rank] = v;
     }
 
     // assumes that queue contains all the leaves!
+    // same as Huffman52Coder::build_tree, except we also set the ranks here
     inline void build_tree(prio_queue_t& queue) {
         assert(!queue.empty());
         
+        size_t next_rank = 0;
         const size_t sigma = queue.size();
         for(size_t i = 0; i < sigma - 1; i++) {
             // get the next two nodes from the priority queue
@@ -34,6 +33,10 @@ private:
             if(r->weight < l->weight) {
                 std::swap(l, r);
             }
+            
+            // determine ranks
+            set_rank(l, next_rank++, true);
+            set_rank(r, next_rank++, true);
 
             // create a new node as parent of l and r
             node_t* v = node(m_num_nodes++);
@@ -48,26 +51,26 @@ private:
         }
         
         m_root = queue.top(); queue.pop();
+        set_rank(m_root, next_rank++, true);
         assert(queue.empty());
     }
 
-public:
-    inline Huffman52Coder(const std::string& s, BitOStream& out) : Huffman52Coder() {
-        // build Huffman tree and write histogram
-        auto queue = init_leaves(s);
-        build_tree(queue);
-        encode_histogram(out, m_sym_coder, m_freq_coder);
+    // same as HuffmanBase, but using set_rank
+    inline void replace(node_t* u, node_t* v) {
+        u->parent = v->parent;
+        set_rank(u, v->rank, false);
+        u->bit = v->bit;
+
+        if(u->parent) {
+            if(u->bit) {
+                u->parent->right = u;
+            } else {
+                u->parent->left = u;
+            }
+        }
     }
 
-    inline Huffman52Coder(BitIStream& in) : Huffman52Coder() {
-        // read histogram and build Huffman tree
-        auto queue = decode_histogram(in, m_sym_coder, m_freq_coder);
-        build_tree(queue);
-    }
-
-    inline void encode(BitOStream& out, uint8_t c) {
-        HuffmanBase::encode(out, m_leaves[c]);
-    }
+    using HuffmanBase::HuffmanBase;
 };
 
 }

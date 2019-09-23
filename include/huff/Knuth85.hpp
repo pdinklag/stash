@@ -3,17 +3,17 @@
 #include <utility>
 #include <vector>
 
-#include <huff/HuffmanBase.hpp>
+#include <huff/AdaptiveHuffmanBase.hpp>
 
 namespace huff {
 
 // dynamic (online) Huffman coding according to [Knuth, 1985]
 template<typename sym_coder_t>
-class Knuth85Coder : public HuffmanBase {
+class Knuth85Coder : public AdaptiveHuffmanBase {
 private:
     sym_coder_t m_sym_coder;
 
-    inline Knuth85Coder() : HuffmanBase() {
+    inline Knuth85Coder() : AdaptiveHuffmanBase() {
         // init tree with NYT node
         m_num_nodes = 1;
         m_nodes[0] = node_t{ 0, 0, nullptr, 0, nullptr, nullptr, 0 };
@@ -134,10 +134,14 @@ private:
             // denote it as u
             const size_t w = q->weight;
             node_t* u = q;
-            for(size_t i = 1; i < m_num_nodes; i++) {
-                node_t* x = node(i);
-                if(x->leaf() && x->rank > u->rank && x->weight == w) {
-                    u = x;
+            for(size_t rank = q->rank + 1; rank < MAX_SYMS; rank++) {
+                node_t* x = m_rank_map[rank];
+                if(x) {
+                    if(x->leaf() && x->weight == w) {
+                        u = x;
+                    } else if( x->weight > w) {
+                        break;
+                    }
                 }
             }
 
@@ -161,10 +165,14 @@ private:
             // NYT can always be skipped
             const size_t w = v->weight;
             node_t* u = v;
-            for(size_t i = 1; i < m_num_nodes; i++) {
-                node_t* x = node(i);
-                if(x->rank > u->rank && x->weight == w) {
-                    u = x;
+            for(size_t rank = v->rank + 1; rank < MAX_SYMS; rank++) {
+                node_t* x = m_rank_map[rank];
+                if(x) {
+                    if(x->weight == w) {
+                        u = x;
+                    } else if(x->weight > w) {
+                        break;
+                    }
                 }
             }
 

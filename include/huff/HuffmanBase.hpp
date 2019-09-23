@@ -3,20 +3,22 @@
 #include <cassert>
 #include <queue>
 #include <utility>
+#include <vector>
 
+#include <code/CoderBase.hpp>
 #include <io/BitIStream.hpp>
 #include <io/BitOStream.hpp>
 
 namespace huff {
 
-class HuffmanBase {
+class HuffmanBase : public CoderBase {
 protected:
     static constexpr size_t MAX_SYMS = 256ULL;
     static constexpr size_t MAX_NODES = 514ULL; // 2 * 257 (all bytes + NYT)
 
     struct node_t {
         size_t weight;
-        size_t rank;
+        size_t rank; // only used by adaptive algorithms
         
         node_t* parent;
         bool bit;
@@ -46,6 +48,9 @@ protected:
     node_t* m_leaves[MAX_SYMS];
     node_t* m_root;
 
+    inline HuffmanBase() {
+    }
+
     inline node_t* node(size_t v) {
         return &m_nodes[v];
     }
@@ -54,41 +59,75 @@ protected:
         return &m_nodes[v];
     }
 
-    // assumes that queue contains all the leaves!
-    inline void build_tree(prio_queue_t& queue) {
-        assert(!queue.empty());
-        
-        size_t next_rank = 0;
-        const size_t sigma = queue.size();
-        for(size_t i = 0; i < sigma - 1; i++) {
-            // get the next two nodes from the priority queue
-            node_t* l = queue.top(); queue.pop();
-            node_t* r = queue.top(); queue.pop();
-
-            // make sure l has the smaller weight
-            if(r->weight < l->weight) {
-                std::swap(l, r);
+    inline prio_queue_t init_leaves(const std::string& s) {
+        // init leaves
+        for(uint8_t c : s) {
+            if(m_leaves[c]) {
+                // already seen, increase weight
+                ++m_leaves[c]->weight;
+            } else {
+                // first time this symbol occurs, create leaf
+                node_t* q = node(m_num_nodes++);
+                *q = node_t { 1, 0, nullptr, 0, nullptr, nullptr, c };
+                m_leaves[c] = q;
             }
-            
-            // determine ranks
-            l->rank = next_rank++;  
-            r->rank = next_rank++;
-
-            // create a new node as parent of l and r
-            node_t* v = node(m_num_nodes++);
-            *v = node_t { l->weight + r->weight, 0, nullptr, 0, l, r, 0 };
-            
-            l->parent = v;
-            l->bit = 0;
-            r->parent = v;
-            r->bit = 1;
-
-            queue.push(v);
         }
-        
-        m_root = queue.top(); queue.pop();
-        m_root->rank = next_rank++;
-        assert(queue.empty());
+
+        // insert leaves into priority queue
+        prio_queue_t queue(node_priority_compare_t{});
+        for(size_t c = 0; c < MAX_SYMS; c++) {
+            node_t* q = m_leaves[c];
+            if(q) {
+                assert(q->weight > 0);
+                queue.push(q);
+            }
+        }
+
+        return queue;
+    }
+
+    template<typename sym_coder_t, typename freq_coder_t>
+    inline void encode_histogram(
+        BitOStream& out,
+        sym_coder_t& sym_coder,
+        freq_coder_t& freq_coder) {
+
+        size_t sigma = 0;
+        for(size_t c = 0; c < MAX_SYMS; c++) {
+            if(m_leaves[c]) ++sigma;
+        }
+
+        out.write_delta(sigma);
+        for(size_t c = 0; c < MAX_SYMS; c++) {
+            node_t* q = m_leaves[c];
+            if(q) {
+                sym_coder.encode(out, q->sym);
+                freq_coder.encode(out, q->weight);
+            }
+        }
+    }
+
+    template<typename sym_coder_t, typename freq_coder_t>
+    inline prio_queue_t decode_histogram(
+        BitIStream& in,
+        sym_coder_t& sym_coder,
+        freq_coder_t& freq_coder) {
+
+        //decode histogram, create leaves and fill queue
+        prio_queue_t queue(node_priority_compare_t{});
+
+        const size_t sigma = in.read_delta<>();
+        for(size_t i = 0; i < sigma; i++) {
+            const uint8_t c = sym_coder.template decode<uint8_t>(in);
+            const size_t w = freq_coder.template decode<>(in);
+
+            node_t* q = node(m_num_nodes++);
+            *q = node_t { w, 0, nullptr, 0, nullptr, nullptr, c };
+            m_leaves[c] = q;
+
+            queue.push(q);
+        }
+        return queue;
     }
 
     inline void replace(node_t* u, node_t* v) {
@@ -105,12 +144,27 @@ protected:
         }
     }
 
-    inline HuffmanBase() {
+public:
+    inline void encode(BitOStream& out, node_t* leaf) {
+        assert(leaf);
+        
+        // encode
+        std::vector<bool> bits;
+        for(const node_t* v = leaf; v != m_root; v = v->parent) {
+            bits.push_back(v->bit);
+        }
+
+        for(size_t i = bits.size(); i > 0; i--) {
+            out.write_bit(bits[i-1]);
+        }
     }
 
-public:
-    inline bool eof(BitIStream& in) const {
-        return in.eof();
+    inline uint8_t decode(BitIStream& in) {
+        node_t* v = m_root;
+        while(!v->leaf()) {
+            v = in.read_bit() ? v->right : v->left;
+        }
+        return v->sym;
     }
 };
 

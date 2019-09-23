@@ -3,20 +3,20 @@
 #include <utility>
 #include <vector>
 
-#include <huff/Huffman52.hpp>
+#include <huff/AdaptiveHuffmanBase.hpp>
 
 namespace huff {
 
 // forward dynamic Huffman coding according to [Fruchtman et al., 2019]
 template<typename sym_coder_t, typename freq_coder_t>
-class HybridCoder : public HuffmanBase {
+class HybridCoder : public AdaptiveHuffmanBase {
 private:
     sym_coder_t  m_sym_coder;
     freq_coder_t m_freq_coder;
 
     size_t m_hist[MAX_SYMS];
 
-    inline HybridCoder() : HuffmanBase() {
+    inline HybridCoder() : AdaptiveHuffmanBase() {
         // initialize
         for(size_t c = 0; c < MAX_SYMS; c++) {
             m_leaves[c] = nullptr;
@@ -141,10 +141,14 @@ private:
             node_t* q = p;
             const size_t w = p->weight;
             
-            for(size_t i = 0; i < m_num_nodes; i++) {
-                node_t* x = node(i);
-                if(x->rank < q->rank && x->weight == w) {
-                    q = x;
+            for(size_t rank = p->rank; rank > 0; rank--) {
+                node_t* x = m_rank_map[rank-1];
+                if(x) {
+                    if(x->weight == w) {
+                        q = x;
+                    } else if(x->weight < w) {
+                        break;
+                    }
                 }
             }
 
@@ -175,7 +179,10 @@ private:
 
                 // "delete" p and its parent by setting infinite weights
                 p->weight = SIZE_MAX;
+                m_rank_map[p->rank] = nullptr;
                 parent->weight = SIZE_MAX;
+                m_rank_map[parent->rank] = nullptr;
+                
                 if(p != node(0)) {
                     m_leaves[p->sym] = nullptr;
                 }
@@ -209,6 +216,18 @@ private:
             // or, if it does not exist, a node with minimum weight
             node_t* v = nullptr;
             node_t* min = nullptr;
+            for(size_t rank = 0; rank < MAX_SYMS; rank++) {
+                node_t* x = m_rank_map[rank];
+                if(x) {
+                    if(!min) min = x;
+                    if(x->weight > w) {
+                        break;
+                    } else {
+                        v = x;
+                    }
+                }
+            }
+            
             for(size_t i = 0; i < m_num_nodes; i++) {
                 node_t* x = node(i);
                 if((!v || x->rank > v->rank) && x->weight <= w) {
