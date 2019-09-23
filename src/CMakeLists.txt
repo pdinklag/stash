@@ -7,3 +7,8 @@ add_executable(coding coding.cpp)
 
 target_include_directories(coding PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(coding ${TLX_LIBRARIES})
+
+add_executable(bwt bwt.cpp)
+
+target_include_directories(bwt PUBLIC ${TLX_INCLUDE_DIRS} ${DIVSUFSORT_INCLUDE_DIRS})
+target_link_libraries(bwt ${TLX_LIBRARIES} ${DIVSUFSORT_LIBRARIES})

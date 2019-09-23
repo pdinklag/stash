@@ -19,6 +19,7 @@ else()
     message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 endif()
 
+find_package(Divsufsort)
 find_package(Powercap)
 find_package(TLX)
 
