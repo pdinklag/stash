@@ -50,11 +50,11 @@ int main(int argc, char** argv) {
     divsufsort64(input, sa, n);
 
     // print BWT
-    sauchar_t c;
     for(size_t i = 0; i < n; i++) {
-        c = input[sa[i]];
+        const auto s = sa[i];
+        const auto c = input[s ? s-1 : n-1];
         std::cout << (c ? c : sentinel);
-    }    
+    }
 
     // clean up
     delete[] sa;
