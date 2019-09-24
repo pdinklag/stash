@@ -149,8 +149,8 @@ bool bench(
 
     // print result
     std::cout << "RESULT name=" << name
-        << " n=" << n
         << " status=OK"
+        << " n=" << n
         << " t_construct_bv=" << t_construct_bv
         << " t_construct_rank=" << t_construct_rank
         << " t_rank=" << t_rank
