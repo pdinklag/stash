@@ -18,6 +18,7 @@ private:
     size_t m_max;
     size_t m_block_size;
     size_t m_supblock_size;
+    size_t m_blocks_per_supblock;
 
     int_vector m_blocks;
     int_vector m_supblocks;
@@ -32,6 +33,7 @@ public:
         // construct
         m_block_size    = log_n;
         m_supblock_size = log_n * log_n;
+        m_blocks_per_supblock = log_n;
 
         m_supblocks = int_vector(div_ceil(n, m_supblock_size), log_n);
         m_blocks = int_vector(div_ceil(n, m_block_size), log_n);
@@ -138,7 +140,7 @@ public:
             if(x == 0) return pos;
 
             // block j is the k-th block within the i-th superblock
-            size_t k = j - i * (m_supblock_size / m_block_size);
+            size_t k = j - i * m_blocks_per_supblock;
             if(k > 0) {
                 pos += m_blocks.get(j-1);
                 x   -= k * m_block_size;
@@ -166,7 +168,7 @@ public:
                 block = m_bv->block64(i);
                 s = basic_select(block, x);
                 if(s == SELECT_FAIL) x -= basic_rank(block);
-            } while(s == SELECT_FAIL);
+            };
 
             return pos + s;
         }

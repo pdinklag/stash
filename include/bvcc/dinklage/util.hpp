@@ -24,13 +24,13 @@ inline constexpr uint8_t rank1_u64(uint64_t v) {
 
 // rank on a 64-bit value up to bit x
 inline constexpr uint8_t rank1_u64(uint64_t v, uint8_t x) {
-    return __builtin_popcountll(v & (UINT64_MAX >> (63ULL - x)));
+    return __builtin_popcountll(v & (UINT64_MAX >> (~x & 63ULL))); // 63 - x
 }
 
 // rank on a 64-bit value between a and b
 inline constexpr uint8_t rank1_u64(uint64_t v, uint8_t a, uint8_t b) {
     const uint64_t mask_a = UINT64_MAX << a;
-    const uint64_t mask_b = UINT64_MAX >> (63ULL - b);
+    const uint64_t mask_b = UINT64_MAX >> (~b & 63ULL); // 63 - b
     return __builtin_popcountll(v & mask_a & mask_b);
 }
 
@@ -50,7 +50,7 @@ constexpr uint8_t SELECT_FAIL = 0xFF;
 inline constexpr uint8_t select1_u64(uint64_t v, uint8_t k) {
     uint8_t pos = 0;
     while(v && k && pos < 64) {
-        const size_t z = __builtin_ffsll(v);
+        const size_t z = __builtin_ctzll(v)+1;
         pos += z;
         v >>= z;
         --k;
@@ -67,7 +67,7 @@ inline constexpr uint8_t select1_u64(uint64_t v, uint8_t k) {
 /// \return the position of the k-th 1-bit (LSBF and zero-based),
 ///         or \ref SELECT_FAIL if no such bit exists
 inline constexpr uint8_t select1_u64(uint64_t v, uint8_t l, uint8_t k) {
-    uint8_t pos = select1_u64(v >> l, k);
+    const uint8_t pos = select1_u64(v >> l, k);
     return (pos != SELECT_FAIL) ? (l + pos) : SELECT_FAIL;
 }
 
@@ -81,16 +81,7 @@ inline constexpr uint8_t select1_u64(uint64_t v, uint8_t l, uint8_t k) {
 /// \return the position of the k-th 0-bit (LSBF and zero-based),
 ///         or \ref SELECT_FAIL if no such bit exists
 inline constexpr uint8_t select0_u64(uint64_t v, uint8_t k) {
-    uint8_t pos = 0;
-    while(v) {
-        if(!(v&1)) {
-            if(!--k) return pos;
-        }
-        ++pos;
-        v >>= 1;
-    }
-    pos += k-1;
-    return (pos < 64ULL) ? pos : SELECT_FAIL; //TODO: throw error?
+    return select1_u64(~v, k);
 }
 
 /// \brief Finds the position of the k-th 0-bit in the binary representation
@@ -102,11 +93,5 @@ inline constexpr uint8_t select0_u64(uint64_t v, uint8_t k) {
 /// \return the position of the k-th 0-bit (LSBF and zero-based),
 ///         or \ref SELECT_FAIL if no such bit exists
 inline constexpr uint8_t select0_u64(uint64_t v, uint8_t l, uint8_t k) {
-    uint8_t pos = select0_u64(v >> l, k);
-    if(pos != SELECT_FAIL) {
-        pos += l;
-        return (pos < 64ULL) ? pos : SELECT_FAIL; //TODO: throw error?
-    } else {
-        return SELECT_FAIL; //TODO: throw error?
-    }
+    return select1_u64(~v, l, k);
 }
