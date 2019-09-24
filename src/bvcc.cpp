@@ -34,6 +34,11 @@ namespace bvcc {
         #include <bvcc/dinklage/bit_vector_rank.hpp>
         #include <bvcc/dinklage/bit_vector_select.hpp>
     }
+    namespace naive {
+        #include <bvcc/naive/bit_vector.hpp>
+        #include <bvcc/naive/bit_vector_rank.hpp>
+        #include <bvcc/naive/bit_vector_select.hpp>
+    }
 }
 
 inline bool xassert(const bool b, const std::string& name, const std::string& reason) {
@@ -201,4 +206,8 @@ int main(int argc, char** argv) {
         bvcc::dinklage::bit_vector,
         bvcc::dinklage::bit_vector_rank,
         bvcc::dinklage::bit_vector_select>("dinklage", n, pos);
+    bench<
+        bvcc::naive::bit_vector,
+        bvcc::naive::bit_vector_rank,
+        bvcc::naive::bit_vector_select>("naive", n, pos);
 }
