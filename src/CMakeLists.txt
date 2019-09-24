@@ -27,3 +27,9 @@ add_executable(bvcc bvcc.cpp)
 
 target_include_directories(bvcc PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(bvcc ${TLX_LIBRARIES})
+
+# sandbox
+add_executable(sandbox sandbox.cpp)
+
+target_include_directories(sandbox PUBLIC ${TLX_INCLUDE_DIRS})
+target_link_libraries(sandbox ${TLX_LIBRARIES})

@@ -49,14 +49,13 @@ constexpr uint8_t SELECT_FAIL = 0xFF;
 ///         or \ref SELECT_FAIL if no such bit exists
 inline constexpr uint8_t select1_u64(uint64_t v, uint8_t k) {
     uint8_t pos = 0;
-    while(v) {
-        if(v&1) {
-            if(!--k) return pos;
-        }
-        ++pos;
-        v >>= 1;
+    while(v && k && pos < 64) {
+        const size_t z = __builtin_ffsll(v);
+        pos += z;
+        v >>= z;
+        --k;
     }
-    return SELECT_FAIL; //TODO: throw error?
+    return k ? SELECT_FAIL : pos - 1;
 }
 
 /// \brief Finds the position of the k-th 1-bit in the binary representation
@@ -71,7 +70,6 @@ inline constexpr uint8_t select1_u64(uint64_t v, uint8_t l, uint8_t k) {
     uint8_t pos = select1_u64(v >> l, k);
     return (pos != SELECT_FAIL) ? (l + pos) : SELECT_FAIL;
 }
-
 
 /// \brief Finds the position of the k-th 0-bit in the binary representation
 ///        of the given value.
