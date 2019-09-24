@@ -16,10 +16,6 @@ void malloc_reset() {
     malloc_max = 0;
 }
 
-void malloc_reset_max() {
-    malloc_max = malloc_cur;
-}
-
 void malloc_callback::on_alloc(size_t size) {
     malloc_cur += size;
     malloc_max = std::max(malloc_max, malloc_cur);
