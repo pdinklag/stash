@@ -1,11 +1,12 @@
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <vector>
+
 #include <io/BitIStream.hpp>
 #include <util/MallocCallback.hpp>
 #include <util/FileSize.hpp>
 #include <util/Time.hpp>
-#include <tlx/cmdline_parser.hpp>
 
 size_t malloc_cur = 0;
 size_t malloc_max = 0;
@@ -169,16 +170,12 @@ bool bench(
 
 int main(int argc, char** argv) {
     // params
-    std::string bv_filename;   // required
-
-    {
-        tlx::CmdlineParser cp;
-        cp.add_param_string("bv", bv_filename, "The input bit vector.");
-        
-        if (!cp.process(argc, argv)) {
-            return -1;
-        }
+    if(argc < 2) {
+        std::cerr << "usage: " << argv[0] << " <file>" << std::endl;
+        return -1;
     }
+    
+    std::string bv_filename(argv[1]);
 
     // read input
     std::cout << "Preparing ..." << std::endl;
