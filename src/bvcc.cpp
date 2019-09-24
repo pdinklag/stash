@@ -1,9 +1,32 @@
+#include <algorithm>
 #include <fstream>
 #include <vector>
 #include <io/BitIStream.hpp>
+#include <util/MallocCallback.hpp>
 #include <util/FileSize.hpp>
 #include <util/Time.hpp>
 #include <tlx/cmdline_parser.hpp>
+
+size_t malloc_cur = 0;
+size_t malloc_max = 0;
+
+void malloc_reset() {
+    malloc_cur = 0;
+    malloc_max = 0;
+}
+
+void malloc_reset_max() {
+    malloc_max = malloc_cur;
+}
+
+void malloc_callback::on_alloc(size_t size) {
+    malloc_cur += size;
+    malloc_max = std::max(malloc_max, malloc_cur);
+}
+
+void malloc_callback::on_free(size_t size) {
+    malloc_cur -= size;
+}
 
 namespace bvcc {
     namespace dinklage {
@@ -27,6 +50,7 @@ bool bench(
     const size_t n,
     std::vector<size_t>& pos) {
 
+    malloc_reset();
     uint64_t t0;
 
     // construct bit vector
@@ -36,6 +60,8 @@ bool bench(
         bv.bitset(i, 1);
     }
 
+    const auto m_construct_bv = malloc_max;
+    const auto m_bv = malloc_cur;
     const auto t_construct_bv = time() - t0;
 
     // verify bit vector
@@ -52,10 +78,13 @@ bool bench(
     }
 
     // construct rank
+    malloc_reset();
     t0 = time();
     rank_t r(bv);
 
     const auto t_construct_rank = time() - t0;
+    const auto m_construct_rank = malloc_max;
+    const auto m_rank = malloc_cur;
 
     // verify rank
     {
@@ -85,10 +114,13 @@ bool bench(
     const auto t_rank = time() - t0;
 
     // construct select
+    malloc_reset();
     t0 = time();
     select_t s(bv);
 
     const auto t_construct_select = time() - t0;
+    const auto m_construct_select = malloc_max;
+    const auto m_select = malloc_cur;
 
     // verify select
     {
@@ -111,12 +143,19 @@ bool bench(
 
     // print result
     std::cout << "RESULT name=" << name
+        << " n=" << n
         << " status=OK"
         << " t_construct_bv=" << t_construct_bv
         << " t_construct_rank=" << t_construct_rank
         << " t_rank=" << t_rank
         << " t_construct_select=" << t_construct_select
         << " t_select=" << t_select
+        << " m_construct_bv=" << m_construct_bv
+        << " m_bv=" << m_bv
+        << " m_construct_rank=" << m_construct_rank
+        << " m_rank=" << m_rank
+        << " m_construct_select=" << m_construct_select
+        << " m_select=" << m_select
         << " rsum=" << rsum
         << " ssum=" << ssum
         << std::endl;

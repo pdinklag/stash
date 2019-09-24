@@ -23,7 +23,7 @@ target_include_directories(runs PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(runs ${TLX_LIBRARIES})
 
 # bvcc
-add_executable(bvcc bvcc.cpp)
+add_executable(bvcc bvcc.cpp malloc.cpp)
 
 target_include_directories(bvcc PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(bvcc ${TLX_LIBRARIES})
