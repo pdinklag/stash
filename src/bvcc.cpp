@@ -8,6 +8,19 @@
 #include <util/FileSize.hpp>
 #include <util/Time.hpp>
 
+namespace bvcc {
+    namespace naive {
+        #include <bvcc/naive/bit_vector.hpp>
+        #include <bvcc/naive/bit_vector_rank.hpp>
+        #include <bvcc/naive/bit_vector_select.hpp>
+    }
+    namespace dinklage {
+        #include <bvcc/dinklage/bit_vector.hpp>
+        #include <bvcc/dinklage/bit_vector_rank.hpp>
+        #include <bvcc/dinklage/bit_vector_select.hpp>
+    }
+}
+
 size_t malloc_cur = 0;
 size_t malloc_max = 0;
 
@@ -23,19 +36,6 @@ void malloc_callback::on_alloc(size_t size) {
 
 void malloc_callback::on_free(size_t size) {
     malloc_cur -= size;
-}
-
-namespace bvcc {
-    namespace dinklage {
-        #include <bvcc/dinklage/bit_vector.hpp>
-        #include <bvcc/dinklage/bit_vector_rank.hpp>
-        #include <bvcc/dinklage/bit_vector_select.hpp>
-    }
-    namespace naive {
-        #include <bvcc/naive/bit_vector.hpp>
-        #include <bvcc/naive/bit_vector_rank.hpp>
-        #include <bvcc/naive/bit_vector_select.hpp>
-    }
 }
 
 inline bool xassert(const bool b, const std::string& name, const std::string& reason) {
@@ -164,29 +164,30 @@ bool bench(
     return true;
 }
 
+#define BENCH(name) \
+    bench< \
+        bvcc::name::bit_vector, \
+        bvcc::name::bit_vector_rank, \
+        bvcc::name::bit_vector_select>(#name, n, pos); \
+
 int main(int argc, char** argv) {
     // params
     if(argc < 2) {
         std::cerr << "usage: " << argv[0] << " <file>" << std::endl;
         return -1;
     }
-    
-    std::string bv_filename(argv[1]);
 
     // read input
     std::cout << "Preparing ..." << std::endl;
     std::vector<size_t> pos;
     
-    // read bits
     size_t n;
     {
         size_t i = 0;
-        std::ifstream ins(bv_filename);
+        std::ifstream ins(argv[1]);
         BitIStream in(ins);
         while(!in.eof()) {
-            if(in.read_bit()) {
-                pos.push_back(i);
-            }
+            if(in.read_bit()) pos.push_back(i);
             ++i;
         }
         n = i;
@@ -195,12 +196,6 @@ int main(int argc, char** argv) {
     std::cout << "Input: n=" << n << ", " << pos.size() << " bits set" << std::endl;
 
     // run benchmarks
-    bench<
-        bvcc::dinklage::bit_vector,
-        bvcc::dinklage::bit_vector_rank,
-        bvcc::dinklage::bit_vector_select>("dinklage", n, pos);
-    bench<
-        bvcc::naive::bit_vector,
-        bvcc::naive::bit_vector_rank,
-        bvcc::naive::bit_vector_select>("naive", n, pos);
+    BENCH(naive);
+    BENCH(dinklage);
 }
