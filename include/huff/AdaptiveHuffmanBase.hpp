@@ -21,7 +21,7 @@ protected:
     // same as Huffman52Coder::build_tree, except we also set the ranks here
     inline void build_tree(prio_queue_t& queue) {
         assert(!queue.empty());
-        
+
         size_t next_rank = 0;
         const size_t sigma = queue.size();
         for(size_t i = 0; i < sigma - 1; i++) {
@@ -33,7 +33,7 @@ protected:
             if(r->weight < l->weight) {
                 std::swap(l, r);
             }
-            
+
             // determine ranks
             set_rank(l, next_rank++, true);
             set_rank(r, next_rank++, true);
@@ -41,7 +41,7 @@ protected:
             // create a new node as parent of l and r
             node_t* v = node(m_num_nodes++);
             *v = node_t { l->weight + r->weight, 0, nullptr, 0, l, r, 0 };
-            
+
             l->parent = v;
             l->bit = 0;
             r->parent = v;
@@ -49,7 +49,7 @@ protected:
 
             queue.push(v);
         }
-        
+
         m_root = queue.top(); queue.pop();
         set_rank(m_root, next_rank++, true);
         assert(queue.empty());

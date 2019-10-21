@@ -19,7 +19,7 @@ protected:
     struct node_t {
         size_t weight;
         size_t rank; // only used by adaptive algorithms
-        
+
         node_t* parent;
         bool bit;
 
@@ -44,7 +44,7 @@ protected:
 
     node_t m_nodes[MAX_NODES];
     size_t m_num_nodes;
-    
+
     node_t* m_leaves[MAX_SYMS];
     node_t* m_root;
 
@@ -52,10 +52,12 @@ protected:
     }
 
     inline node_t* node(size_t v) {
+        assert(v < MAX_NODES);
         return &m_nodes[v];
     }
 
     inline const node_t* node(size_t v) const {
+        assert(v < MAX_NODES);
         return &m_nodes[v];
     }
 
@@ -147,7 +149,7 @@ protected:
 public:
     inline void encode(BitOStream& out, node_t* leaf) {
         assert(leaf);
-        
+
         // encode
         std::vector<bool> bits;
         for(const node_t* v = leaf; v != m_root; v = v->parent) {

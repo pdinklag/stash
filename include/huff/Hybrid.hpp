@@ -46,7 +46,7 @@ public:
     inline HybridCoder(BitIStream& in) : HybridCoder() {
         // read sigma
         const size_t sigma = m_freq_coder.template decode<>(in);
-        
+
         // init tree with NYT node
         m_num_nodes = 1;
         m_nodes[0] = node_t{ sigma, 0, nullptr, 0, nullptr, nullptr, 0 };
@@ -134,13 +134,13 @@ public:
 private:
     inline void decrease(node_t* leaf) {
         assert(leaf->leaf());
-        
+
         // practically the same as Forward::update
         for(node_t* p = leaf; p; p = p->parent) {
             // find lowest ranked node with same weight as p
             node_t* q = p;
             const size_t w = p->weight;
-            
+
             for(size_t rank = p->rank; rank > 0; rank--) {
                 node_t* x = m_rank_map[rank-1];
                 if(x) {
@@ -154,7 +154,7 @@ private:
 
             if(p != q) {
                 assert(q != m_root);
-                
+
                 // interchange p and q
                 node_t temp_q = *q;
                 replace(q, p);
@@ -182,7 +182,7 @@ private:
                 m_rank_map[p->rank] = nullptr;
                 parent->weight = SIZE_MAX;
                 m_rank_map[parent->rank] = nullptr;
-                
+
                 if(p != node(0)) {
                     m_leaves[p->sym] = nullptr;
                 }
@@ -227,7 +227,7 @@ private:
                     }
                 }
             }
-            
+
             for(size_t i = 0; i < m_num_nodes; i++) {
                 node_t* x = node(i);
                 if((!v || x->rank > v->rank) && x->weight <= w) {
@@ -236,9 +236,17 @@ private:
 
                 if(!min || x->weight < min->weight) min = x;
             }
-            
+
             if(!v) v = min;
             assert(v); // there must be at least NYT
+
+            // increase ranks of nodes with rank > v->rank by two
+            // (we will insert nodes with ranks v->rank+1 and v->rank+2)
+            for(size_t i = 0; i < m_num_nodes; i++) {
+                node_t* x = node(i);
+                if(x->rank > v->rank) set_rank(x, x->rank + 2, false);
+                assert(x->rank < MAX_NODES);
+            }
 
             // create a new leaf q for c
             node_t* q = node(m_num_nodes++);
@@ -248,7 +256,12 @@ private:
             // with left child v (so ranks remain) and right child the new leaf
             node_t* u = node(m_num_nodes++);
             *u = node_t { v->weight+w, v->rank+2, v->parent, v->bit, v, q, 0 };
-                
+
+            // properly assign rank
+            assert(u->rank < MAX_NODES);
+            assert(m_rank_map[u->rank] == nullptr);
+            set_rank(u, u->rank, true);
+
             if(v->parent) {
                 if(v->bit) {
                     v->parent->right = u;
@@ -267,11 +280,10 @@ private:
             // init leaf
             *q = node_t { w, v->rank+1, u, 1, nullptr, nullptr, c };
 
-            // increase ranks of nodes with rank > v->rank
-            for(size_t i = 0; i < m_num_nodes; i++) {
-                node_t* x = node(i);
-                if(x->rank > v->rank) x->rank += 2;
-            }
+            // properly assign rank
+            assert(q->rank < MAX_NODES);
+            assert(m_rank_map[q->rank] == nullptr);
+            set_rank(q, q->rank, true);
 
             // increase weights up
             for(v = u->parent; v; v = v->parent) {
