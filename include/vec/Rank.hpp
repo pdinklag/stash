@@ -1,10 +1,9 @@
 #pragma once
 
-#include <vector>
-#include "bit_vector.hpp"
-#include "int_vector.hpp"
+#include <vec/BitVector.hpp>
+#include <vec/IntVector.hpp>
 
-class bit_vector_rank {
+class Rank {
 private:
     static constexpr size_t SUP_SZ = 4096;
     static constexpr size_t SUP_MSK = 4095;
@@ -13,13 +12,13 @@ private:
     static constexpr size_t BLOCKS_PER_SB = SUP_SZ >> 6ULL;
     static constexpr size_t SB_INNER_RS = SUP_W - 6ULL;
         
-    const bit_vector* m_bv;
+    const BitVector* m_bv;
 
-    int_vector m_blocks;    // size 64 each
-    int_vector m_supblocks; // size SUP_SZ each
+    IntVector m_blocks;    // size 64 each
+    IntVector m_supblocks; // size SUP_SZ each
 
 public:
-    inline bit_vector_rank(const bit_vector& bv) : m_bv(&bv) {
+    inline Rank(const BitVector& bv) : m_bv(&bv) {
         const size_t n = m_bv->size();
 
         // determine number of superblocks and superblock entry width
@@ -43,7 +42,7 @@ public:
                 size_t i = j >> SB_INNER_RS;
                 if(i > cur_sb) {
                     // we reached a new superblock
-                    m_supblocks.set(cur_sb, rank_bv);
+                    m_supblocks[cur_sb] = rank_bv;
                     rank_sb = 0;
                     cur_sb = i;
                 }
@@ -52,7 +51,7 @@ public:
                 rank_sb += rank_b;
                 rank_bv += rank_b;
 
-                m_blocks.set(j, rank_sb);
+                m_blocks[j] = rank_sb;
             }
         }
     }
@@ -60,14 +59,18 @@ public:
     inline size_t rank1(const size_t x) const {
         size_t r = 0;
         const size_t i = x >> SUP_W;
-        if(i > 0) r += m_supblocks.get(i - 1);
+        if(i > 0) r += m_supblocks[i - 1];
         const size_t j = x >> 6ULL;
 
         const size_t k = j - i * BLOCKS_PER_SB;
-        if(k > 0) r += m_blocks.get(j - 1);
+        if(k > 0) r += m_blocks[j - 1];
 
         r += rank1_u64(m_bv->block64(j), x & 63ULL);
         return r;
+    }
+
+    inline size_t operator()(size_t i) const {
+        return rank1(i);
     }
 
     inline size_t rank0(size_t x) const {

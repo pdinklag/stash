@@ -3,46 +3,12 @@
 #include <vector>
 #include "util.hpp"
 
-class int_vector {
+class IntVector {
 private:
     size_t m_size;
     size_t m_width;
     size_t m_mask;
     std::vector<uint64_t> m_data;
-
-public:
-    inline int_vector() {
-        m_size = 0;
-        m_width = 0;
-        m_mask = 0;
-    }
-
-    inline int_vector(size_t size, size_t width) {
-        resize(size, width);
-    }
-
-    inline void resize(size_t size, size_t width) {
-        m_size = size;
-        m_width = width;
-        m_mask = bit_mask(width);
-        
-        const size_t bits = m_size * m_width;
-        const size_t q = bits >> 6ULL; // divide by 64
-        const size_t k = bits & 63ULL; // mod 64
-        m_data.resize(k ? q + 1 : q);
-    }
-
-    inline void rebuild(size_t size, size_t width) {
-        int_vector new_iv(size, width);
-        for(size_t i = 0; i < size; i++) {
-            new_iv.set(i, get(i));
-        }
-        
-        m_size = new_iv.m_size;
-        m_width = new_iv.m_width;
-        m_mask = new_iv.m_mask;
-        m_data = std::move(new_iv.m_data);
-    }
 
     inline void set(size_t i, uint64_t v) {
         v &= m_mask; // make sure it fits...
@@ -101,6 +67,61 @@ public:
             const size_t dl = j & 63ULL;
             return (m_data[a] >> dl) & m_mask;
         }
+    }
+
+public:
+    struct Ref {
+        IntVector* iv;
+        size_t i;
+
+        inline operator uint64_t() const {
+            return iv->get(i);
+        }
+
+        inline void operator=(uint64_t v) {
+            iv->set(i, v);
+        }
+    };
+
+    inline IntVector() {
+        m_size = 0;
+        m_width = 0;
+        m_mask = 0;
+    }
+
+    inline IntVector(size_t size, size_t width) {
+        resize(size, width);
+    }
+
+    inline void resize(size_t size, size_t width) {
+        m_size = size;
+        m_width = width;
+        m_mask = bit_mask(width);
+        
+        const size_t bits = m_size * m_width;
+        const size_t q = bits >> 6ULL; // divide by 64
+        const size_t k = bits & 63ULL; // mod 64
+        m_data.resize(k ? q + 1 : q);
+    }
+
+    inline void rebuild(size_t size, size_t width) {
+        IntVector new_iv(size, width);
+        for(size_t i = 0; i < size; i++) {
+            new_iv.set(i, get(i));
+        }
+        
+        m_size = new_iv.m_size;
+        m_width = new_iv.m_width;
+        m_mask = new_iv.m_mask;
+        m_data = std::move(new_iv.m_data);
+    }
+
+    inline uint64_t operator[](size_t i) const {
+        return get(i);
+    }
+
+    inline Ref operator[](size_t i) {
+        return Ref { this, i };
     }
 
     inline size_t size() const {

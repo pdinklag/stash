@@ -1,11 +1,10 @@
 #pragma once
 
-#include <vector>
-#include "bit_vector.hpp"
-#include "int_vector.hpp"
+#include <vec/BitVector.hpp>
+#include <vec/IntVector.hpp>
 
 template<bool m_bit>
-class bv_select_ds {
+class Select {
 private:
     static constexpr uint8_t basic_rank(uint64_t v);
     static constexpr uint8_t basic_rank(uint64_t v, uint8_t x);
@@ -13,18 +12,18 @@ private:
     static constexpr uint8_t basic_select(uint64_t v, uint8_t k);
     static constexpr uint8_t basic_select(uint64_t v, uint8_t l, uint8_t k);
 
-    const bit_vector* m_bv;
+    const BitVector* m_bv;
 
     size_t m_max;
     size_t m_block_size;
     size_t m_supblock_size;
     size_t m_blocks_per_supblock;
 
-    int_vector m_blocks;
-    int_vector m_supblocks;
+    IntVector m_blocks;
+    IntVector m_supblocks;
 
 public:
-    bv_select_ds(const bit_vector& bv) {
+    Select(const BitVector& bv) {
         m_bv = &bv;
 
         const size_t n = bv.size();
@@ -35,8 +34,8 @@ public:
         m_supblock_size = log_n * log_n;
         m_blocks_per_supblock = log_n;
 
-        m_supblocks = int_vector(div_ceil(n, m_supblock_size), log_n);
-        m_blocks = int_vector(div_ceil(n, m_block_size), log_n);
+        m_supblocks = IntVector(div_ceil(n, m_supblock_size), log_n);
+        m_blocks = IntVector(div_ceil(n, m_block_size), log_n);
 
         m_max = 0;
         size_t r_sb = 0; // current bit count in superblock
@@ -95,12 +94,12 @@ public:
                         longest_sb = std::max(longest_sb, pos - cur_sb_offset);
                         cur_sb_offset = pos;
 
-                        m_supblocks.set(cur_sb++, pos);
+                        m_supblocks[cur_sb++] = pos;
 
                         r_sb -= m_supblock_size;
                     }
 
-                    m_blocks.set(cur_b++, pos - cur_sb_offset);
+                    m_blocks[cur_b++] = pos - cur_sb_offset;
                     r_b -= m_block_size;
                     distance_b = m_block_size;
 
@@ -134,7 +133,7 @@ public:
             const size_t j = x / m_block_size;
 
             if(i > 0) {
-                pos += m_supblocks.get(i-1);
+                pos += m_supblocks[i-1];
                 x -= i * m_supblock_size;
             }
             if(x == 0) return pos;
@@ -142,7 +141,7 @@ public:
             // block j is the k-th block within the i-th superblock
             size_t k = j - i * m_blocks_per_supblock;
             if(k > 0) {
-                pos += m_blocks.get(j-1);
+                pos += m_blocks[j-1];
                 x   -= k * m_block_size;
             }
             if(x == 0) return pos;
@@ -173,73 +172,61 @@ public:
             return pos + s;
         }
     }
+
+    inline size_t operator()(size_t x) const {
+        return select(x);
+    }
 };
 
 template<>
-inline constexpr uint8_t bv_select_ds<0>::basic_rank(uint64_t v) {
+inline constexpr uint8_t Select<0>::basic_rank(uint64_t v) {
     return 64ULL - rank1_u64(v);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<0>::basic_rank(uint64_t v, uint8_t x) {
+inline constexpr uint8_t Select<0>::basic_rank(uint64_t v, uint8_t x) {
     return x + 1 - rank1_u64(v, x);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<0>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
+inline constexpr uint8_t Select<0>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
     return (b-a+1) - rank1_u64(v, a, b);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<0>::basic_select(uint64_t v, uint8_t k) {
+inline constexpr uint8_t Select<0>::basic_select(uint64_t v, uint8_t k) {
     return select0_u64(v, k);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<0>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
+inline constexpr uint8_t Select<0>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
     return select0_u64(v, l, k);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<1>::basic_rank(uint64_t v) {
+inline constexpr uint8_t Select<1>::basic_rank(uint64_t v) {
     return rank1_u64(v);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<1>::basic_rank(uint64_t v, uint8_t x) {
+inline constexpr uint8_t Select<1>::basic_rank(uint64_t v, uint8_t x) {
     return rank1_u64(v, x);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<1>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
+inline constexpr uint8_t Select<1>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
     return rank1_u64(v, a, b);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<1>::basic_select(uint64_t v, uint8_t k) {
+inline constexpr uint8_t Select<1>::basic_select(uint64_t v, uint8_t k) {
     return select1_u64(v, k);
 }
 
 template<>
-inline constexpr uint8_t bv_select_ds<1>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
+inline constexpr uint8_t Select<1>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
     return select1_u64(v, l, k);
 }
 
-class bit_vector_select {
-private:
-    bv_select_ds<0> m_select0;
-    bv_select_ds<1> m_select1;
-
-public:
-    inline bit_vector_select(const bit_vector& bv)
-        : m_select0(bv), m_select1(bv) {
-    }
-
-    inline size_t select1(size_t k) const {
-        return m_select1.select(k);
-    }
-
-    inline size_t select0(size_t k) const {
-        return m_select0.select(k);
-    }
-};
+using Select0 = Select<0>;
+using Select1 = Select<1>;
