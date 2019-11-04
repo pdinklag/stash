@@ -29,11 +29,13 @@ void test(const std::string& input, const std::string& filename, bool verify) {
         std::string mtf_code;
         {
             std::ostringstream mtf_ss;
-            BitOStream out(mtf_ss);
-            std::cout << "# encoding with MTF ..." << std::endl;
-            
-            encode<mtf_coder_t>(input, out);
-            bits_written = out.bits_written();
+            {
+                BitOStream out(mtf_ss);
+                std::cout << "# encoding with MTF ..." << std::endl;
+                
+                encode<mtf_coder_t>(input, out);
+                bits_written = out.bits_written();
+            }
             mtf_code = mtf_ss.str();
         }
         
@@ -73,12 +75,6 @@ void test(const std::string& input, const std::string& filename, bool verify) {
 
             std::cout << "# checking ..." << std::endl;
             success = (dec == input);
-
-            if(!success) {
-                std::cerr << "# verification failed" << std::endl;
-                std::cerr << "#     input: " << input << std::endl;
-                std::cerr << "#    output: " << dec << std::endl;
-            }
         }
     } else {
         success = true;
