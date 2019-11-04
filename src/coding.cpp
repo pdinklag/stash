@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
                      std::istreambuf_iterator<char>());
     }
     
-    test<ASCIICoder>(text, outfile_prefix + "ascii", verify);
+    //test<ASCIICoder>(text, outfile_prefix + "ascii", verify);
     test<huff::Huffman52Coder<ASCIICoder, DeltaCoder>>(text, outfile_prefix + "huff52", verify);
     //test<huff::Knuth85Coder<ASCIICoder>>(text, outfile_prefix + "knuth85", verify);
     test<huff::ForwardCoder<ASCIICoder, DeltaCoder>>(text, outfile_prefix + "fwd", verify);
