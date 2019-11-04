@@ -17,6 +17,8 @@
 #include <huff/Forward.hpp>
 #include <huff/Hybrid.hpp>
 
+#include <util/Time.hpp>
+
 using mtf_coder_t = MTFCoder<ASCIICoder, ASCIICoder, BinaryCoder<>>;
 
 template<typename coder_t>
@@ -24,6 +26,7 @@ void test(const std::string& input, const std::string& filename, bool verify) {
     std::cout << "# " << filename << " ..." << std::endl;
     
     // encode using MTF first
+    uint64_t encode_time;
     size_t bits_written;
     {
         std::string mtf_code;
@@ -31,7 +34,7 @@ void test(const std::string& input, const std::string& filename, bool verify) {
             std::ostringstream mtf_ss;
             {
                 BitOStream out(mtf_ss);
-                std::cout << "# encoding with MTF ..." << std::endl;
+                std::cout << "# encoding MTF ..." << std::endl;
                 
                 encode<mtf_coder_t>(input, out);
                 bits_written = out.bits_written();
@@ -40,14 +43,16 @@ void test(const std::string& input, const std::string& filename, bool verify) {
         }
         
         // encode using given coder
+        auto t0 = time();
         {
             std::ofstream f(filename);
             BitOStream out(f);
 
-            std::cout << "# encoding file ..." << std::endl;
+            std::cout << "# encoding " << filename << "..." << std::endl;
             encode<coder_t>(mtf_code, out);
             bits_written = out.bits_written();
         }
+        encode_time = time() - t0;
     }
 
     bool success;
@@ -59,7 +64,7 @@ void test(const std::string& input, const std::string& filename, bool verify) {
                 std::ifstream f(filename);
                 BitIStream in(f);
 
-                std::cout << "# decoding file ..." << std::endl;
+                std::cout << "# decoding " << filename << " ..." << std::endl;
                 mtf_dec = decode<coder_t>(in);
             }
 
@@ -69,7 +74,7 @@ void test(const std::string& input, const std::string& filename, bool verify) {
                 std::istringstream ss(mtf_dec);
                 BitIStream in(ss);
 
-                std::cout << "# decoding with MTF ..." << std::endl;
+                std::cout << "# decoding MTF ..." << std::endl;
                 dec = decode<mtf_coder_t>(in);
             }
 
@@ -83,6 +88,7 @@ void test(const std::string& input, const std::string& filename, bool verify) {
     std::cout << "RESULT algo=" << filename
         << ", in=" << 8 * input.length()
         << ", out=" << bits_written
+        << ", time=" << encode_time
         << ", rate=" << double(bits_written) / double(8 * input.length())
         << ", success=" << success
         << std::endl;
@@ -93,6 +99,9 @@ int main(int argc, char** argv) {
 
     std::string input_filename;
     cp.add_param_string("file", input_filename, "The input file.");
+
+    std::string outfile_prefix = "";
+    cp.add_string('d', "dir", outfile_prefix, "The output directory.");
 
     bool verify = false;
     cp.add_flag("verify", verify, "Decode and verify.");
@@ -112,9 +121,9 @@ int main(int argc, char** argv) {
                      std::istreambuf_iterator<char>());
     }
     
-    test<ASCIICoder>(text, "ascii", verify);
-    test<huff::Huffman52Coder<ASCIICoder, DeltaCoder>>(text, "huff52", verify);
-    test<huff::Knuth85Coder<ASCIICoder>>(text, "knuth85", verify);
-    test<huff::ForwardCoder<ASCIICoder, DeltaCoder>>(text, "fwd", verify);
-    test<huff::HybridCoder<ASCIICoder, DeltaCoder>>(text, "hybrid", verify);
+    test<ASCIICoder>(text, outfile_prefix + "ascii", verify);
+    test<huff::Huffman52Coder<ASCIICoder, DeltaCoder>>(text, outfile_prefix + "huff52", verify);
+    //test<huff::Knuth85Coder<ASCIICoder>>(text, outfile_prefix + "knuth85", verify);
+    test<huff::ForwardCoder<ASCIICoder, DeltaCoder>>(text, outfile_prefix + "fwd", verify);
+    test<huff::HybridCoder<ASCIICoder, DeltaCoder>>(text, outfile_prefix + "hybrid", verify);
 }
