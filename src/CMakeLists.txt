@@ -22,6 +22,12 @@ add_executable(runs runs.cpp)
 target_include_directories(runs PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(runs ${TLX_LIBRARIES})
 
+# pred
+add_executable(pred pred.cpp)
+
+target_include_directories(pred PUBLIC ${TLX_INCLUDE_DIRS})
+target_link_libraries(pred ${TLX_LIBRARIES})
+
 # sandbox
 add_executable(sandbox sandbox.cpp)
 
