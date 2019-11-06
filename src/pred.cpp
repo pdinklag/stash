@@ -8,6 +8,7 @@
 #include <pred/BinSearch.hpp>
 #include <pred/RankSelect.hpp>
 
+#include <io/LoadFile.hpp>
 #include <util/MallocCallback.hpp>
 #include <util/Time.hpp>
 #include <util/UintTypes.hpp>
@@ -82,9 +83,9 @@ TestResult test(
 int main(int argc, char** argv) {
     tlx::CmdlineParser cp;
 
-    //std::string input_filename;
-    //cp.add_param_string("file", input_filename, "The input file.");
-
+    std::string input_filename;
+    cp.add_param_string("file", input_filename, "The input file.");
+    
     size_t num_queries = 10'000'000ULL;
     cp.add_size_t('q', "queries", num_queries, "The number of queries to perform.");
 
@@ -110,8 +111,7 @@ int main(int argc, char** argv) {
     auto queries = generate_queries(num_queries, universe);
 
     // test
-    std::vector<value_t> array = { 2, 4, 5, 7, 11, 12, 15, 18, 19, 22, 24, 28, 31, 35, 37, 42 };
-
+    auto array = load_file_as_vector<value_t>(input_filename);
     print_result("binary_search", test<BinSearch>(array, queries));
     print_result("rank",          test<RankSelect>(array, queries));
 }

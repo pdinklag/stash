@@ -17,6 +17,7 @@
 #include <huff/Forward.hpp>
 #include <huff/Hybrid.hpp>
 
+#include <io/LoadFile.hpp>
 #include <util/Time.hpp>
 
 using mtf_coder_t = MTFCoder<ASCIICoder, ASCIICoder, BinaryCoder<>>;
@@ -110,17 +111,8 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    std::string text;
-    {
-        std::ifstream f(input_filename);
-        f.seekg(0, std::ios::end);   
-        text.reserve(f.tellg());
-        f.seekg(0, std::ios::beg);
+    auto text = load_file_as_string(input_filename);
 
-        text.assign((std::istreambuf_iterator<char>(f)),
-                     std::istreambuf_iterator<char>());
-    }
-    
     //test<ASCIICoder>(text, outfile_prefix + "ascii", verify);
     test<huff::Huffman52Coder<ASCIICoder, DeltaCoder>>(text, outfile_prefix + "huff52", verify);
     //test<huff::Knuth85Coder<ASCIICoder>>(text, outfile_prefix + "knuth85", verify);
