@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include <vec/BitVector.hpp>
 #include <vec/IntVector.hpp>
 
@@ -54,6 +56,31 @@ public:
                 m_blocks[j] = rank_sb;
             }
         }
+    }
+
+    inline Rank() : m_bv(nullptr) {
+    }
+
+    inline Rank(const Rank& other) {
+        *this = other;
+    }
+
+    inline Rank(Rank&& other) {
+        *this = std::move(other);
+    }
+
+    inline Rank& operator=(const Rank& other) {
+        m_bv = other.m_bv;
+        m_blocks = other.m_blocks;
+        m_supblocks = other.m_supblocks;
+        return *this;
+    }
+
+    inline Rank& operator=(Rank&& other) {
+        m_bv = other.m_bv;
+        m_blocks = std::move(other.m_blocks);
+        m_supblocks = std::move(other.m_supblocks);
+        return *this;
     }
 
     inline size_t rank1(const size_t x) const {

@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <utility>
 
 class BitVector {
 private:
@@ -50,10 +51,33 @@ public:
         }
     };
 
+    inline BitVector() : m_size(0) {
+    }
+
+    inline BitVector(const BitVector& other) {
+        *this = other;
+    }
+
+    inline BitVector(BitVector&& other) {
+        *this = std::move(other);
+    }
+
     inline BitVector(size_t size) : m_size(size) {
         const size_t q = block(size);
         const size_t k = offset(size);
         m_bits.resize(k ? q+1 : q);
+    }
+
+    inline BitVector& operator=(const BitVector& other) {
+        m_size = other.m_size;
+        m_bits = other.m_bits;
+        return *this;
+    }
+
+    inline BitVector& operator=(BitVector&& other) {
+        m_size = std::move(other.m_size);
+        m_bits = std::move(other.m_bits);
+        return *this;
     }
 
     inline uint64_t block64(size_t i) const {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include <vec/BitVector.hpp>
 #include <vec/IntVector.hpp>
 
@@ -23,7 +25,7 @@ private:
     IntVector m_supblocks;
 
 public:
-    Select(const BitVector& bv) {
+    inline Select(const BitVector& bv) {
         m_bv = &bv;
 
         const size_t n = bv.size();
@@ -119,6 +121,44 @@ public:
 
         m_supblocks.rebuild(cur_sb, log_n);
         m_blocks.rebuild(cur_b, w_block);
+    }
+
+    inline Select()
+        : m_bv(nullptr),
+          m_max(0),
+          m_block_size(0),
+          m_supblock_size(0),
+          m_blocks_per_supblock(0) {
+    }
+
+    inline Select(const Select& other) {
+        *this = other;
+    }
+
+    inline Select(Select&& other) {
+        *this = std::move(other);
+    }
+
+    inline Select& operator=(const Select& other) {
+        m_bv = other.m_bv;
+        m_max = other.m_max;
+        m_block_size = other.m_block_size;
+        m_supblock_size = other.m_supblock_size;
+        m_blocks_per_supblock = other.m_blocks_per_supblock;
+        m_blocks = other.m_blocks;
+        m_supblocks = other.m_supblocks;
+        return *this;
+    }
+
+    inline Select& operator=(Select&& other) {
+        m_bv = other.m_bv;
+        m_max = other.m_max;
+        m_block_size = other.m_block_size;
+        m_supblock_size = other.m_supblock_size;
+        m_blocks_per_supblock = other.m_blocks_per_supblock;
+        m_blocks = std::move(other.m_blocks);
+        m_supblocks = std::move(other.m_supblocks);
+        return *this;
     }
 
     inline size_t select(size_t x) const {

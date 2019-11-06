@@ -1,7 +1,9 @@
 #pragma once
     
 #include <vector>
-#include "util.hpp"
+#include <utility>
+
+#include <vec/util.hpp>
 
 class IntVector {
 private:
@@ -83,14 +85,35 @@ public:
         }
     };
 
-    inline IntVector() {
-        m_size = 0;
-        m_width = 0;
-        m_mask = 0;
+    inline IntVector() : m_size(0), m_width(0), m_mask(0) {
+    }
+
+    inline IntVector(const IntVector& other) {
+        *this = other;
+    }
+
+    inline IntVector(IntVector&& other) {
+        *this = std::move(other);
     }
 
     inline IntVector(size_t size, size_t width) {
         resize(size, width);
+    }
+
+    inline IntVector& operator=(const IntVector& other) {
+        m_size = other.m_size;
+        m_width = other.m_width;
+        m_mask = other.m_mask;
+        m_data = other.m_data;
+        return *this;
+    }
+
+    inline IntVector& operator=(IntVector&& other) {
+        m_size = other.m_size;
+        m_width = other.m_width;
+        m_mask = other.m_mask;
+        m_data = std::move(other.m_data);
+        return *this;
     }
 
     inline void resize(size_t size, size_t width) {
