@@ -134,16 +134,18 @@ int main(int argc, char** argv) {
     print_result("2_binary_search*<64>", test<TwoLevelBinSearch<64ULL>>(array, queries));
     print_result("2_binary_search*<128>", test<TwoLevelBinSearch<128ULL>>(array, queries));
     print_result("2_binary_search*<256>", test<TwoLevelBinSearch<256ULL>>(array, queries));
-    print_result("2_binary_search*<384>", test<TwoLevelBinSearch<384ULL>>(array, queries));
     print_result("2_binary_search*<512>", test<TwoLevelBinSearch<512ULL>>(array, queries));
-    print_result("2_binary_search*<768>", test<TwoLevelBinSearch<768ULL>>(array, queries));
     print_result("2_binary_search*<1024>", test<TwoLevelBinSearch<1024ULL>>(array, queries));
+    print_result("2_binary_search*<2048>", test<TwoLevelBinSearch<2048ULL>>(array, queries));
+    print_result("2_binary_search*<4096>", test<TwoLevelBinSearch<4096ULL>>(array, queries));
+    print_result("2_binary_search*<8192>", test<TwoLevelBinSearch<8192ULL>>(array, queries));
     print_result("2*_binary_search*<64>", test<TwoLevelCacheBinSearch<64ULL>>(array, queries));
     print_result("2*_binary_search*<128>", test<TwoLevelCacheBinSearch<128ULL>>(array, queries));
     print_result("2*_binary_search*<256>", test<TwoLevelCacheBinSearch<256ULL>>(array, queries));
-    print_result("2*_binary_search*<384>", test<TwoLevelCacheBinSearch<384ULL>>(array, queries));
     print_result("2*_binary_search*<512>", test<TwoLevelCacheBinSearch<512ULL>>(array, queries));
-    print_result("2*_binary_search*<768>", test<TwoLevelCacheBinSearch<768ULL>>(array, queries));
     print_result("2*_binary_search*<1024>", test<TwoLevelCacheBinSearch<1024ULL>>(array, queries));
+    print_result("2*_binary_search*<2048>", test<TwoLevelBinSearch<2048ULL>>(array, queries));
+    print_result("2*_binary_search*<4096>", test<TwoLevelCacheBinSearch<4096ULL>>(array, queries));
+    print_result("2*_binary_search*<8192>", test<TwoLevelCacheBinSearch<8192ULL>>(array, queries));
     print_result("rank_select",    test<RankSelect>(array, queries));
 }
