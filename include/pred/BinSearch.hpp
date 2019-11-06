@@ -14,6 +14,17 @@ private:
     item_t m_max;
 
 public:
+    inline BinSearch() : m_array(nullptr), m_num(0), m_min(), m_max() {
+    }
+
+    inline BinSearch(BinSearch&& other) {
+        *this = other;
+    }
+    
+    inline BinSearch(const BinSearch& other) {
+        *this = other;
+    }
+
     inline BinSearch(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
@@ -21,6 +32,22 @@ public:
           m_array(&array) {
 
         assert_sorted_ascending(array);
+    }
+
+    inline BinSearch& operator=(BinSearch&& other) {
+        m_array = other.m_array;
+        m_num = other.m_num;
+        m_min = other.m_min;
+        m_max = other.m_max;
+        return *this;
+    }
+
+    inline BinSearch& operator=(const BinSearch& other) {
+        m_array = other.m_array;
+        m_num = other.m_num;
+        m_min = other.m_min;
+        m_max = other.m_max;
+        return *this;
     }
 
     inline Result<item_t> predecessor(const item_t x) const {

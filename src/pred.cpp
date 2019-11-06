@@ -7,8 +7,10 @@
 
 #include <pred/BinSearch.hpp>
 #include <pred/CacheBinSearch.hpp>
-#include <pred/IdxBinSearch.hpp>
 #include <pred/RankSelect.hpp>
+
+#include <pred/TwoLevelBinSearch.hpp>
+#include <pred/TwoLevelCacheBinSearch.hpp>
 
 #include <io/LoadFile.hpp>
 #include <util/MallocCallback.hpp>
@@ -21,7 +23,10 @@ using CacheBinSearch = pred::CacheBinSearch<std::vector<value_t>, value_t>;
 using RankSelect     = pred::RankSelect<std::vector<value_t>, value_t>;
 
 template<size_t k>
-using IdxBinSearch = pred::IdxBinSearch<std::vector<value_t>, value_t, k>;
+using TwoLevelBinSearch = pred::TwoLevelBinSearch<std::vector<value_t>, value_t, k>;
+
+template<size_t k>
+using TwoLevelCacheBinSearch = pred::TwoLevelCacheBinSearch<std::vector<value_t>, value_t, k>;
 
 size_t mem = 0;
 
@@ -126,12 +131,19 @@ int main(int argc, char** argv) {
     std::cout << "# running tests ..." << std::endl;
     print_result("binary_search",  test<BinSearch>(array, queries));
     print_result("binary_search*", test<CacheBinSearch>(array, queries));
-    print_result("idx_binary_search*<64>", test<IdxBinSearch<64ULL>>(array, queries));
-    print_result("idx_binary_search*<128>", test<IdxBinSearch<128ULL>>(array, queries));
-    print_result("idx_binary_search*<256>", test<IdxBinSearch<256ULL>>(array, queries));
-    print_result("idx_binary_search*<384>", test<IdxBinSearch<384ULL>>(array, queries));
-    print_result("idx_binary_search*<512>", test<IdxBinSearch<512ULL>>(array, queries));
-    print_result("idx_binary_search*<768>", test<IdxBinSearch<768ULL>>(array, queries));
-    print_result("idx_binary_search*<1024>", test<IdxBinSearch<1024ULL>>(array, queries));
+    print_result("2_binary_search*<64>", test<TwoLevelBinSearch<64ULL>>(array, queries));
+    print_result("2_binary_search*<128>", test<TwoLevelBinSearch<128ULL>>(array, queries));
+    print_result("2_binary_search*<256>", test<TwoLevelBinSearch<256ULL>>(array, queries));
+    print_result("2_binary_search*<384>", test<TwoLevelBinSearch<384ULL>>(array, queries));
+    print_result("2_binary_search*<512>", test<TwoLevelBinSearch<512ULL>>(array, queries));
+    print_result("2_binary_search*<768>", test<TwoLevelBinSearch<384ULL>>(array, queries));
+    print_result("2_binary_search*<1024>", test<TwoLevelBinSearch<1024ULL>>(array, queries));
+    print_result("2*_binary_search*<64>", test<TwoLevelCacheBinSearch<64ULL>>(array, queries));
+    print_result("2*_binary_search*<128>", test<TwoLevelCacheBinSearch<128ULL>>(array, queries));
+    print_result("2*_binary_search*<256>", test<TwoLevelCacheBinSearch<256ULL>>(array, queries));
+    print_result("2*_binary_search*<384>", test<TwoLevelCacheBinSearch<384ULL>>(array, queries));
+    print_result("2*_binary_search*<512>", test<TwoLevelCacheBinSearch<512ULL>>(array, queries));
+    print_result("2*_binary_search*<768>", test<TwoLevelCacheBinSearch<384ULL>>(array, queries));
+    print_result("2*_binary_search*<1024>", test<TwoLevelCacheBinSearch<1024ULL>>(array, queries));
     print_result("rank_select",    test<RankSelect>(array, queries));
 }

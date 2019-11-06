@@ -14,7 +14,7 @@ private:
     item_t m_max;
 
 public:
-    inline CacheBinSearch() : m_num(0), m_min(), m_max() {
+    inline CacheBinSearch() : m_array(nullptr), m_num(0), m_min(), m_max() {
     }
 
     inline CacheBinSearch(CacheBinSearch&& other) {
