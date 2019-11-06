@@ -5,7 +5,7 @@
 
 namespace pred {
 
-template<typename array_t, typename item_t, size_t cache_num = 512ULL / sizeof(item_t)>
+template<typename array_t, typename item_t, size_t m_cache_num = 512ULL / sizeof(item_t)>
 class CacheBinSearch {
 private:
     const array_t* m_array;
@@ -14,6 +14,17 @@ private:
     item_t m_max;
 
 public:
+    inline CacheBinSearch() : m_num(0), m_min(), m_max() {
+    }
+
+    inline CacheBinSearch(CacheBinSearch&& other) {
+        *this = other;
+    }
+    
+    inline CacheBinSearch(const CacheBinSearch& other) {
+        *this = other;
+    }
+
     inline CacheBinSearch(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
@@ -23,14 +34,31 @@ public:
         assert_sorted_ascending(array);
     }
 
+    inline CacheBinSearch& operator=(CacheBinSearch&& other) {
+        m_array = other.m_array;
+        m_num = other.m_num;
+        m_min = other.m_min;
+        m_max = other.m_max;
+        return *this;
+    }
+
+    inline CacheBinSearch& operator=(const CacheBinSearch& other) {
+        m_array = other.m_array;
+        m_num = other.m_num;
+        m_min = other.m_min;
+        m_max = other.m_max;
+        return *this;
+    }
+
     inline Result<item_t> predecessor(const item_t x) const {
         if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
         if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, false, m_max };
-        
+
+        // binary search        
         size_t p = 0;
         size_t q = m_num - 1;
 
-        while(q - p > cache_num) {
+        while(q - p > m_cache_num) {
             assert(x >= (*m_array)[p]);
             assert(x < (*m_array)[q]);
             

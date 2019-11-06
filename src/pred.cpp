@@ -7,6 +7,7 @@
 
 #include <pred/BinSearch.hpp>
 #include <pred/CacheBinSearch.hpp>
+#include <pred/IdxBinSearch.hpp>
 #include <pred/RankSelect.hpp>
 
 #include <io/LoadFile.hpp>
@@ -18,6 +19,9 @@ using value_t = uint40_t;
 using BinSearch      = pred::BinSearch<std::vector<value_t>, value_t>;
 using CacheBinSearch = pred::CacheBinSearch<std::vector<value_t>, value_t>;
 using RankSelect     = pred::RankSelect<std::vector<value_t>, value_t>;
+
+template<size_t k>
+using IdxBinSearch = pred::IdxBinSearch<std::vector<value_t>, value_t, k>;
 
 size_t mem = 0;
 
@@ -122,5 +126,12 @@ int main(int argc, char** argv) {
     std::cout << "# running tests ..." << std::endl;
     print_result("binary_search",  test<BinSearch>(array, queries));
     print_result("binary_search*", test<CacheBinSearch>(array, queries));
+    print_result("idx_binary_search*<64>", test<IdxBinSearch<64ULL>>(array, queries));
+    print_result("idx_binary_search*<128>", test<IdxBinSearch<128ULL>>(array, queries));
+    print_result("idx_binary_search*<256>", test<IdxBinSearch<256ULL>>(array, queries));
+    print_result("idx_binary_search*<384>", test<IdxBinSearch<384ULL>>(array, queries));
+    print_result("idx_binary_search*<512>", test<IdxBinSearch<512ULL>>(array, queries));
+    print_result("idx_binary_search*<768>", test<IdxBinSearch<768ULL>>(array, queries));
+    print_result("idx_binary_search*<1024>", test<IdxBinSearch<1024ULL>>(array, queries));
     print_result("rank_select",    test<RankSelect>(array, queries));
 }
