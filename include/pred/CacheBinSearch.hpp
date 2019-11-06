@@ -5,7 +5,10 @@
 
 namespace pred {
 
-template<typename array_t, typename item_t, size_t m_cache_num = 512ULL / sizeof(item_t)>
+//constexpr size_t L1_CACHE_SIZE = 65536ULL; // LIDO
+constexpr size_t L1_CACHE_SIZE = 512ULL; // flint
+
+template<typename array_t, typename item_t, size_t m_cache_num = L1_CACHE_SIZE / sizeof(item_t)>
 class CacheBinSearch {
 private:
     const array_t* m_array;
