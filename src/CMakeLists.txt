@@ -23,7 +23,7 @@ target_include_directories(runs PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(runs ${TLX_LIBRARIES})
 
 # pred
-add_executable(pred pred.cpp)
+add_executable(pred pred.cpp malloc.cpp)
 
 target_include_directories(pred PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(pred ${TLX_LIBRARIES})

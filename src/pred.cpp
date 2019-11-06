@@ -8,11 +8,26 @@
 #include <pred/BinSearch.hpp>
 #include <pred/RankSelect.hpp>
 
+#include <util/MallocCallback.hpp>
 #include <util/Time.hpp>
 
 using value_t = uint64_t;
 using BinSearchU64 = pred::BinSearch<std::vector<uint64_t>, uint64_t>;
 using RankSelectU64  = pred::RankSelect<std::vector<uint64_t>, uint64_t>;
+
+size_t mem = 0;
+
+namespace malloc_callback {
+    
+void on_alloc(size_t num) {
+    mem += num;
+}
+
+void on_free(size_t num) {
+    mem -= num;
+}
+
+}
 
 template<typename pred_t>
 void test(
@@ -24,8 +39,10 @@ void test(
 
     // construct
     auto t0 = time();
+    auto m0 = mem;
     pred_t q(array);
     uint64_t t_construct = time() - t0;
+    size_t   m_ds = mem - m0;
 
     // seed
     std::default_random_engine gen(seed);
@@ -42,7 +59,13 @@ void test(
         t_queries = time() - t0;
     }
     
-    std::cout << "RESULT algo=" << name << " queries=" << num_queries << " universe=" << universe << " t_construct=" << t_construct << " t_queries=" << t_queries << " sum=" << sum << std::endl;
+    std::cout << "RESULT algo="<< name
+        << " queries=" << num_queries
+        << " universe=" << universe
+        << " t_construct=" << t_construct
+        << " t_queries=" << t_queries
+        << " m_ds=" << m_ds
+        << " sum=" << sum << std::endl;
 }
 
 int main(int argc, char** argv) {
