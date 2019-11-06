@@ -30,13 +30,33 @@ void on_free(size_t num) {
 
 }
 
+std::vector<value_t> generate_queries(size_t num, size_t universe, size_t seed = 147ULL) {
+    std::vector<value_t> queries;
+    queries.reserve(num);
+    
+    // seed
+    std::default_random_engine gen(seed);
+    std::uniform_int_distribution<> dist(0, universe);
+
+    // generate
+    for(size_t i = 0; i < num; i++) {
+        queries.push_back(dist(gen));
+    }
+
+    return queries;
+}
+
+struct TestResult {
+    uint64_t t_construct;
+    size_t   m_ds;
+    uint64_t t_queries;
+    value_t  sum;
+};
+
 template<typename pred_t>
-void test(
-    const std::string& name,
+TestResult test(
     const std::vector<value_t>& array,
-    const unsigned int num_queries,
-    const unsigned int universe,
-    const unsigned int seed = 147U) {
+    const std::vector<value_t>& queries) {
 
     // construct
     auto t0 = time();
@@ -45,28 +65,18 @@ void test(
     uint64_t t_construct = time() - t0;
     size_t   m_ds = mem - m0;
 
-    // seed
-    std::default_random_engine gen(seed);
-    std::uniform_int_distribution<> dist(0, universe);
-
     // do queries
     uint64_t t_queries;
     value_t sum = 0;
     {
         auto t0 = time();
-        for(uint64_t i = 0; i < num_queries; i++) {
-            sum += q.predecessor(dist(gen)).value;
+        for(auto x : queries) {
+            sum += q.predecessor(x).value;
         }
         t_queries = time() - t0;
     }
-    
-    std::cout << "RESULT algo="<< name
-        << " queries=" << num_queries
-        << " universe=" << universe
-        << " t_construct=" << t_construct
-        << " t_queries=" << t_queries
-        << " m_ds=" << m_ds
-        << " sum=" << sum << std::endl;
+
+    return TestResult { t_construct, m_ds, t_queries, sum };
 }
 
 int main(int argc, char** argv) {
@@ -75,18 +85,33 @@ int main(int argc, char** argv) {
     //std::string input_filename;
     //cp.add_param_string("file", input_filename, "The input file.");
 
-    unsigned int universe = UINT32_MAX;
-    cp.add_uint('u', "universe", universe, "The universe size.");
+    size_t num_queries = 10'000'000ULL;
+    cp.add_size_t('q', "queries", num_queries, "The number of queries to perform.");
 
-    unsigned int num_queries = 10'000'000ULL;
-    cp.add_uint('q', "queries", num_queries, "The number of queries to perform.");
+    size_t universe = std::numeric_limits<value_t>::max();
+    cp.add_size_t('u', "universe", universe, "The universe to draw query numbers from.");
 
     if (!cp.process(argc, argv)) {
         return -1;
     }
 
-    std::vector<value_t> array = { 2, 4, 5, 7, 11, 12, 15, 18, 19, 22, 24, 28, 31, 35, 37, 42 };
-    test<BinSearch>("binary_search", array, num_queries, universe);
-    test<RankSelect>("rank", array, num_queries, universe);
-}
+    // print a test result
+    auto print_result = [&](const std::string& name, TestResult&& r){
+        std::cout << "RESULT algo="<< name
+            << " queries=" << num_queries
+            << " universe=" << universe
+            << " t_construct=" << r.t_construct
+            << " t_queries=" << r.t_queries
+            << " m_ds=" << r.m_ds
+            << " sum=" << r.sum << std::endl;
+    };
 
+    // generate queries
+    auto queries = generate_queries(num_queries, universe);
+
+    // test
+    std::vector<value_t> array = { 2, 4, 5, 7, 11, 12, 15, 18, 19, 22, 24, 28, 31, 35, 37, 42 };
+
+    print_result("binary_search", test<BinSearch>(array, queries));
+    print_result("rank",          test<RankSelect>(array, queries));
+}
