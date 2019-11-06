@@ -6,10 +6,13 @@
 #include <tlx/cmdline_parser.hpp>
 
 #include <pred/BinSearch.hpp>
+#include <pred/RankSelect.hpp>
+
 #include <util/Time.hpp>
 
 using value_t = uint64_t;
-using BinSearchU32 = pred::BinSearch<std::vector<uint64_t>, uint64_t>;
+using BinSearchU64 = pred::BinSearch<std::vector<uint64_t>, uint64_t>;
+using RankSelectU64  = pred::RankSelect<std::vector<uint64_t>, uint64_t>;
 
 template<typename pred_t>
 void test(
@@ -59,6 +62,7 @@ int main(int argc, char** argv) {
     }
 
     std::vector<uint64_t> array = { 2, 4, 5, 7, 11, 12, 15, 18, 19, 22, 24, 28, 31, 35, 37, 42 };
-    test<BinSearchU32>("binary_search", array, num_queries, universe);
+    test<BinSearchU64>("binary_search", array, num_queries, universe);
+    test<RankSelectU64>("rank", array, num_queries, universe);
 }
 
