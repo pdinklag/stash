@@ -8,7 +8,7 @@ namespace pred {
 template<typename array_t, typename item_t>
 class BinSearch {
 private:
-    array_t m_array;
+    const array_t* m_array;
     size_t m_num;
     item_t m_min;
     item_t m_max;
@@ -18,18 +18,9 @@ public:
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
-          m_array(array) {
+          m_array(&array) {
 
-        assert_sorted_ascending(m_array);
-    }
-
-    inline BinSearch(array_t&& array) :
-        m_num(array.size()),
-        m_min(array[0]),
-        m_max(array[m_num-1]),
-        m_array(array) {
-
-        assert_sorted_ascending(m_array);
+        assert_sorted_ascending(array);
     }
 
     inline Result<item_t> predecessor(const item_t x) const {
@@ -40,12 +31,12 @@ public:
         size_t q = m_num - 1;
 
         while(p < q - 1) {
-            assert(x >= m_array[p]);
-            assert(x < m_array[q]);
+            assert(x >= (*m_array)[p]);
+            assert(x < (*m_array)[q]);
             
             const size_t m = (p + q) >> 1ULL;
             
-            const bool le = (m_array[m] <= x);
+            const bool le = ((*m_array)[m] <= x);
             const size_t le_mask = -size_t(le);
             const size_t gt_mask = ~le_mask;
 
@@ -56,7 +47,7 @@ public:
             q = (gt_mask & m) | (le_mask & q);
         }
 
-        const item_t r = m_array[p];
+        const item_t r = (*m_array)[p];
         return Result<item_t> { true, r == x, r };
     }
 };
