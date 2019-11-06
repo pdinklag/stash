@@ -6,6 +6,7 @@
 #include <tlx/cmdline_parser.hpp>
 
 #include <pred/BinSearch.hpp>
+#include <pred/CacheBinSearch.hpp>
 #include <pred/RankSelect.hpp>
 
 #include <io/LoadFile.hpp>
@@ -14,8 +15,9 @@
 #include <util/UintTypes.hpp>
 
 using value_t = uint40_t;
-using BinSearch = pred::BinSearch<std::vector<value_t>, value_t>;
-using RankSelect  = pred::RankSelect<std::vector<value_t>, value_t>;
+using BinSearch      = pred::BinSearch<std::vector<value_t>, value_t>;
+using CacheBinSearch = pred::CacheBinSearch<std::vector<value_t>, value_t>;
+using RankSelect     = pred::RankSelect<std::vector<value_t>, value_t>;
 
 size_t mem = 0;
 
@@ -118,6 +120,7 @@ int main(int argc, char** argv) {
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
-    print_result("binary_search", test<BinSearch>(array, queries));
-    print_result("rank_select",          test<RankSelect>(array, queries));
+    print_result("binary_search",  test<BinSearch>(array, queries));
+    print_result("binary_search*", test<CacheBinSearch>(array, queries));
+    print_result("rank_select",    test<RankSelect>(array, queries));
 }
