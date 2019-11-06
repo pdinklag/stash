@@ -10,10 +10,11 @@
 
 #include <util/MallocCallback.hpp>
 #include <util/Time.hpp>
+#include <util/UintTypes.hpp>
 
-using value_t = uint64_t;
-using BinSearchU64 = pred::BinSearch<std::vector<uint64_t>, uint64_t>;
-using RankSelectU64  = pred::RankSelect<std::vector<uint64_t>, uint64_t>;
+using value_t = uint40_t;
+using BinSearch = pred::BinSearch<std::vector<value_t>, value_t>;
+using RankSelect  = pred::RankSelect<std::vector<value_t>, value_t>;
 
 size_t mem = 0;
 
@@ -32,7 +33,7 @@ void on_free(size_t num) {
 template<typename pred_t>
 void test(
     const std::string& name,
-    const std::vector<uint64_t>& array,
+    const std::vector<value_t>& array,
     const unsigned int num_queries,
     const unsigned int universe,
     const unsigned int seed = 147U) {
@@ -50,7 +51,7 @@ void test(
 
     // do queries
     uint64_t t_queries;
-    uint64_t sum = 0;
+    value_t sum = 0;
     {
         auto t0 = time();
         for(uint64_t i = 0; i < num_queries; i++) {
@@ -84,8 +85,8 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    std::vector<uint64_t> array = { 2, 4, 5, 7, 11, 12, 15, 18, 19, 22, 24, 28, 31, 35, 37, 42 };
-    test<BinSearchU64>("binary_search", array, num_queries, universe);
-    test<RankSelectU64>("rank", array, num_queries, universe);
+    std::vector<value_t> array = { 2, 4, 5, 7, 11, 12, 15, 18, 19, 22, 24, 28, 31, 35, 37, 42 };
+    test<BinSearch>("binary_search", array, num_queries, universe);
+    test<RankSelect>("rank", array, num_queries, universe);
 }
 
