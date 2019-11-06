@@ -90,17 +90,22 @@ int main(int argc, char** argv) {
     cp.add_size_t('q', "queries", num_queries, "The number of queries to perform.");
 
     size_t universe = std::numeric_limits<value_t>::max();
-    cp.add_size_t('u', "universe", universe, "The universe to draw query numbers from.");
+    cp.add_bytes('u', "universe", universe, "The universe to draw query numbers from.");
 
     if (!cp.process(argc, argv)) {
         return -1;
     }
 
-    // print a test result
+    // load input
+    std::cout << "# loading input ..." << std::endl;
+    auto array = load_file_as_vector<value_t>(input_filename);
+
+    // lambda to print a test result
     auto print_result = [&](const std::string& name, TestResult&& r){
         std::cout << "RESULT algo="<< name
             << " queries=" << num_queries
             << " universe=" << universe
+            << " keys=" << array.size()
             << " t_construct=" << r.t_construct
             << " t_queries=" << r.t_queries
             << " m_ds=" << r.m_ds
@@ -108,10 +113,11 @@ int main(int argc, char** argv) {
     };
 
     // generate queries
+    std::cout << "# generating queries ..." << std::endl;
     auto queries = generate_queries(num_queries, universe);
 
-    // test
-    auto array = load_file_as_vector<value_t>(input_filename);
+    // run tests
+    std::cout << "# running tests ..." << std::endl;
     print_result("binary_search", test<BinSearch>(array, queries));
-    print_result("rank",          test<RankSelect>(array, queries));
+    print_result("rank_select",          test<RankSelect>(array, queries));
 }

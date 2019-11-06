@@ -18,7 +18,7 @@ std::string load_file_as_string(const std::string& filename) {
 template<typename T>
 std::vector<T> load_file_as_vector(
     const std::string& filename,
-    const size_t bufsize = 4096ULL) {
+    const size_t bufsize = 16384ULL) {
 
     std::vector<T> v;
 
