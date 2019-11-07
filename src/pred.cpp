@@ -43,11 +43,11 @@ std::vector<value_t> generate_queries(size_t num, size_t universe, size_t seed =
     
     // seed
     std::default_random_engine gen(seed);
-    std::uniform_int_distribution<> dist(0, universe);
+    std::uniform_int_distribution<uint64_t> dist(0, universe);
 
     // generate
     for(size_t i = 0; i < num; i++) {
-        queries.push_back(dist(gen));
+        queries.push_back(value_t(dist(gen)));
     }
 
     return queries;
@@ -57,7 +57,7 @@ struct TestResult {
     uint64_t t_construct;
     size_t   m_ds;
     uint64_t t_queries;
-    value_t  sum;
+    uint64_t  sum;
 };
 
 template<typename pred_t>
@@ -74,10 +74,10 @@ TestResult test(
 
     // do queries
     uint64_t t_queries;
-    value_t sum = 0;
+    uint64_t sum = 0;
     {
         auto t0 = time();
-        for(auto x : queries) {
+        for(value_t x : queries) {
             sum += q.predecessor(x).value;
         }
         t_queries = time() - t0;
@@ -106,10 +106,14 @@ int main(int argc, char** argv) {
     std::cout << "# loading input ..." << std::endl;
     auto array = load_file_as_vector<value_t>(input_filename);
 
+    // generate queries
+    std::cout << "# generating queries ..." << std::endl;
+    auto queries = generate_queries(num_queries, universe);
+
     // lambda to print a test result
     auto print_result = [&](const std::string& name, TestResult&& r){
         std::cout << "RESULT algo="<< name
-            << " queries=" << num_queries
+            << " queries=" << queries.size()
             << " universe=" << universe
             << " keys=" << array.size()
             << " t_construct=" << r.t_construct
@@ -117,10 +121,6 @@ int main(int argc, char** argv) {
             << " m_ds=" << r.m_ds
             << " sum=" << r.sum << std::endl;
     };
-
-    // generate queries
-    std::cout << "# generating queries ..." << std::endl;
-    auto queries = generate_queries(num_queries, universe);
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
