@@ -16,7 +16,7 @@ template<
     typename item_t,
     size_t m_k,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
-class TwoLevelCacheBinSearch {
+class TwoLevelBinSearch {
 private:
     const array_t* m_array;
     size_t m_num;
@@ -46,7 +46,7 @@ private:
     idx_pred_t          m_idx;
 
 public:
-    inline TwoLevelCacheBinSearch(const array_t& array)
+    inline TwoLevelBinSearch(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),

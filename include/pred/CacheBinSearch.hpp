@@ -50,14 +50,10 @@ public:
         return *this;
     }
 
-    inline Result<item_t> predecessor(const item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, false, m_max };
+    inline Result<item_t> predecessor_seeded(
+        const item_t x, size_t p, size_t q) const {
 
-        // binary search        
-        size_t p = 0;
-        size_t q = m_num - 1;
-
+        assert(x >= m_min && x < m_max);
         while(q - p > m_cache_num) {
             assert(x >= (*m_array)[p]);
             assert(x < (*m_array)[q]);
@@ -81,6 +77,12 @@ public:
         
         const item_t r = (*m_array)[p - 1];
         return Result<item_t> { true, r == x, r };
+    }
+
+    inline Result<item_t> predecessor(const item_t x) const {
+        if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
+        if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, false, m_max };
+        return predecessor_seeded(x, 0, m_num - 1);
     }
 };
 
