@@ -31,7 +31,7 @@ private:
 
     std::unordered_map<uint64_t, size_t> m_hi_idx;
 
-    using lo_pred_t = CacheBinSearch<array_t, item_t>;
+    using lo_pred_t = CacheBinSearch<array_t, item_t, m_cache_num>;
     lo_pred_t m_lo_pred;
 
 public:
