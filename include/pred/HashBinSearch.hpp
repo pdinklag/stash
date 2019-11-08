@@ -29,11 +29,7 @@ private:
     uint64_t m_key_min;
     uint64_t m_key_max;
 
-    struct Interval {
-        size_t first, last;
-    };
-
-    std::unordered_map<uint64_t, Interval> m_hi_idx;
+    std::unordered_map<uint64_t, size_t> m_hi_idx;
 
     using lo_pred_t = CacheBinSearch<array_t, item_t>;
     lo_pred_t m_lo_pred;
@@ -59,10 +55,8 @@ public:
         for(size_t i = 1; i < m_num; i++) {
             uint64_t key = array[i] >> m_lo_bits;
             if(key != prev_key) {
-                Interval iv { cur_interval_start, i };
-
                 for(uint64_t k = prev_key; k < key; k++) {
-                    m_hi_idx.emplace(k, iv);
+                    m_hi_idx.emplace(k, i);
                 }
 
                 prev_key = key;
@@ -72,8 +66,6 @@ public:
         }
 
         assert(prev_key == m_key_max);
-
-        m_hi_idx.emplace(prev_key, Interval{cur_interval_start, m_num-1});
         m_hi_idx.rehash(0);
 
         // DEBUG
@@ -94,15 +86,14 @@ public:
         if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
         if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, x == m_max, m_max };
 
-        uint64_t key = x >> m_lo_bits;
-        auto it = m_hi_idx.find(key);
-        assert(it != m_hi_idx.end());
+        const uint64_t key = x >> m_lo_bits;
 
-        auto interval = it->second;
-        if(__builtin_expect(x == (*m_array)[interval.last], false)) {
+        const size_t q = (key == m_key_max ? m_num-1 : m_hi_idx.find(key)->second);
+        if(__builtin_expect(x == (*m_array)[q], false)) {
             return Result<item_t> { true, true, x };
         } else {
-            return m_lo_pred.predecessor_seeded(x, interval.first, interval.last);
+            const size_t p = (key == m_key_min ? 0 : m_hi_idx.find(key-1)->second);
+            return m_lo_pred.predecessor_seeded(x, p, q);
         }
     }
 };
