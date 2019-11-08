@@ -128,14 +128,14 @@ int main(int argc, char** argv) {
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
-    print_result("2*_binsearch*<64>", test<TwoLevelBinSearch<64>>(array, queries));
-    print_result("2*_binsearch*<128>", test<TwoLevelBinSearch<128>>(array, queries));
-    print_result("2*_binsearch*<256>", test<TwoLevelBinSearch<256>>(array, queries));
-    print_result("2*_binsearch*<512>", test<TwoLevelBinSearch<512>>(array, queries));
-    print_result("2*_binsearch*<1024>", test<TwoLevelBinSearch<1024>>(array, queries));
-    print_result("2*_binsearch*<2048>", test<TwoLevelBinSearch<2048>>(array, queries));
-    print_result("2*_binsearch*<4096>", test<TwoLevelBinSearch<4096>>(array, queries));
-    print_result("2*_binsearch*<8192>", test<TwoLevelBinSearch<8192>>(array, queries));
+    // print_result("2*_binsearch*<64>", test<TwoLevelBinSearch<64>>(array, queries));
+    // print_result("2*_binsearch*<128>", test<TwoLevelBinSearch<128>>(array, queries));
+    // print_result("2*_binsearch*<256>", test<TwoLevelBinSearch<256>>(array, queries));
+    // print_result("2*_binsearch*<512>", test<TwoLevelBinSearch<512>>(array, queries));
+    // print_result("2*_binsearch*<1024>", test<TwoLevelBinSearch<1024>>(array, queries));
+    // print_result("2*_binsearch*<2048>", test<TwoLevelBinSearch<2048>>(array, queries));
+    // print_result("2*_binsearch*<4096>", test<TwoLevelBinSearch<4096>>(array, queries));
+    // print_result("2*_binsearch*<8192>", test<TwoLevelBinSearch<8192>>(array, queries));
     print_result("hash_binsearch*<6>", test<HashBinSearch<6>>(array, queries));
     print_result("hash_binsearch*<7>", test<HashBinSearch<7>>(array, queries));
     print_result("hash_binsearch*<8>", test<HashBinSearch<8>>(array, queries));
