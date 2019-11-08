@@ -1,8 +1,7 @@
 #pragma once
 
 #include <algorithm>
-
-#include <cmph.h>
+#include <unordered_map>
 
 #include <pred/util.hpp>
 #include <pred/Result.hpp>
@@ -27,6 +26,15 @@ private:
     item_t m_min;
     item_t m_max;
 
+    struct Interval {
+        size_t first, last;
+    };
+
+    std::unordered_map<uint64_t, Interval> m_hi_idx;
+
+    using lo_pred_t = CacheBinSearch<array_t, item_t>;
+    lo_pred_t m_lo_pred;
+
 public:
     inline HashBinSearch(const array_t& array)
         : m_num(array.size()),
@@ -36,15 +44,67 @@ public:
 
         assert_sorted_ascending(array);
 
-        // TODO: build MPHF
+        // build an index for high bits
+        const uint64_t min_key = uint64_t(m_min) >> m_lo_bits;
+        const uint64_t max_key = uint64_t(m_max) >> m_lo_bits;
+        m_hi_idx.reserve(max_key - min_key + 1);
+
+        uint64_t prev_key = min_key;
+        size_t cur_interval_start = 0;
+
+        for(size_t i = 1; i < m_num; i++) {
+            uint64_t key = array[i] >> m_lo_bits;
+            if(key != prev_key) {
+                Interval iv{cur_interval_start, i};
+
+                for(uint64_t k = prev_key; k < key; k++) {
+                    m_hi_idx.emplace(k, iv);
+                }
+
+                prev_key = key;
+                cur_interval_start = i-1; // include the last value with the
+                                          // previous key (important)!
+            }
+        }
+
+        m_hi_idx.emplace(prev_key,
+            Interval{cur_interval_start, m_num-1});
+
+        m_hi_idx.rehash(0);
+
+        // DEBUG
+        #ifndef NDEBUG
+        std::cout << "# HashBinSearch: keys=" << m_hi_idx.size()
+                  << ", load_factor=" << m_hi_idx.load_factor()
+                  << std::endl;
+        #endif
+
+        // build the predecessor data structure for low bits
+        m_lo_pred = lo_pred_t(array);
+    }
+
+    inline ~HashBinSearch() {
     }
 
     inline Result<item_t> predecessor(const item_t x) const {
         if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
         if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, x == m_max, m_max };
 
-        // TODO
-        return Result<item_t> { false, false, x };
+        uint64_t key = x >> m_lo_bits;
+        auto it = m_hi_idx.find(key);
+        assert(it != m_hi_idx.end());
+
+        /*while(it == m_hi_idx.end()) {
+            assert(key > 0);
+            it = m_hi_idx.find(--key);
+        }*/
+
+        auto interval = it->second;
+        if(__builtin_expect(x == (*m_array)[interval.last], false)) {
+            return Result<item_t> { true, true, x };
+        } else {
+            return m_lo_pred.predecessor_seeded(x, interval.first, interval.last);
+        }
     }
 };
 

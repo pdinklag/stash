@@ -30,7 +30,7 @@ using HashBinSearch = pred::HashBinSearch<std::vector<value_t>, value_t, k>;
 size_t mem = 0;
 
 namespace malloc_callback {
-    
+
 void on_alloc(size_t num) {
     mem += num;
 }
@@ -44,7 +44,7 @@ void on_free(size_t num) {
 std::vector<value_t> generate_queries(size_t num, size_t universe, size_t seed = 147ULL) {
     std::vector<value_t> queries;
     queries.reserve(num);
-    
+
     // seed
     std::default_random_engine gen(seed);
     std::uniform_int_distribution<uint64_t> dist(0, universe);
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
 
     std::string input_filename;
     cp.add_param_string("file", input_filename, "The input file.");
-    
+
     size_t num_queries = 10'000'000ULL;
     cp.add_bytes('q', "queries", num_queries, "The number of queries to perform.");
 
@@ -128,8 +128,6 @@ int main(int argc, char** argv) {
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
-    print_result("binsearch",  test<BinSearch>(array, queries));
-    print_result("binsearch*", test<CacheBinSearch>(array, queries));
     print_result("2*_binsearch*<64>", test<TwoLevelBinSearch<64>>(array, queries));
     print_result("2*_binsearch*<128>", test<TwoLevelBinSearch<128>>(array, queries));
     print_result("2*_binsearch*<256>", test<TwoLevelBinSearch<256>>(array, queries));
@@ -138,10 +136,18 @@ int main(int argc, char** argv) {
     print_result("2*_binsearch*<2048>", test<TwoLevelBinSearch<2048>>(array, queries));
     print_result("2*_binsearch*<4096>", test<TwoLevelBinSearch<4096>>(array, queries));
     print_result("2*_binsearch*<8192>", test<TwoLevelBinSearch<8192>>(array, queries));
+    print_result("hash_binsearch*<6>", test<HashBinSearch<6>>(array, queries));
     print_result("hash_binsearch*<7>", test<HashBinSearch<7>>(array, queries));
     print_result("hash_binsearch*<8>", test<HashBinSearch<8>>(array, queries));
     print_result("hash_binsearch*<9>", test<HashBinSearch<9>>(array, queries));
     print_result("hash_binsearch*<10>", test<HashBinSearch<10>>(array, queries));
     print_result("hash_binsearch*<11>", test<HashBinSearch<11>>(array, queries));
+    print_result("hash_binsearch*<12>", test<HashBinSearch<12>>(array, queries));
+    print_result("hash_binsearch*<13>", test<HashBinSearch<13>>(array, queries));
+    print_result("hash_binsearch*<14>", test<HashBinSearch<14>>(array, queries));
+    print_result("hash_binsearch*<15>", test<HashBinSearch<15>>(array, queries));
+    print_result("hash_binsearch*<16>", test<HashBinSearch<16>>(array, queries));
+    print_result("binsearch*", test<CacheBinSearch>(array, queries));
+    print_result("binsearch",  test<BinSearch>(array, queries));
     print_result("rank_select",    test<RankSelect>(array, queries));
 }
