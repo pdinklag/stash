@@ -28,9 +28,12 @@ private:
 
     struct Interval {
         size_t first, last;
+
+        inline Interval(size_t _first, size_t _last) : first(_first), last(_last) {}
     };
 
-    std::unordered_map<uint64_t, Interval> m_hi_idx;
+    std::vector<Interval> m_idx_intervals;
+    std::unordered_map<uint64_t, size_t> m_hi_idx;
 
     using lo_pred_t = CacheBinSearch<array_t, item_t>;
     lo_pred_t m_lo_pred;
@@ -51,25 +54,29 @@ public:
 
         uint64_t prev_key = min_key;
         size_t cur_interval_start = 0;
+        size_t cur_interval_num = 0;
 
         for(size_t i = 1; i < m_num; i++) {
             uint64_t key = array[i] >> m_lo_bits;
             if(key != prev_key) {
-                Interval iv{cur_interval_start, i};
+                m_idx_intervals.emplace_back(cur_interval_start, i);
 
                 for(uint64_t k = prev_key; k < key; k++) {
-                    m_hi_idx.emplace(k, iv);
+                    m_hi_idx.emplace(k, cur_interval_num);
                 }
 
                 prev_key = key;
+                ++cur_interval_num;
                 cur_interval_start = i-1; // include the last value with the
                                           // previous key (important)!
             }
         }
 
-        m_hi_idx.emplace(prev_key,
-            Interval{cur_interval_start, m_num-1});
+        assert(prev_key == max_key);
 
+        m_idx_intervals.emplace_back(cur_interval_start, m_num-1);
+
+        m_hi_idx.emplace(prev_key, cur_interval_num);
         m_hi_idx.rehash(0);
 
         // DEBUG
@@ -94,12 +101,7 @@ public:
         auto it = m_hi_idx.find(key);
         assert(it != m_hi_idx.end());
 
-        /*while(it == m_hi_idx.end()) {
-            assert(key > 0);
-            it = m_hi_idx.find(--key);
-        }*/
-
-        auto interval = it->second;
+        const auto& interval = m_idx_intervals[it->second];
         if(__builtin_expect(x == (*m_array)[interval.last], false)) {
             return Result<item_t> { true, true, x };
         } else {
