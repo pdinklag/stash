@@ -50,6 +50,8 @@ public:
         // build an index for high bits
         const uint64_t min_key = uint64_t(m_min) >> m_lo_bits;
         const uint64_t max_key = uint64_t(m_max) >> m_lo_bits;
+
+        m_idx_intervals.reserve(max_key - min_key + 1);
         m_hi_idx.reserve(max_key - min_key + 1);
 
         uint64_t prev_key = min_key;
@@ -75,6 +77,7 @@ public:
         assert(prev_key == max_key);
 
         m_idx_intervals.emplace_back(cur_interval_start, m_num-1);
+        m_idx_intervals.shrink_to_fit();
 
         m_hi_idx.emplace(prev_key, cur_interval_num);
         m_hi_idx.rehash(0);
