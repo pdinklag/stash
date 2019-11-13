@@ -21,6 +21,7 @@ endif()
 
 find_package(Cmph)
 find_package(Divsufsort)
+find_package(Plads)
 find_package(Powercap)
 find_package(TLX)
 

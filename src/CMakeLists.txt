@@ -22,6 +22,12 @@ add_executable(runs runs.cpp)
 target_include_directories(runs PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(runs ${TLX_LIBRARIES})
 
+# plads
+add_executable(plads plads.cpp)
+
+target_include_directories(plads PUBLIC ${PLADS_INCLUDE_DIRS})
+target_link_libraries(plads ${PLADS_LIBRARIES})
+
 # pred
 add_executable(pred pred.cpp malloc.cpp)
 
