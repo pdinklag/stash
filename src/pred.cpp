@@ -8,6 +8,7 @@
 #include <pred/BinSearch.hpp>
 #include <pred/CacheBinSearch.hpp>
 #include <pred/HashBinSearch.hpp>
+#include <pred/IdxBinSearch.hpp>
 #include <pred/RankSelect.hpp>
 #include <pred/TwoLevelBinSearch.hpp>
 
@@ -26,6 +27,9 @@ using TwoLevelBinSearch = pred::TwoLevelBinSearch<std::vector<value_t>, value_t,
 
 template<size_t k>
 using HashBinSearch = pred::HashBinSearch<std::vector<value_t>, value_t, k>;
+
+template<size_t k>
+using IdxBinSearch = pred::IdxBinSearch<std::vector<value_t>, value_t, k>;
 
 size_t mem = 0;
 
@@ -147,6 +151,17 @@ int main(int argc, char** argv) {
     print_result("hash_binsearch*<14>", test<HashBinSearch<14>>(array, queries));
     print_result("hash_binsearch*<15>", test<HashBinSearch<15>>(array, queries));
     print_result("hash_binsearch*<16>", test<HashBinSearch<16>>(array, queries));
+    print_result("idx_binsearch*<6>", test<IdxBinSearch<6>>(array, queries));
+    print_result("idx_binsearch*<7>", test<IdxBinSearch<7>>(array, queries));
+    print_result("idx_binsearch*<8>", test<IdxBinSearch<8>>(array, queries));
+    print_result("idx_binsearch*<9>", test<IdxBinSearch<9>>(array, queries));
+    print_result("idx_binsearch*<10>", test<IdxBinSearch<10>>(array, queries));
+    print_result("idx_binsearch*<11>", test<IdxBinSearch<11>>(array, queries));
+    print_result("idx_binsearch*<12>", test<IdxBinSearch<12>>(array, queries));
+    print_result("idx_binsearch*<13>", test<IdxBinSearch<13>>(array, queries));
+    print_result("idx_binsearch*<14>", test<IdxBinSearch<14>>(array, queries));
+    print_result("idx_binsearch*<15>", test<IdxBinSearch<15>>(array, queries));
+    print_result("idx_binsearch*<16>", test<IdxBinSearch<16>>(array, queries));
     print_result("binsearch*", test<CacheBinSearch>(array, queries));
     print_result("binsearch",  test<BinSearch>(array, queries));
     print_result("rank_select",    test<RankSelect>(array, queries));

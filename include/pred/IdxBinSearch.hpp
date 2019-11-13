@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <unordered_map>
 
 #include <pred/util.hpp>
 #include <pred/Result.hpp>
@@ -17,7 +16,7 @@ template<
     typename item_t,
     size_t m_lo_bits,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
-class HashBinSearch {
+class IdxBinSearch {
 private:
     static constexpr size_t m_hi_bits = 8 * sizeof(item_t) - m_lo_bits;
 
@@ -29,13 +28,13 @@ private:
     uint64_t m_key_min;
     uint64_t m_key_max;
 
-    std::unordered_map<uint64_t, size_t> m_hi_idx;
+    std::vector<size_t> m_hi_idx;
 
     using lo_pred_t = CacheBinSearch<array_t, item_t, m_cache_num>;
     lo_pred_t m_lo_pred;
 
 public:
-    inline HashBinSearch(const array_t& array)
+    inline IdxBinSearch(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
@@ -56,7 +55,7 @@ public:
             uint64_t key = array[i] >> m_lo_bits;
             if(key != prev_key) {
                 for(uint64_t k = prev_key; k < key; k++) {
-                    m_hi_idx.emplace(k, i);
+                    m_hi_idx.emplace_back(i);
                 }
 
                 prev_key = key;
@@ -65,15 +64,8 @@ public:
             }
         }
 
+        assert(m_hi_idx.size() == m_hi_idx.capacity());
         assert(prev_key == m_key_max);
-        m_hi_idx.rehash(0);
-
-        // DEBUG
-        #ifndef NDEBUG
-        std::cout << "# HashBinSearch: keys=" << m_hi_idx.size()
-                  << ", load_factor=" << m_hi_idx.load_factor()
-                  << std::endl;
-        #endif
 
         // build the predecessor data structure for low bits
         m_lo_pred = lo_pred_t(array);
@@ -85,11 +77,11 @@ public:
 
         const uint64_t key = x >> m_lo_bits;
 
-        const size_t q = (key == m_key_max ? m_num-1 : m_hi_idx.find(key)->second);
+        const size_t q = (key == m_key_max ? m_num-1 : m_hi_idx[key - m_key_min]);
         if(__builtin_expect(x == (*m_array)[q], false)) {
             return Result<item_t> { true, true, x };
         } else {
-            const size_t p = (key == m_key_min ? 0 : m_hi_idx.find(key-1)->second);
+            const size_t p = (key == m_key_min ? 0 : m_hi_idx[key-1-m_key_min]);
             return m_lo_pred.predecessor_seeded(x, p, q);
         }
     }
