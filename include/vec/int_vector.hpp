@@ -5,7 +5,7 @@
 
 #include <vec/util.hpp>
 
-class IntVector {
+class int_vector {
 private:
     size_t m_size;
     size_t m_width;
@@ -73,7 +73,7 @@ private:
 
 public:
     struct Ref {
-        IntVector* iv;
+        int_vector* iv;
         size_t i;
 
         inline operator uint64_t() const {
@@ -85,22 +85,22 @@ public:
         }
     };
 
-    inline IntVector() : m_size(0), m_width(0), m_mask(0) {
+    inline int_vector() : m_size(0), m_width(0), m_mask(0) {
     }
 
-    inline IntVector(const IntVector& other) {
+    inline int_vector(const int_vector& other) {
         *this = other;
     }
 
-    inline IntVector(IntVector&& other) {
+    inline int_vector(int_vector&& other) {
         *this = std::move(other);
     }
 
-    inline IntVector(size_t size, size_t width) {
+    inline int_vector(size_t size, size_t width) {
         resize(size, width);
     }
 
-    inline IntVector& operator=(const IntVector& other) {
+    inline int_vector& operator=(const int_vector& other) {
         m_size = other.m_size;
         m_width = other.m_width;
         m_mask = other.m_mask;
@@ -108,7 +108,7 @@ public:
         return *this;
     }
 
-    inline IntVector& operator=(IntVector&& other) {
+    inline int_vector& operator=(int_vector&& other) {
         m_size = other.m_size;
         m_width = other.m_width;
         m_mask = other.m_mask;
@@ -128,7 +128,7 @@ public:
     }
 
     inline void rebuild(size_t size, size_t width) {
-        IntVector new_iv(size, width);
+        int_vector new_iv(size, width);
         for(size_t i = 0; i < size; i++) {
             new_iv.set(i, get(i));
         }

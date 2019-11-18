@@ -3,7 +3,7 @@
 namespace pred {
 
 template<typename item_t>
-struct Result {
+struct result {
     bool   exists;
     bool   contained;
     item_t value;

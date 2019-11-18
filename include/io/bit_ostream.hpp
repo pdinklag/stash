@@ -12,7 +12,7 @@
 ///
 /// Bits are written into a buffer byte, which is written to the output when
 /// it is either filled or when a flush is explicitly requested.
-class BitOStream {
+class bit_ostream {
     std::ostream* m_stream;
 
     uint8_t m_next;
@@ -36,11 +36,11 @@ class BitOStream {
     }
 
 public:
-    inline BitOStream(std::ostream& stream) : m_stream(&stream) {
+    inline bit_ostream(std::ostream& stream) : m_stream(&stream) {
         reset();
     }
 
-    inline ~BitOStream() {
+    inline ~bit_ostream() {
         uint8_t set_bits = MSB - m_cursor; // will only be in range 0 to 7
         if(m_cursor >= 2) {
             // if there are at least 3 bits free in the byte buffer,

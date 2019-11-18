@@ -1,18 +1,18 @@
 #pragma once
 
-#include <code/CoderBase.hpp>
+#include <code/coder.hpp>
 
-class DeltaCoder : public CoderBase {
+class delta_coder : public coder {
 public:
-    using CoderBase::CoderBase;
+    using coder::coder;
 
     template<typename T>
-    void encode(BitOStream& out, T value) {
+    void encode(bit_ostream& out, T value) {
         out.write_delta(value);
     }
 
     template<typename T = uint64_t>
-    T decode(BitIStream& in) {
+    T decode(bit_istream& in) {
         return in.template read_delta<T>();
     }
 };

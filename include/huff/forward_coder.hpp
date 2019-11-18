@@ -3,18 +3,18 @@
 #include <utility>
 #include <vector>
 
-#include <huff/AdaptiveHuffmanBase.hpp>
+#include <huff/huffman_coder_base.hpp>
 
 namespace huff {
 
 // forward dynamic Huffman coding according to [Klein et al., 2019]
 template<typename sym_coder_t, typename freq_coder_t>
-class ForwardCoder : public AdaptiveHuffmanBase {
+class forward_coder : public adaptive_huffman_coder_base {
 private:
     sym_coder_t  m_sym_coder;
     freq_coder_t m_freq_coder;
 
-    inline ForwardCoder() : AdaptiveHuffmanBase() {
+    inline forward_coder() : adaptive_huffman_coder_base() {
         // initialize
         for(size_t c = 0; c < MAX_SYMS; c++) {
             m_leaves[c] = nullptr;
@@ -23,20 +23,20 @@ private:
     }
 
 public:
-    inline ForwardCoder(const std::string& s, BitOStream& out) : ForwardCoder() {
+    inline forward_coder(const std::string& s, bit_ostream& out) : forward_coder() {
         // build Huffman tree and write histogram
         auto queue = init_leaves(s);
         build_tree(queue);
         encode_histogram(out, m_sym_coder, m_freq_coder);
     }
 
-    inline ForwardCoder(BitIStream& in) : ForwardCoder() {
+    inline forward_coder(bit_istream& in) : forward_coder() {
         // read histogram and build Huffman tree
         auto queue = decode_histogram(in, m_sym_coder, m_freq_coder);
         build_tree(queue);
     }
 
-    inline bool eof(BitIStream& in) const {
+    inline bool eof(bit_istream& in) const {
         if(in.eof()) {
             return !m_root;
         } else {
@@ -44,26 +44,26 @@ public:
         }
     }
 
-    inline void encode(BitOStream& out, uint8_t c) {
+    inline void encode(bit_ostream& out, uint8_t c) {
         if(m_root->leaf()) {
             // only root is left, and it's unique, no need to encode
         } else {
             // default
-            HuffmanBase::encode(out, m_leaves[c]);
+            huffman_coder_base::encode(out, m_leaves[c]);
         }
 
         // decrease weight
         decrease(c);
     }
 
-    inline uint8_t decode(BitIStream& in) {
+    inline uint8_t decode(bit_istream& in) {
         uint8_t c;
         if(m_root->leaf()) {
             // only root is left, report its symbol
             c = m_root->sym;
         } else {
             // default
-            c = HuffmanBase::decode(in);
+            c = huffman_coder_base::decode(in);
         }
 
         // decrease weight

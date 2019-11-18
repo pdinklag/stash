@@ -1,10 +1,10 @@
 #pragma once
 
 #include <vector>
-#include <code/CoderBase.hpp>
+#include <code/coder.hpp>
 
 template<typename coder_t, typename sym_coder_t, typename num_coder_t>
-class MTFCoder : public CoderBase {
+class mtf_coder : public coder {
 private:
     static constexpr size_t MAX_SYMS = 256ULL;
 
@@ -13,7 +13,7 @@ private:
     coder_t m_coder;
 
 public:
-    inline MTFCoder(const std::string s, BitOStream& out) {
+    inline mtf_coder(const std::string s, bit_ostream& out) {
         std::vector<bool> occ(MAX_SYMS);
 
         m_sigma = 0;
@@ -34,7 +34,7 @@ public:
         }
     }
 
-    inline MTFCoder(BitIStream& in) {
+    inline mtf_coder(bit_istream& in) {
         sym_coder_t sym_coder;
         num_coder_t num_coder;
         
@@ -44,11 +44,11 @@ public:
         }
     }
 
-    inline bool eof(BitIStream& in) {
+    inline bool eof(bit_istream& in) {
         return in.eof();
     }
 
-    inline void encode(BitOStream& out, uint8_t c) {
+    inline void encode(bit_ostream& out, uint8_t c) {
         // look for c
         for(size_t x = 0; x < m_sigma; x++) {
             if(m_syms[x] == c) {
@@ -59,7 +59,7 @@ public:
         update(c);
     }
     
-    inline uint8_t decode(BitIStream& in) {
+    inline uint8_t decode(bit_istream& in) {
         uint8_t c = m_syms[m_coder.template decode<uint8_t>(in)];
         update(c);
         return c;

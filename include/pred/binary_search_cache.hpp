@@ -1,12 +1,12 @@
 #pragma once
 
+#include <pred/result.hpp>
 #include <pred/util.hpp>
-#include <pred/Result.hpp>
 
 namespace pred {
 
 template<typename array_t, typename item_t, size_t m_cache_num = 512ULL / sizeof(item_t)>
-class CacheBinSearch {
+class binary_search_cache {
 private:
     const array_t* m_array;
     size_t m_num;
@@ -14,18 +14,18 @@ private:
     item_t m_max;
 
 public:
-    inline CacheBinSearch() : m_array(nullptr), m_num(0), m_min(), m_max() {
+    inline binary_search_cache() : m_array(nullptr), m_num(0), m_min(), m_max() {
     }
 
-    inline CacheBinSearch(CacheBinSearch&& other) {
+    inline binary_search_cache(binary_search_cache&& other) {
         *this = other;
     }
     
-    inline CacheBinSearch(const CacheBinSearch& other) {
+    inline binary_search_cache(const binary_search_cache& other) {
         *this = other;
     }
 
-    inline CacheBinSearch(const array_t& array)
+    inline binary_search_cache(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
@@ -34,7 +34,7 @@ public:
         assert_sorted_ascending(array);
     }
 
-    inline CacheBinSearch& operator=(CacheBinSearch&& other) {
+    inline binary_search_cache& operator=(binary_search_cache&& other) {
         m_array = other.m_array;
         m_num = other.m_num;
         m_min = other.m_min;
@@ -42,7 +42,7 @@ public:
         return *this;
     }
 
-    inline CacheBinSearch& operator=(const CacheBinSearch& other) {
+    inline binary_search_cache& operator=(const binary_search_cache& other) {
         m_array = other.m_array;
         m_num = other.m_num;
         m_min = other.m_min;
@@ -50,7 +50,7 @@ public:
         return *this;
     }
 
-    inline Result<item_t> predecessor_seeded(
+    inline result<item_t> predecessor_seeded(
         const item_t x, size_t p, size_t q) const {
 
         assert(x >= m_min && x < m_max);
@@ -76,12 +76,12 @@ public:
         assert((*m_array)[p-1] <= x);
         
         const item_t r = (*m_array)[p - 1];
-        return Result<item_t> { true, r == x, r };
+        return result<item_t> { true, r == x, r };
     }
 
-    inline Result<item_t> predecessor(const item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, false, m_max };
+    inline result<item_t> predecessor(const item_t x) const {
+        if(__builtin_expect(x < m_min, false))  return result<item_t> { false, false, x };
+        if(__builtin_expect(x >= m_max, false)) return result<item_t> { true, false, m_max };
         return predecessor_seeded(x, 0, m_num - 1);
     }
 };

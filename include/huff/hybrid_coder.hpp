@@ -3,20 +3,20 @@
 #include <utility>
 #include <vector>
 
-#include <huff/AdaptiveHuffmanBase.hpp>
+#include <huff/adaptive_huffman_coder_base.hpp>
 
 namespace huff {
 
 // forward dynamic Huffman coding according to [Fruchtman et al., 2019]
 template<typename sym_coder_t, typename freq_coder_t>
-class HybridCoder : public AdaptiveHuffmanBase {
+class hybrid_coder : public adaptive_huffman_coder_base {
 private:
     sym_coder_t  m_sym_coder;
     freq_coder_t m_freq_coder;
 
     size_t m_hist[MAX_SYMS];
 
-    inline HybridCoder() : AdaptiveHuffmanBase() {
+    inline hybrid_coder() : adaptive_huffman_coder_base() {
         // initialize
         for(size_t c = 0; c < MAX_SYMS; c++) {
             m_leaves[c] = nullptr;
@@ -26,7 +26,7 @@ private:
     }
 
 public:
-    inline HybridCoder(const std::string& s, BitOStream& out) : HybridCoder() {
+    inline hybrid_coder(const std::string& s, bit_ostream& out) : hybrid_coder() {
         // count histogram
         size_t sigma = 0;
         for(uint8_t c : s) {
@@ -43,7 +43,7 @@ public:
         m_freq_coder.encode(out, sigma);
     }
 
-    inline HybridCoder(BitIStream& in) : HybridCoder() {
+    inline hybrid_coder(bit_istream& in) : hybrid_coder() {
         // read sigma
         const size_t sigma = m_freq_coder.template decode<>(in);
 
@@ -53,7 +53,7 @@ public:
         m_root = node(0);
     }
 
-    inline bool eof(BitIStream& in) const {
+    inline bool eof(bit_istream& in) const {
         if(in.eof()) {
             return !m_root;
         } else {
@@ -61,7 +61,7 @@ public:
         }
     }
 
-    inline void encode(BitOStream& out, uint8_t c) {
+    inline void encode(bit_ostream& out, uint8_t c) {
         const node_t* q = m_leaves[c];
         if(q == m_root) {
             // only symbol in existance, no need to encode
@@ -98,7 +98,7 @@ public:
         update(c);
     }
 
-    inline uint8_t decode(BitIStream& in) {
+    inline uint8_t decode(bit_istream& in) {
         uint8_t c;
         if(in.eof()) {
             // last symbol

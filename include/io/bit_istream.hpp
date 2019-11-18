@@ -10,7 +10,7 @@
 ///
 /// The current byte in the underlying input stream is buffered and processed
 /// bitwise using another cursor.
-class BitIStream {
+class bit_istream {
     std::istream* m_stream;
 
     static constexpr uint8_t MSB = 7;
@@ -58,7 +58,7 @@ class BitIStream {
         read_next_from_stream();
     }
 public:
-    inline BitIStream(std::istream& input) : m_stream(&input) {
+    inline bit_istream(std::istream& input) : m_stream(&input) {
         char c;
         if(m_stream->get(c)) {
             // prepare the state by reading the first byte into to the `m_next`

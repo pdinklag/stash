@@ -5,13 +5,11 @@
 #include <utility>
 #include <vector>
 
-#include <code/CoderBase.hpp>
-#include <io/BitIStream.hpp>
-#include <io/BitOStream.hpp>
+#include <code/coder.hpp>
 
 namespace huff {
 
-class HuffmanBase : public CoderBase {
+class huffman_coder_base : public coder {
 protected:
     static constexpr size_t MAX_SYMS = 256ULL;
     static constexpr size_t MAX_NODES = 514ULL; // 2 * 257 (all bytes + NYT)
@@ -48,7 +46,7 @@ protected:
     node_t* m_leaves[MAX_SYMS];
     node_t* m_root;
 
-    inline HuffmanBase() {
+    inline huffman_coder_base() {
     }
 
     inline node_t* node(size_t v) {
@@ -90,7 +88,7 @@ protected:
 
     template<typename sym_coder_t, typename freq_coder_t>
     inline void encode_histogram(
-        BitOStream& out,
+        bit_ostream& out,
         sym_coder_t& sym_coder,
         freq_coder_t& freq_coder) {
 
@@ -111,7 +109,7 @@ protected:
 
     template<typename sym_coder_t, typename freq_coder_t>
     inline prio_queue_t decode_histogram(
-        BitIStream& in,
+        bit_istream& in,
         sym_coder_t& sym_coder,
         freq_coder_t& freq_coder) {
 
@@ -147,7 +145,7 @@ protected:
     }
 
 public:
-    inline void encode(BitOStream& out, node_t* leaf) {
+    inline void encode(bit_ostream& out, node_t* leaf) {
         assert(leaf);
 
         // encode
@@ -161,7 +159,7 @@ public:
         }
     }
 
-    inline uint8_t decode(BitIStream& in) {
+    inline uint8_t decode(bit_istream& in) {
         node_t* v = m_root;
         while(!v->leaf()) {
             v = in.read_bit() ? v->right : v->left;

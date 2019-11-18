@@ -2,17 +2,17 @@
 
 namespace rapl {
 
-struct Power {
+struct power {
     double core, uncore, dram; // power in W (watts)
 
-    inline Power() : core(0.0), uncore(0.0), dram(0.0) {
+    inline power() : core(0.0), uncore(0.0), dram(0.0) {
     }
 
-    inline Power(double _core, double _uncore, double _dram)
+    inline power(double _core, double _uncore, double _dram)
         : core(_core), uncore(_uncore), dram(_dram) {
     }
 
-    inline Power(Energy de, uint64_t dt) {
+    inline power(energy de, uint64_t dt) {
         const double ddt = double(dt);
         
         core =   (double(de.core) / ddt) / 1000.0;
@@ -24,31 +24,31 @@ struct Power {
         return core + uncore + dram;
     }
 
-    inline Power operator+(const Power& other) {
-        return Power {
+    inline power operator+(const power& other) {
+        return power {
             core   + other.core,
             uncore + other.uncore,
             dram   + other.dram
         };
     }
 
-    inline Power& operator+=(const Power& other) {
+    inline power& operator+=(const power& other) {
         core   += other.core;
         uncore += other.uncore;
         dram   += other.dram;
         return *this;
     }
 
-    inline Power operator-(const Power& other) {
-        return Power {
+    inline power operator-(const power& other) {
+        return power {
             core   - other.core,
             uncore - other.uncore,
             dram   - other.dram
         };
     }
 
-    inline Power operator/(double d) {
-        return Power {
+    inline power operator/(double d) {
+        return power {
             core   / d,
             uncore / d,
             dram   / d
@@ -60,7 +60,7 @@ struct Power {
 
 #include <ostream>
 
-std::ostream& operator<<(std::ostream& os, const rapl::Power& p) {
+std::ostream& operator<<(std::ostream& os, const rapl::power& p) {
     os << "(" << p.core << "," << p.uncore << "," << p.dram << ")";
     return os;
 }

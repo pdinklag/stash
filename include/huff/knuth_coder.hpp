@@ -3,17 +3,17 @@
 #include <utility>
 #include <vector>
 
-#include <huff/AdaptiveHuffmanBase.hpp>
+#include <huff/adaptive_huffman_coder_base.hpp>
 
 namespace huff {
 
 // dynamic (online) Huffman coding according to [Knuth, 1985]
 template<typename sym_coder_t>
-class Knuth85Coder : public AdaptiveHuffmanBase {
+class knuth_coder : public adaptive_huffman_coder_base {
 private:
     sym_coder_t m_sym_coder;
 
-    inline Knuth85Coder() : AdaptiveHuffmanBase() {
+    inline knuth_coder() : adaptive_huffman_coder_base() {
         // init tree with NYT node
         m_num_nodes = 1;
         m_nodes[0] = node_t{ 0, 0, nullptr, 0, nullptr, nullptr, 0 };
@@ -26,13 +26,13 @@ private:
     }
 
 public:
-    inline Knuth85Coder(const std::string& s, BitOStream& out) : Knuth85Coder() {
+    inline knuth_coder(const std::string& s, bit_ostream& out) : knuth_coder() {
     }
 
-    inline Knuth85Coder(BitIStream& in) : Knuth85Coder() {
+    inline knuth_coder(bit_istream& in) : knuth_coder() {
     }
 
-    inline void encode(BitOStream& out, uint8_t c) {
+    inline void encode(bit_ostream& out, uint8_t c) {
         const node_t* q = m_leaves[c];
         bool is_nyt;
         if(q) {
@@ -63,7 +63,7 @@ public:
         increase(c);
     }
 
-    inline uint8_t decode(BitIStream& in) {
+    inline uint8_t decode(bit_istream& in) {
         uint8_t c;
         if(m_num_nodes == 1) {
             // first character

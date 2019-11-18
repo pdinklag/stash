@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include <vec/BitVector.hpp>
-#include <vec/IntVector.hpp>
+#include <vec/bit_vector.hpp>
+#include <vec/int_vector.hpp>
 
-class Rank {
+class bit_rank {
 private:
     static constexpr size_t SUP_SZ = 4096;
     static constexpr size_t SUP_MSK = 4095;
@@ -14,13 +14,13 @@ private:
     static constexpr size_t BLOCKS_PER_SB = SUP_SZ >> 6ULL;
     static constexpr size_t SB_INNER_RS = SUP_W - 6ULL;
         
-    const BitVector* m_bv;
+    const bit_vector* m_bv;
 
-    IntVector m_blocks;    // size 64 each
-    IntVector m_supblocks; // size SUP_SZ each
+    int_vector m_blocks;    // size 64 each
+    int_vector m_supblocks; // size SUP_SZ each
 
 public:
-    inline Rank(const BitVector& bv) : m_bv(&bv) {
+    inline bit_rank(const bit_vector& bv) : m_bv(&bv) {
         const size_t n = m_bv->size();
 
         // determine number of superblocks and superblock entry width
@@ -58,25 +58,25 @@ public:
         }
     }
 
-    inline Rank() : m_bv(nullptr) {
+    inline bit_rank() : m_bv(nullptr) {
     }
 
-    inline Rank(const Rank& other) {
+    inline bit_rank(const bit_rank& other) {
         *this = other;
     }
 
-    inline Rank(Rank&& other) {
+    inline bit_rank(bit_rank&& other) {
         *this = std::move(other);
     }
 
-    inline Rank& operator=(const Rank& other) {
+    inline bit_rank& operator=(const bit_rank& other) {
         m_bv = other.m_bv;
         m_blocks = other.m_blocks;
         m_supblocks = other.m_supblocks;
         return *this;
     }
 
-    inline Rank& operator=(Rank&& other) {
+    inline bit_rank& operator=(bit_rank&& other) {
         m_bv = other.m_bv;
         m_blocks = std::move(other.m_blocks);
         m_supblocks = std::move(other.m_supblocks);

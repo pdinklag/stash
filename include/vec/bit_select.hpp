@@ -2,11 +2,11 @@
 
 #include <utility>
 
-#include <vec/BitVector.hpp>
-#include <vec/IntVector.hpp>
+#include <vec/bit_vector.hpp>
+#include <vec/int_vector.hpp>
 
 template<bool m_bit>
-class Select {
+class bit_select {
 private:
     static constexpr uint8_t basic_rank(uint64_t v);
     static constexpr uint8_t basic_rank(uint64_t v, uint8_t x);
@@ -14,18 +14,18 @@ private:
     static constexpr uint8_t basic_select(uint64_t v, uint8_t k);
     static constexpr uint8_t basic_select(uint64_t v, uint8_t l, uint8_t k);
 
-    const BitVector* m_bv;
+    const bit_vector* m_bv;
 
     size_t m_max;
     size_t m_block_size;
     size_t m_supblock_size;
     size_t m_blocks_per_supblock;
 
-    IntVector m_blocks;
-    IntVector m_supblocks;
+    int_vector m_blocks;
+    int_vector m_supblocks;
 
 public:
-    inline Select(const BitVector& bv) {
+    inline bit_select(const bit_vector& bv) {
         m_bv = &bv;
 
         const size_t n = bv.size();
@@ -36,8 +36,8 @@ public:
         m_supblock_size = log_n * log_n;
         m_blocks_per_supblock = log_n;
 
-        m_supblocks = IntVector(div_ceil(n, m_supblock_size), log_n);
-        m_blocks = IntVector(div_ceil(n, m_block_size), log_n);
+        m_supblocks = int_vector(div_ceil(n, m_supblock_size), log_n);
+        m_blocks = int_vector(div_ceil(n, m_block_size), log_n);
 
         m_max = 0;
         size_t r_sb = 0; // current bit count in superblock
@@ -123,7 +123,7 @@ public:
         m_blocks.rebuild(cur_b, w_block);
     }
 
-    inline Select()
+    inline bit_select()
         : m_bv(nullptr),
           m_max(0),
           m_block_size(0),
@@ -131,15 +131,15 @@ public:
           m_blocks_per_supblock(0) {
     }
 
-    inline Select(const Select& other) {
+    inline bit_select(const bit_select& other) {
         *this = other;
     }
 
-    inline Select(Select&& other) {
+    inline bit_select(bit_select&& other) {
         *this = std::move(other);
     }
 
-    inline Select& operator=(const Select& other) {
+    inline bit_select& operator=(const bit_select& other) {
         m_bv = other.m_bv;
         m_max = other.m_max;
         m_block_size = other.m_block_size;
@@ -150,7 +150,7 @@ public:
         return *this;
     }
 
-    inline Select& operator=(Select&& other) {
+    inline bit_select& operator=(bit_select&& other) {
         m_bv = other.m_bv;
         m_max = other.m_max;
         m_block_size = other.m_block_size;
@@ -219,54 +219,54 @@ public:
 };
 
 template<>
-inline constexpr uint8_t Select<0>::basic_rank(uint64_t v) {
+inline constexpr uint8_t bit_select<0>::basic_rank(uint64_t v) {
     return 64ULL - rank1_u64(v);
 }
 
 template<>
-inline constexpr uint8_t Select<0>::basic_rank(uint64_t v, uint8_t x) {
+inline constexpr uint8_t bit_select<0>::basic_rank(uint64_t v, uint8_t x) {
     return x + 1 - rank1_u64(v, x);
 }
 
 template<>
-inline constexpr uint8_t Select<0>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
+inline constexpr uint8_t bit_select<0>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
     return (b-a+1) - rank1_u64(v, a, b);
 }
 
 template<>
-inline constexpr uint8_t Select<0>::basic_select(uint64_t v, uint8_t k) {
+inline constexpr uint8_t bit_select<0>::basic_select(uint64_t v, uint8_t k) {
     return select0_u64(v, k);
 }
 
 template<>
-inline constexpr uint8_t Select<0>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
+inline constexpr uint8_t bit_select<0>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
     return select0_u64(v, l, k);
 }
 
 template<>
-inline constexpr uint8_t Select<1>::basic_rank(uint64_t v) {
+inline constexpr uint8_t bit_select<1>::basic_rank(uint64_t v) {
     return rank1_u64(v);
 }
 
 template<>
-inline constexpr uint8_t Select<1>::basic_rank(uint64_t v, uint8_t x) {
+inline constexpr uint8_t bit_select<1>::basic_rank(uint64_t v, uint8_t x) {
     return rank1_u64(v, x);
 }
 
 template<>
-inline constexpr uint8_t Select<1>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
+inline constexpr uint8_t bit_select<1>::basic_rank(uint64_t v, uint8_t a, uint8_t b) {
     return rank1_u64(v, a, b);
 }
 
 template<>
-inline constexpr uint8_t Select<1>::basic_select(uint64_t v, uint8_t k) {
+inline constexpr uint8_t bit_select<1>::basic_select(uint64_t v, uint8_t k) {
     return select1_u64(v, k);
 }
 
 template<>
-inline constexpr uint8_t Select<1>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
+inline constexpr uint8_t bit_select<1>::basic_select(uint64_t v, uint8_t l, uint8_t k) {
     return select1_u64(v, l, k);
 }
 
-using Select0 = Select<0>;
-using Select1 = Select<1>;
+using bit_select0 = bit_select<0>;
+using bit_select1 = bit_select<1>;

@@ -2,13 +2,13 @@
 
 namespace rapl {
     
-struct Energy {
+struct energy {
     uint64_t core, uncore, dram; // energy in µJ (microjoules)
 
-    inline Energy() : core(0), uncore(0), dram(0) {
+    inline energy() : core(0), uncore(0), dram(0) {
     }
 
-    inline Energy(uint64_t _core, uint64_t _uncore, uint64_t _dram)
+    inline energy(uint64_t _core, uint64_t _uncore, uint64_t _dram)
         : core(_core), uncore(_uncore), dram(_dram) {
     }
 
@@ -16,8 +16,8 @@ struct Energy {
         return core + uncore + dram;
     }
 
-    inline Energy operator-(const Energy& other) {
-        return Energy {
+    inline energy operator-(const energy& other) {
+        return energy {
             core   - other.core,
             uncore - other.uncore,
             dram   - other.dram
@@ -29,7 +29,7 @@ struct Energy {
 
 #include <ostream>
 
-std::ostream& operator<<(std::ostream& os, const rapl::Energy& e) {
+std::ostream& operator<<(std::ostream& os, const rapl::energy& e) {
     os << "(" << e.core << "," << e.uncore << "," << e.dram << ")";
     return os;
 }

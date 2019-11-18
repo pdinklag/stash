@@ -3,11 +3,11 @@
 #include <algorithm>
 
 #include <pred/util.hpp>
-#include <pred/Result.hpp>
+#include <pred/result.hpp>
 
-#include <pred/CacheBinSearch.hpp>
+#include <pred/binary_search_cache.hpp>
 
-#include <vec/IntVector.hpp>
+#include <vec/int_vector.hpp>
 #include <vec/util.hpp>
 
 namespace pred {
@@ -17,7 +17,7 @@ template<
     typename item_t,
     size_t m_lo_bits,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
-class IdxBinSearch {
+class idx_binary_search {
 private:
     static constexpr size_t m_hi_bits = 8 * sizeof(item_t) - m_lo_bits;
 
@@ -29,13 +29,13 @@ private:
     uint64_t m_key_min;
     uint64_t m_key_max;
 
-    IntVector m_hi_idx;
+    int_vector m_hi_idx;
 
-    using lo_pred_t = CacheBinSearch<array_t, item_t, m_cache_num>;
+    using lo_pred_t = binary_search_cache<array_t, item_t, m_cache_num>;
     lo_pred_t m_lo_pred;
 
 public:
-    inline IdxBinSearch(const array_t& array)
+    inline idx_binary_search(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
@@ -47,7 +47,7 @@ public:
         m_key_min = uint64_t(m_min) >> m_lo_bits;
         m_key_max = uint64_t(m_max) >> m_lo_bits;
 
-        m_hi_idx = IntVector(m_key_max - m_key_min, log2_ceil(m_num-1));
+        m_hi_idx = int_vector(m_key_max - m_key_min, log2_ceil(m_num-1));
 
         uint64_t prev_key = m_key_min;
         for(size_t i = 1; i < m_num; i++) {
@@ -68,16 +68,16 @@ public:
         m_lo_pred = lo_pred_t(array);
     }
 
-    inline Result<item_t> predecessor(const item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, x == m_max, m_max };
+    inline result<item_t> predecessor(const item_t x) const {
+        if(__builtin_expect(x < m_min, false))  return result<item_t> { false, false, x };
+        if(__builtin_expect(x >= m_max, false)) return result<item_t> { true, x == m_max, m_max };
 
         const uint64_t key = x >> m_lo_bits;
 
         const size_t q = (key == m_key_max ? m_num-1 : m_hi_idx[key - m_key_min]);
         assert(x < (*m_array)[q]);
         if(__builtin_expect(x == (*m_array)[q], false)) {
-            return Result<item_t> { true, true, x };
+            return result<item_t> { true, true, x };
         } else {
             const size_t p = (key == m_key_min ? 0 : m_hi_idx[key-1-m_key_min]);
             return m_lo_pred.predecessor_seeded(x, p, q);

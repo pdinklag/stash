@@ -4,7 +4,7 @@
 #include <vector>
 #include <utility>
 
-class BitVector {
+class bit_vector {
 private:
     size_t m_size;
     std::vector<uint64_t> m_bits;
@@ -39,7 +39,7 @@ private:
 
 public:
     struct Ref {
-        BitVector* bv;
+        bit_vector* bv;
         size_t i;
         
         inline operator bool() const {
@@ -51,30 +51,30 @@ public:
         }
     };
 
-    inline BitVector() : m_size(0) {
+    inline bit_vector() : m_size(0) {
     }
 
-    inline BitVector(const BitVector& other) {
+    inline bit_vector(const bit_vector& other) {
         *this = other;
     }
 
-    inline BitVector(BitVector&& other) {
+    inline bit_vector(bit_vector&& other) {
         *this = std::move(other);
     }
 
-    inline BitVector(size_t size) : m_size(size) {
+    inline bit_vector(size_t size) : m_size(size) {
         const size_t q = block(size);
         const size_t k = offset(size);
         m_bits.resize(k ? q+1 : q);
     }
 
-    inline BitVector& operator=(const BitVector& other) {
+    inline bit_vector& operator=(const bit_vector& other) {
         m_size = other.m_size;
         m_bits = other.m_bits;
         return *this;
     }
 
-    inline BitVector& operator=(BitVector&& other) {
+    inline bit_vector& operator=(bit_vector&& other) {
         m_size = std::move(other.m_size);
         m_bits = std::move(other.m_bits);
         return *this;

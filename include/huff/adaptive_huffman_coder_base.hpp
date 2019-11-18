@@ -1,11 +1,10 @@
 #pragma once
 
-#include <huff/HuffmanBase.hpp>
-#include <io/BitOStream.hpp>
+#include <huff/huffman_coder_base.hpp>
 
 namespace huff {
 
-class AdaptiveHuffmanBase : public HuffmanBase {
+class adaptive_huffman_coder_base : public huffman_coder_base {
 protected:
     node_t* m_rank_map[MAX_NODES];
 
@@ -70,7 +69,7 @@ protected:
         }
     }
 
-    using HuffmanBase::HuffmanBase;
+    using huffman_coder_base::huffman_coder_base;
 };
 
 }

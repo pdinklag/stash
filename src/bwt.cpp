@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 
-#include <util/FileSize.hpp>
+#include <util/file_size.hpp>
 
 #include <divsufsort64.h>
 #include <tlx/cmdline_parser.hpp>

@@ -1,18 +1,18 @@
 #pragma once
 
 #include <vector>
-#include <huff/HuffmanBase.hpp>
+#include <huff/huffman_coder_base.hpp>
 
 namespace huff {
 
 // Huffman coder based on [Huffman, 1952]
 template<typename sym_coder_t, typename freq_coder_t>
-class Huffman52Coder : public HuffmanBase {
+class huffman_coder : public huffman_coder_base {
 private:
     sym_coder_t  m_sym_coder;
     freq_coder_t m_freq_coder;
 
-    inline Huffman52Coder() : HuffmanBase() {
+    inline huffman_coder() : huffman_coder_base() {
         // initialize
         for(size_t c = 0; c < MAX_SYMS; c++) {
             m_leaves[c] = nullptr;
@@ -52,21 +52,21 @@ private:
     }
 
 public:
-    inline Huffman52Coder(const std::string& s, BitOStream& out) : Huffman52Coder() {
+    inline huffman_coder(const std::string& s, bit_ostream& out) : huffman_coder() {
         // build Huffman tree and write histogram
         auto queue = init_leaves(s);
         build_tree(queue);
         encode_histogram(out, m_sym_coder, m_freq_coder);
     }
 
-    inline Huffman52Coder(BitIStream& in) : Huffman52Coder() {
+    inline huffman_coder(bit_istream& in) : huffman_coder() {
         // read histogram and build Huffman tree
         auto queue = decode_histogram(in, m_sym_coder, m_freq_coder);
         build_tree(queue);
     }
 
-    inline void encode(BitOStream& out, uint8_t c) {
-        HuffmanBase::encode(out, m_leaves[c]);
+    inline void encode(bit_ostream& out, uint8_t c) {
+        huffman_coder_base::encode(out, m_leaves[c]);
     }
 };
 

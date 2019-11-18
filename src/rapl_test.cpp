@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include <rapl/Reader.hpp>
-#include <rapl/Power.hpp>
-#include <util/Time.hpp>
+#include <rapl/reader.hpp>
+#include <rapl/power.hpp>
+#include <util/time.hpp>
 
 #include <algorithm>
 #include <unordered_set>
@@ -11,46 +11,46 @@
 
 volatile int x;
 
-rapl::Power test_add(const rapl::Reader& r, const int* a, size_t n) {
+rapl::power test_add(const rapl::reader& r, const int* a, size_t n) {
     auto t0 = time();
     auto e0 = r.read();
     for(size_t i = 0; i < n; i++) {
         x += a[i];
     }
-    return rapl::Power(r.read() - e0, time() - t0);
+    return rapl::power(r.read() - e0, time() - t0);
 }
 
-rapl::Power test_xor(const rapl::Reader& r, const int* a, size_t n) {
+rapl::power test_xor(const rapl::reader& r, const int* a, size_t n) {
     auto t0 = time();
     auto e0 = r.read();
     for(size_t i = 0; i < n; i++) {
         x ^= a[i];
     }
-    return rapl::Power(r.read() - e0, time() - t0);
+    return rapl::power(r.read() - e0, time() - t0);
 }
 
-rapl::Power test_mul(const rapl::Reader& r, const int* a, size_t n) {
+rapl::power test_mul(const rapl::reader& r, const int* a, size_t n) {
     auto t0 = time();
     auto e0 = r.read();
     for(size_t i = 0; i < n; i++) {
         x *= a[i];
     }
-    return rapl::Power(r.read() - e0, time() - t0);
+    return rapl::power(r.read() - e0, time() - t0);
 }
 
-rapl::Power test_sleep(const rapl::Reader& r, size_t iterations = 5) {
-    rapl::Power p;
+rapl::power test_sleep(const rapl::reader& r, size_t iterations = 5) {
+    rapl::power p;
     for(size_t i = 0; i < iterations; i++) {
         auto t0 = time();
         auto e0 = r.read();
         usleep(250'000);
-        p += rapl::Power(r.read() - e0, time() - t0);
+        p += rapl::power(r.read() - e0, time() - t0);
     }
     return p / double(iterations);
 }
 
 int main(int argc, char** argv) {
-    rapl::Reader r(0);
+    rapl::reader r(0);
 
     const size_t n = 10'000'000;
     const size_t iterations = 100;
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
     for(size_t it = 0; it < iterations; it++) {
     
-        rapl::Power p_random;
+        rapl::power p_random;
         {
             auto t0 = time();
             auto e0 = r.read();
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
                 a[i] = uniform_dist(e);
             }
 
-            p_random = rapl::Power(r.read() - e0, time() - t0);
+            p_random = rapl::power(r.read() - e0, time() - t0);
         }
 
         auto p_sleep = test_sleep(r);

@@ -1,12 +1,12 @@
 #pragma once
 
+#include <pred/result.hpp>
 #include <pred/util.hpp>
-#include <pred/Result.hpp>
 
 namespace pred {
 
 template<typename array_t, typename item_t>
-class BinSearch {
+class binary_search {
 private:
     const array_t* m_array;
     size_t m_num;
@@ -14,18 +14,18 @@ private:
     item_t m_max;
 
 public:
-    inline BinSearch() : m_array(nullptr), m_num(0), m_min(), m_max() {
+    inline binary_search() : m_array(nullptr), m_num(0), m_min(), m_max() {
     }
 
-    inline BinSearch(BinSearch&& other) {
+    inline binary_search(binary_search&& other) {
         *this = other;
     }
     
-    inline BinSearch(const BinSearch& other) {
+    inline binary_search(const binary_search& other) {
         *this = other;
     }
 
-    inline BinSearch(const array_t& array)
+    inline binary_search(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
@@ -34,7 +34,7 @@ public:
         assert_sorted_ascending(array);
     }
 
-    inline BinSearch& operator=(BinSearch&& other) {
+    inline binary_search& operator=(binary_search&& other) {
         m_array = other.m_array;
         m_num = other.m_num;
         m_min = other.m_min;
@@ -42,7 +42,7 @@ public:
         return *this;
     }
 
-    inline BinSearch& operator=(const BinSearch& other) {
+    inline binary_search& operator=(const binary_search& other) {
         m_array = other.m_array;
         m_num = other.m_num;
         m_min = other.m_min;
@@ -50,9 +50,9 @@ public:
         return *this;
     }
 
-    inline Result<item_t> predecessor(const item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return Result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return Result<item_t> { true, false, m_max };
+    inline result<item_t> predecessor(const item_t x) const {
+        if(__builtin_expect(x < m_min, false))  return result<item_t> { false, false, x };
+        if(__builtin_expect(x >= m_max, false)) return result<item_t> { true, false, m_max };
         
         size_t p = 0;
         size_t q = m_num - 1;
@@ -75,7 +75,7 @@ public:
         }
 
         const item_t r = (*m_array)[p];
-        return Result<item_t> { true, r == x, r };
+        return result<item_t> { true, r == x, r };
     }
 };
 
