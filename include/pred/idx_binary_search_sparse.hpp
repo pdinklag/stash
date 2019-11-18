@@ -98,12 +98,14 @@ public:
         if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
         
         const uint64_t key = hi(x) - m_key_min;
-        const size_t q = m_hi_idx[m_hi_rank(key+1)-1];
+        const size_t qrank = m_hi_rank(key+1);
+        const size_t q = m_hi_idx[qrank ? qrank-1 : 0];
 
         if(unlikely(x == (*m_array)[q])) {
             return result<item_t> { true, true, x };
         } else {
-            const size_t p = key > 0 ? m_hi_idx[m_hi_rank(key)-1] : 0;
+            const size_t prank = m_hi_rank(key);
+            const size_t p = m_hi_idx[prank ? prank-1 : 0];
             return m_lo_pred.predecessor_seeded(x, p, q);
         }
     }
