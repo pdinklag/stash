@@ -8,6 +8,7 @@
 #include <pred/binary_search.hpp>
 #include <pred/binary_search_cache.hpp>
 #include <pred/idx_binary_search.hpp>
+#include <pred/idx_binary_search_sparse.hpp>
 #include <pred/rank_select.hpp>
 #include <pred/two_level_binary_search.hpp>
 
@@ -26,6 +27,9 @@ using two_level_binary_search = pred::two_level_binary_search<std::vector<value_
 
 template<size_t k>
 using idx_binary_search = pred::idx_binary_search<std::vector<value_t>, value_t, k>;
+
+template<size_t k>
+using idx_binary_search_sparse = pred::idx_binary_search_sparse<std::vector<value_t>, value_t, k>;
 
 size_t mem = 0;
 
@@ -82,7 +86,9 @@ test_result test(
     {
         auto t0 = time();
         for(value_t x : queries) {
-            sum += q.predecessor(x).value;
+            auto pred_x = q.predecessor(x).value;
+            assert(x >= pred_x);
+            sum += pred_x;
         }
         t_queries = time() - t0;
     }
@@ -139,6 +145,17 @@ int main(int argc, char** argv) {
     print_result("idx_binsearch*<14>", test<idx_binary_search<14>>(array, queries));
     print_result("idx_binsearch*<15>", test<idx_binary_search<15>>(array, queries));
     print_result("idx_binsearch*<16>", test<idx_binary_search<16>>(array, queries));
+    print_result("sidx_binsearch*<6>", test<idx_binary_search_sparse<6>>(array, queries));
+    print_result("sidx_binsearch*<7>", test<idx_binary_search_sparse<7>>(array, queries));
+    print_result("sidx_binsearch*<8>", test<idx_binary_search_sparse<8>>(array, queries));
+    print_result("sidx_binsearch*<9>", test<idx_binary_search_sparse<9>>(array, queries));
+    print_result("sidx_binsearch*<10>", test<idx_binary_search_sparse<10>>(array, queries));
+    print_result("sidx_binsearch*<11>", test<idx_binary_search_sparse<11>>(array, queries));
+    print_result("sidx_binsearch*<12>", test<idx_binary_search_sparse<12>>(array, queries));
+    print_result("sidx_binsearch*<13>", test<idx_binary_search_sparse<13>>(array, queries));
+    print_result("sidx_binsearch*<14>", test<idx_binary_search_sparse<14>>(array, queries));
+    print_result("sidx_binsearch*<15>", test<idx_binary_search_sparse<15>>(array, queries));
+    print_result("sidx_binsearch*<16>", test<idx_binary_search_sparse<16>>(array, queries));
     print_result("2*_binsearch*<64>", test<two_level_binary_search<64>>(array, queries));
     print_result("2*_binsearch*<128>", test<two_level_binary_search<128>>(array, queries));
     print_result("2*_binsearch*<256>", test<two_level_binary_search<256>>(array, queries));

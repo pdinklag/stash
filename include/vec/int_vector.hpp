@@ -139,6 +139,10 @@ public:
         m_data = std::move(new_iv.m_data);
     }
 
+    inline void rebuild(size_t size) {
+        rebuild(size, m_width);
+    }
+
     inline uint64_t operator[](size_t i) const {
         return get(i);
     }

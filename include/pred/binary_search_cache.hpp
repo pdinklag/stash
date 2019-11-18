@@ -56,7 +56,6 @@ public:
         assert(x >= m_min && x < m_max);
         while(q - p > m_cache_num) {
             assert(x >= (*m_array)[p]);
-            assert(x < (*m_array)[q]);
             
             const size_t m = (p + q) >> 1ULL;
             
