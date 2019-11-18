@@ -69,14 +69,14 @@ public:
     }
 
     inline result<item_t> predecessor(const item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return result<item_t> { true, x == m_max, m_max };
-
+        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
+        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
+        
         const uint64_t key = x >> m_lo_bits;
 
         const size_t q = (key == m_key_max ? m_num-1 : m_hi_idx[key - m_key_min]);
         assert(x < (*m_array)[q]);
-        if(__builtin_expect(x == (*m_array)[q], false)) {
+        if(unlikely(x == (*m_array)[q])) {
             return result<item_t> { true, true, x };
         } else {
             const size_t p = (key == m_key_min ? 0 : m_hi_idx[key-1-m_key_min]);

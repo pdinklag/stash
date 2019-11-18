@@ -66,8 +66,8 @@ public:
     }
 
     inline result<item_t> predecessor(const item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return result<item_t> { true, x == m_max, m_max };
+        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
+        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
 
         auto idx = m_idx.predecessor(sample{x, 0}).value;
         if(idx.item == x) {

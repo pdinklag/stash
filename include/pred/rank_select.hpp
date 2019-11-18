@@ -37,8 +37,8 @@ public:
     }
 
     inline result<item_t> predecessor(item_t x) const {
-        if(__builtin_expect(x < m_min, false))  return result<item_t> { false, false, x };
-        if(__builtin_expect(x >= m_max, false)) return result<item_t> { true, false, m_max };
+        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
+        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
 
         x -= m_min;
         if(m_bv[x]) {

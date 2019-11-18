@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <util/likely.hpp>
 
 template<typename array_t>
 void assert_sorted_ascending(const array_t& a) {
