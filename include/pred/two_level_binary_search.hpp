@@ -7,7 +7,7 @@
 
 #include <pred/binary_search_cache.hpp>
 
-#include <vec/util.hpp>
+#include <util/math.hpp>
 
 namespace pred {
 
@@ -55,7 +55,7 @@ public:
         assert_sorted_ascending(array);
 
         // sample
-        const size_t num_samples = div_ceil(m_num, m_k);
+        const size_t num_samples = idiv_ceil(m_num, m_k);
         
         m_sample.reserve(num_samples);
         for(size_t i = 0; i < m_num; i += m_k) {

@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include <util/math.hpp>
 #include <vec/bit_vector.hpp>
 #include <vec/int_vector.hpp>
 
@@ -36,8 +37,8 @@ public:
         m_supblock_size = log_n * log_n;
         m_blocks_per_supblock = log_n;
 
-        m_supblocks = int_vector(div_ceil(n, m_supblock_size), log_n);
-        m_blocks = int_vector(div_ceil(n, m_block_size), log_n);
+        m_supblocks = int_vector(idiv_ceil(n, m_supblock_size), log_n);
+        m_blocks = int_vector(idiv_ceil(n, m_block_size), log_n);
 
         m_max = 0;
         size_t r_sb = 0; // current bit count in superblock

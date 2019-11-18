@@ -7,16 +7,6 @@ inline constexpr uint64_t bit_mask(uint64_t bits) {
     return (1ULL << bits) - 1ULL;
 }
 
-// integer division rounding up
-inline constexpr uint64_t div_ceil(uint64_t a, uint64_t b) {
-    const uint64_t q = a / b;
-    return (a % b == 0) ? q : q + 1;
-}
-
-inline constexpr uint64_t log2_ceil(uint64_t x) {
-    return 64ULL - __builtin_clzll(x);
-} 
-
 // rank on a 64-bit value
 inline constexpr uint8_t rank1_u64(uint64_t v) {
     return __builtin_popcountll(v);

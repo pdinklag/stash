@@ -8,7 +8,7 @@
 #include <pred/binary_search_cache.hpp>
 
 #include <vec/int_vector.hpp>
-#include <vec/util.hpp>
+#include <util/math.hpp>
 
 namespace pred {
 
