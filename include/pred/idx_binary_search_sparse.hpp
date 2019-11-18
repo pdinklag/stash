@@ -103,7 +103,7 @@ public:
         if(unlikely(x == (*m_array)[q])) {
             return result<item_t> { true, true, x };
         } else {
-            const size_t p = m_hi_idx[m_hi_rank(key)-1];
+            const size_t p = key > 0 ? m_hi_idx[m_hi_rank(key)-1] : 0;
             return m_lo_pred.predecessor_seeded(x, p, q);
         }
     }
