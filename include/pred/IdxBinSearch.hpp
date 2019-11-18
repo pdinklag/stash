@@ -7,6 +7,7 @@
 
 #include <pred/CacheBinSearch.hpp>
 
+#include <vec/IntVector.hpp>
 #include <vec/util.hpp>
 
 namespace pred {
@@ -28,7 +29,7 @@ private:
     uint64_t m_key_min;
     uint64_t m_key_max;
 
-    std::vector<size_t> m_hi_idx;
+    IntVector m_hi_idx;
 
     using lo_pred_t = CacheBinSearch<array_t, item_t, m_cache_num>;
     lo_pred_t m_lo_pred;
@@ -46,25 +47,21 @@ public:
         m_key_min = uint64_t(m_min) >> m_lo_bits;
         m_key_max = uint64_t(m_max) >> m_lo_bits;
 
-        m_hi_idx.reserve(m_key_max - m_key_min + 1);
+        m_hi_idx = IntVector(m_key_max - m_key_min, log2_ceil(m_num-1));
 
         uint64_t prev_key = m_key_min;
-        size_t cur_interval_start = 0;
-
         for(size_t i = 1; i < m_num; i++) {
             uint64_t key = array[i] >> m_lo_bits;
             if(key != prev_key) {
                 for(uint64_t k = prev_key; k < key; k++) {
-                    m_hi_idx.emplace_back(i);
+                    //m_hi_idx.emplace_back(i);
+                    m_hi_idx[k - m_key_min] = i;
                 }
 
                 prev_key = key;
-                cur_interval_start = i-1; // include the last value with the
-                                          // previous key (important)!
             }
         }
 
-        assert(m_hi_idx.size() == m_hi_idx.capacity());
         assert(prev_key == m_key_max);
 
         // build the predecessor data structure for low bits
@@ -78,6 +75,7 @@ public:
         const uint64_t key = x >> m_lo_bits;
 
         const size_t q = (key == m_key_max ? m_num-1 : m_hi_idx[key - m_key_min]);
+        assert(x < (*m_array)[q]);
         if(__builtin_expect(x == (*m_array)[q], false)) {
             return Result<item_t> { true, true, x };
         } else {
