@@ -7,7 +7,6 @@
 
 #include <pred/BinSearch.hpp>
 #include <pred/CacheBinSearch.hpp>
-#include <pred/HashBinSearch.hpp>
 #include <pred/IdxBinSearch.hpp>
 #include <pred/RankSelect.hpp>
 #include <pred/TwoLevelBinSearch.hpp>
@@ -24,9 +23,6 @@ using RankSelect     = pred::RankSelect<std::vector<value_t>, value_t>;
 
 template<size_t k>
 using TwoLevelBinSearch = pred::TwoLevelBinSearch<std::vector<value_t>, value_t, k>;
-
-template<size_t k>
-using HashBinSearch = pred::HashBinSearch<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
 using IdxBinSearch = pred::IdxBinSearch<std::vector<value_t>, value_t, k>;
@@ -132,25 +128,6 @@ int main(int argc, char** argv) {
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
-    print_result("2*_binsearch*<64>", test<TwoLevelBinSearch<64>>(array, queries));
-    print_result("2*_binsearch*<128>", test<TwoLevelBinSearch<128>>(array, queries));
-    print_result("2*_binsearch*<256>", test<TwoLevelBinSearch<256>>(array, queries));
-    print_result("2*_binsearch*<512>", test<TwoLevelBinSearch<512>>(array, queries));
-    print_result("2*_binsearch*<1024>", test<TwoLevelBinSearch<1024>>(array, queries));
-    print_result("2*_binsearch*<2048>", test<TwoLevelBinSearch<2048>>(array, queries));
-    print_result("2*_binsearch*<4096>", test<TwoLevelBinSearch<4096>>(array, queries));
-    print_result("2*_binsearch*<8192>", test<TwoLevelBinSearch<8192>>(array, queries));
-    print_result("hash_binsearch*<6>", test<HashBinSearch<6>>(array, queries));
-    print_result("hash_binsearch*<7>", test<HashBinSearch<7>>(array, queries));
-    print_result("hash_binsearch*<8>", test<HashBinSearch<8>>(array, queries));
-    print_result("hash_binsearch*<9>", test<HashBinSearch<9>>(array, queries));
-    print_result("hash_binsearch*<10>", test<HashBinSearch<10>>(array, queries));
-    print_result("hash_binsearch*<11>", test<HashBinSearch<11>>(array, queries));
-    print_result("hash_binsearch*<12>", test<HashBinSearch<12>>(array, queries));
-    print_result("hash_binsearch*<13>", test<HashBinSearch<13>>(array, queries));
-    print_result("hash_binsearch*<14>", test<HashBinSearch<14>>(array, queries));
-    print_result("hash_binsearch*<15>", test<HashBinSearch<15>>(array, queries));
-    print_result("hash_binsearch*<16>", test<HashBinSearch<16>>(array, queries));
     print_result("idx_binsearch*<6>", test<IdxBinSearch<6>>(array, queries));
     print_result("idx_binsearch*<7>", test<IdxBinSearch<7>>(array, queries));
     print_result("idx_binsearch*<8>", test<IdxBinSearch<8>>(array, queries));
@@ -162,6 +139,14 @@ int main(int argc, char** argv) {
     print_result("idx_binsearch*<14>", test<IdxBinSearch<14>>(array, queries));
     print_result("idx_binsearch*<15>", test<IdxBinSearch<15>>(array, queries));
     print_result("idx_binsearch*<16>", test<IdxBinSearch<16>>(array, queries));
+    print_result("2*_binsearch*<64>", test<TwoLevelBinSearch<64>>(array, queries));
+    print_result("2*_binsearch*<128>", test<TwoLevelBinSearch<128>>(array, queries));
+    print_result("2*_binsearch*<256>", test<TwoLevelBinSearch<256>>(array, queries));
+    print_result("2*_binsearch*<512>", test<TwoLevelBinSearch<512>>(array, queries));
+    print_result("2*_binsearch*<1024>", test<TwoLevelBinSearch<1024>>(array, queries));
+    print_result("2*_binsearch*<2048>", test<TwoLevelBinSearch<2048>>(array, queries));
+    print_result("2*_binsearch*<4096>", test<TwoLevelBinSearch<4096>>(array, queries));
+    print_result("2*_binsearch*<8192>", test<TwoLevelBinSearch<8192>>(array, queries));
     print_result("binsearch*", test<CacheBinSearch>(array, queries));
     print_result("binsearch",  test<BinSearch>(array, queries));
     print_result("rank_select",    test<RankSelect>(array, queries));
