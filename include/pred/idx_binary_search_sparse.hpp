@@ -55,7 +55,7 @@ public:
         m_key_min = uint64_t(m_min) >> m_lo_bits;
         m_key_max = uint64_t(m_max) >> m_lo_bits;
 
-        size_t cap = m_key_max - m_key_min + 1;
+        size_t cap = m_key_max - m_key_min + 2;
         size_t used = 0;
 
         m_hi_idx = int_vector(cap, log2_ceil(m_num-1));
@@ -69,9 +69,6 @@ public:
             if(cur_key > prev_key) {
                 m_hi_idx[used++] = i-1;
                 m_hi_bv[prev_key + 1 - m_key_min] = 1;
-                //~ for(uint64_t key = prev_key + 1; key <= cur_key; key++) {
-                    //~ m_hi_idx[key - m_key_min] = i - 1;
-                //~ }
             }
             prev_key = cur_key;
         }
