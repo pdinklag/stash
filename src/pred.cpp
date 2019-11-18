@@ -142,6 +142,8 @@ int main(int argc, char** argv) {
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
+    print_result("fast_idx_binsearch*<4>", test<fast_idx_binary_search<4>>(array, queries));
+    print_result("fast_idx_binsearch*<5>", test<fast_idx_binary_search<5>>(array, queries));
     print_result("fast_idx_binsearch*<6>", test<fast_idx_binary_search<6>>(array, queries));
     print_result("fast_idx_binsearch*<7>", test<fast_idx_binary_search<7>>(array, queries));
     print_result("fast_idx_binsearch*<8>", test<fast_idx_binary_search<8>>(array, queries));
@@ -153,6 +155,8 @@ int main(int argc, char** argv) {
     print_result("fast_idx_binsearch*<14>", test<fast_idx_binary_search<14>>(array, queries));
     print_result("fast_idx_binsearch*<15>", test<fast_idx_binary_search<15>>(array, queries));
     print_result("fast_idx_binsearch*<16>", test<fast_idx_binary_search<16>>(array, queries));
+    print_result("fast_sidx_binsearch*<4>", test<fast_idx_binary_search_sparse<4>>(array, queries));
+    print_result("fast_sidx_binsearch*<5>", test<fast_idx_binary_search_sparse<5>>(array, queries));
     print_result("fast_sidx_binsearch*<6>", test<fast_idx_binary_search_sparse<6>>(array, queries));
     print_result("fast_sidx_binsearch*<7>", test<fast_idx_binary_search_sparse<7>>(array, queries));
     print_result("fast_sidx_binsearch*<8>", test<fast_idx_binary_search_sparse<8>>(array, queries));
@@ -164,6 +168,8 @@ int main(int argc, char** argv) {
     print_result("fast_sidx_binsearch*<14>", test<fast_idx_binary_search_sparse<14>>(array, queries));
     print_result("fast_sidx_binsearch*<15>", test<fast_idx_binary_search_sparse<15>>(array, queries));
     print_result("fast_sidx_binsearch*<16>", test<fast_idx_binary_search_sparse<16>>(array, queries));
+    print_result("idx_binsearch*<4>", test<idx_binary_search<4>>(array, queries));
+    print_result("idx_binsearch*<5>", test<idx_binary_search<5>>(array, queries));
     print_result("idx_binsearch*<6>", test<idx_binary_search<6>>(array, queries));
     print_result("idx_binsearch*<7>", test<idx_binary_search<7>>(array, queries));
     print_result("idx_binsearch*<8>", test<idx_binary_search<8>>(array, queries));
@@ -175,6 +181,8 @@ int main(int argc, char** argv) {
     print_result("idx_binsearch*<14>", test<idx_binary_search<14>>(array, queries));
     print_result("idx_binsearch*<15>", test<idx_binary_search<15>>(array, queries));
     print_result("idx_binsearch*<16>", test<idx_binary_search<16>>(array, queries));
+    print_result("sidx_binsearch*<4>", test<idx_binary_search_sparse<4>>(array, queries));
+    print_result("sidx_binsearch*<5>", test<idx_binary_search_sparse<5>>(array, queries));
     print_result("sidx_binsearch*<6>", test<idx_binary_search_sparse<6>>(array, queries));
     print_result("sidx_binsearch*<7>", test<idx_binary_search_sparse<7>>(array, queries));
     print_result("sidx_binsearch*<8>", test<idx_binary_search_sparse<8>>(array, queries));
