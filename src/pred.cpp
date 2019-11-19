@@ -30,7 +30,7 @@ template<size_t k>
 using idx_binary_search = pred::idx_binary_search<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using idx_binary_search_civ = pred::idx_binary_search_sparse<std::vector<value_t>, value_t, k>;
+using idx_binary_search_civ = pred::idx_binary_search_civ<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
 using idx_binary_search_sparse = pred::idx_binary_search_sparse<std::vector<value_t>, value_t, k>;
