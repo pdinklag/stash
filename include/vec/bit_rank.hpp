@@ -4,6 +4,7 @@
 
 #include <vec/bit_vector.hpp>
 #include <vec/int_vector.hpp>
+#include <util/math.hpp>
 
 class bit_rank {
 private:
@@ -81,6 +82,12 @@ public:
         m_blocks = std::move(other.m_blocks);
         m_supblocks = std::move(other.m_supblocks);
         return *this;
+    }
+
+    inline void reassign(bit_rank&& other, const bit_vector& bv) {
+        // FIXME: this shouldn't be necessary
+        *this = std::move(other),
+        m_bv = &bv;
     }
 
     inline size_t rank1(const size_t x) const {

@@ -4,6 +4,8 @@
 #include <vector>
 #include <utility>
 
+#include <util/math.hpp>
+
 class bit_vector {
 private:
     size_t m_size;
@@ -63,9 +65,14 @@ public:
     }
 
     inline bit_vector(size_t size) : m_size(size) {
-        const size_t q = block(size);
-        const size_t k = offset(size);
-        m_bits.resize(k ? q+1 : q);
+        m_bits.resize(idiv_ceil(size, 64ULL));
+    }
+
+    inline bit_vector(const std::vector<bool>& bv) : bit_vector(bv.size()) {
+        // FIXME: is there no faster way?
+        for(size_t i = 0; i < m_size; i++) {
+            bitset(i, bv[i]);
+        }
     }
 
     inline bit_vector& operator=(const bit_vector& other) {

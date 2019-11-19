@@ -162,6 +162,12 @@ public:
         return *this;
     }
 
+    inline void reassign(bit_select&& other, const bit_vector& bv) {
+        // FIXME: this shouldn't be necessary
+        *this = std::move(other),
+        m_bv = &bv;
+    }
+
     inline size_t select(size_t x) const {
         assert(x > 0);
         if(x > m_max) return m_bv->size();
