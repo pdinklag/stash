@@ -6,7 +6,7 @@
 namespace pred {
 
 template<typename array_t, typename item_t>
-class binary_search {
+class binsearch {
 private:
     const array_t* m_array;
     size_t m_num;
@@ -14,18 +14,18 @@ private:
     item_t m_max;
 
 public:
-    inline binary_search() : m_array(nullptr), m_num(0), m_min(), m_max() {
+    inline binsearch() : m_array(nullptr), m_num(0), m_min(), m_max() {
     }
 
-    inline binary_search(binary_search&& other) {
+    inline binsearch(binsearch&& other) {
         *this = other;
     }
     
-    inline binary_search(const binary_search& other) {
+    inline binsearch(const binsearch& other) {
         *this = other;
     }
 
-    inline binary_search(const array_t& array)
+    inline binsearch(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
@@ -34,7 +34,7 @@ public:
         assert_sorted_ascending(array);
     }
 
-    inline binary_search& operator=(binary_search&& other) {
+    inline binsearch& operator=(binsearch&& other) {
         m_array = other.m_array;
         m_num = other.m_num;
         m_min = other.m_min;
@@ -42,7 +42,7 @@ public:
         return *this;
     }
 
-    inline binary_search& operator=(const binary_search& other) {
+    inline binsearch& operator=(const binsearch& other) {
         m_array = other.m_array;
         m_num = other.m_num;
         m_min = other.m_min;

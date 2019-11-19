@@ -5,13 +5,13 @@
 
 #include <tlx/cmdline_parser.hpp>
 
-#include <pred/binary_search.hpp>
-#include <pred/binary_search_cache.hpp>
-#include <pred/idx_binary_search.hpp>
-#include <pred/idx_binary_search_civ.hpp>
-#include <pred/idx_binary_search_sparse.hpp>
+#include <pred/binsearch.hpp>
+#include <pred/binsearch_cache.hpp>
+#include <pred/indexed.hpp>
+#include <pred/indexed_compact.hpp>
+#include <pred/indexed_sparse.hpp>
 #include <pred/rank_select.hpp>
-#include <pred/two_level_binary_search.hpp>
+#include <pred/sampled.hpp>
 
 #include <io/load_file.hpp>
 #include <util/malloc_callback.hpp>
@@ -19,21 +19,21 @@
 #include <util/uint_types.hpp>
 
 using value_t = uint40_t;
-using binary_search       = pred::binary_search<std::vector<value_t>, value_t>;
-using binary_search_cache = pred::binary_search_cache<std::vector<value_t>, value_t>;
+using binsearch       = pred::binsearch<std::vector<value_t>, value_t>;
+using binsearch_cache = pred::binsearch_cache<std::vector<value_t>, value_t>;
 using rank_select         = pred::rank_select<std::vector<value_t>, value_t>;
 
 template<size_t k>
-using two_level_binary_search = pred::two_level_binary_search<std::vector<value_t>, value_t, k>;
+using sampled = pred::sampled<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using idx_binary_search = pred::idx_binary_search<std::vector<value_t>, value_t, k>;
+using indexed = pred::indexed<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using idx_binary_search_civ = pred::idx_binary_search_civ<std::vector<value_t>, value_t, k>;
+using indexed_compact = pred::indexed_compact<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using idx_binary_search_sparse = pred::idx_binary_search_sparse<std::vector<value_t>, value_t, k>;
+using indexed_sparse = pred::indexed_sparse<std::vector<value_t>, value_t, k>;
 
 size_t mem = 0;
 
@@ -138,54 +138,54 @@ int main(int argc, char** argv) {
 
     // run tests
     std::cout << "# running tests ..." << std::endl;
-    print_result("idx<4>", test<idx_binary_search<4>>(array, queries));
-    print_result("idx<5>", test<idx_binary_search<5>>(array, queries));
-    print_result("idx<6>", test<idx_binary_search<6>>(array, queries));
-    print_result("idx<7>", test<idx_binary_search<7>>(array, queries));
-    print_result("idx<8>", test<idx_binary_search<8>>(array, queries));
-    print_result("idx<9>", test<idx_binary_search<9>>(array, queries));
-    print_result("idx<10>", test<idx_binary_search<10>>(array, queries));
-    print_result("idx<11>", test<idx_binary_search<11>>(array, queries));
-    print_result("idx<12>", test<idx_binary_search<12>>(array, queries));
-    print_result("idx<13>", test<idx_binary_search<13>>(array, queries));
-    print_result("idx<14>", test<idx_binary_search<14>>(array, queries));
-    print_result("idx<15>", test<idx_binary_search<15>>(array, queries));
-    print_result("idx<16>", test<idx_binary_search<16>>(array, queries));
-    print_result("cidx<4>", test<idx_binary_search_civ<4>>(array, queries));
-    print_result("cidx<5>", test<idx_binary_search_civ<5>>(array, queries));
-    print_result("cidx<6>", test<idx_binary_search_civ<6>>(array, queries));
-    print_result("cidx<7>", test<idx_binary_search_civ<7>>(array, queries));
-    print_result("cidx<8>", test<idx_binary_search_civ<8>>(array, queries));
-    print_result("cidx<9>", test<idx_binary_search_civ<9>>(array, queries));
-    print_result("cidx<10>", test<idx_binary_search_civ<10>>(array, queries));
-    print_result("cidx<11>", test<idx_binary_search_civ<11>>(array, queries));
-    print_result("cidx<12>", test<idx_binary_search_civ<12>>(array, queries));
-    print_result("cidx<13>", test<idx_binary_search_civ<13>>(array, queries));
-    print_result("cidx<14>", test<idx_binary_search_civ<14>>(array, queries));
-    print_result("cidx<15>", test<idx_binary_search_civ<15>>(array, queries));
-    print_result("cidx<16>", test<idx_binary_search_civ<16>>(array, queries));
-    print_result("sidx<4>", test<idx_binary_search_sparse<4>>(array, queries));
-    print_result("sidx<5>", test<idx_binary_search_sparse<5>>(array, queries));
-    print_result("sidx<6>", test<idx_binary_search_sparse<6>>(array, queries));
-    print_result("sidx<7>", test<idx_binary_search_sparse<7>>(array, queries));
-    print_result("sidx<8>", test<idx_binary_search_sparse<8>>(array, queries));
-    print_result("sidx<9>", test<idx_binary_search_sparse<9>>(array, queries));
-    print_result("sidx<10>", test<idx_binary_search_sparse<10>>(array, queries));
-    print_result("sidx<11>", test<idx_binary_search_sparse<11>>(array, queries));
-    print_result("sidx<12>", test<idx_binary_search_sparse<12>>(array, queries));
-    print_result("sidx<13>", test<idx_binary_search_sparse<13>>(array, queries));
-    print_result("sidx<14>", test<idx_binary_search_sparse<14>>(array, queries));
-    print_result("sidx<15>", test<idx_binary_search_sparse<15>>(array, queries));
-    print_result("sidx<16>", test<idx_binary_search_sparse<16>>(array, queries));
-    print_result("sample<64>", test<two_level_binary_search<64>>(array, queries));
-    print_result("sample<128>", test<two_level_binary_search<128>>(array, queries));
-    print_result("sample<256>", test<two_level_binary_search<256>>(array, queries));
-    print_result("sample<512>", test<two_level_binary_search<512>>(array, queries));
-    print_result("sample<1024>", test<two_level_binary_search<1024>>(array, queries));
-    print_result("sample<2048>", test<two_level_binary_search<2048>>(array, queries));
-    print_result("sample<4096>", test<two_level_binary_search<4096>>(array, queries));
-    print_result("sample<8192>", test<two_level_binary_search<8192>>(array, queries));
-    print_result("bs*", test<binary_search_cache>(array, queries));
-    print_result("bs", test<binary_search>(array, queries));
+    print_result("idx<4>", test<indexed<4>>(array, queries));
+    print_result("idx<5>", test<indexed<5>>(array, queries));
+    print_result("idx<6>", test<indexed<6>>(array, queries));
+    print_result("idx<7>", test<indexed<7>>(array, queries));
+    print_result("idx<8>", test<indexed<8>>(array, queries));
+    print_result("idx<9>", test<indexed<9>>(array, queries));
+    print_result("idx<10>", test<indexed<10>>(array, queries));
+    print_result("idx<11>", test<indexed<11>>(array, queries));
+    print_result("idx<12>", test<indexed<12>>(array, queries));
+    print_result("idx<13>", test<indexed<13>>(array, queries));
+    print_result("idx<14>", test<indexed<14>>(array, queries));
+    print_result("idx<15>", test<indexed<15>>(array, queries));
+    print_result("idx<16>", test<indexed<16>>(array, queries));
+    print_result("cidx<4>", test<indexed_compact<4>>(array, queries));
+    print_result("cidx<5>", test<indexed_compact<5>>(array, queries));
+    print_result("cidx<6>", test<indexed_compact<6>>(array, queries));
+    print_result("cidx<7>", test<indexed_compact<7>>(array, queries));
+    print_result("cidx<8>", test<indexed_compact<8>>(array, queries));
+    print_result("cidx<9>", test<indexed_compact<9>>(array, queries));
+    print_result("cidx<10>", test<indexed_compact<10>>(array, queries));
+    print_result("cidx<11>", test<indexed_compact<11>>(array, queries));
+    print_result("cidx<12>", test<indexed_compact<12>>(array, queries));
+    print_result("cidx<13>", test<indexed_compact<13>>(array, queries));
+    print_result("cidx<14>", test<indexed_compact<14>>(array, queries));
+    print_result("cidx<15>", test<indexed_compact<15>>(array, queries));
+    print_result("cidx<16>", test<indexed_compact<16>>(array, queries));
+    print_result("sidx<4>", test<indexed_sparse<4>>(array, queries));
+    print_result("sidx<5>", test<indexed_sparse<5>>(array, queries));
+    print_result("sidx<6>", test<indexed_sparse<6>>(array, queries));
+    print_result("sidx<7>", test<indexed_sparse<7>>(array, queries));
+    print_result("sidx<8>", test<indexed_sparse<8>>(array, queries));
+    print_result("sidx<9>", test<indexed_sparse<9>>(array, queries));
+    print_result("sidx<10>", test<indexed_sparse<10>>(array, queries));
+    print_result("sidx<11>", test<indexed_sparse<11>>(array, queries));
+    print_result("sidx<12>", test<indexed_sparse<12>>(array, queries));
+    print_result("sidx<13>", test<indexed_sparse<13>>(array, queries));
+    print_result("sidx<14>", test<indexed_sparse<14>>(array, queries));
+    print_result("sidx<15>", test<indexed_sparse<15>>(array, queries));
+    print_result("sidx<16>", test<indexed_sparse<16>>(array, queries));
+    print_result("sample<64>", test<sampled<64>>(array, queries));
+    print_result("sample<128>", test<sampled<128>>(array, queries));
+    print_result("sample<256>", test<sampled<256>>(array, queries));
+    print_result("sample<512>", test<sampled<512>>(array, queries));
+    print_result("sample<1024>", test<sampled<1024>>(array, queries));
+    print_result("sample<2048>", test<sampled<2048>>(array, queries));
+    print_result("sample<4096>", test<sampled<4096>>(array, queries));
+    print_result("sample<8192>", test<sampled<8192>>(array, queries));
+    print_result("bs*", test<binsearch_cache>(array, queries));
+    print_result("bs", test<binsearch>(array, queries));
     print_result("rs", test<rank_select>(array, queries));
 }

@@ -5,7 +5,7 @@
 #include <pred/util.hpp>
 #include <pred/result.hpp>
 
-#include <pred/binary_search_cache.hpp>
+#include <pred/binsearch_cache.hpp>
 
 #include <util/math.hpp>
 
@@ -16,7 +16,7 @@ template<
     typename item_t,
     size_t m_k,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
-class two_level_binary_search {
+class sampled {
 private:
     const array_t* m_array;
     size_t m_num;
@@ -40,13 +40,13 @@ private:
         inline bool operator >=(const sample& x) const { return item >= x.item; }
         inline bool operator > (const sample& x) const { return item >  x.item; }
     };
-    using idx_pred_t = binary_search_cache<std::vector<sample>, sample>;
+    using idx_pred_t = binsearch_cache<std::vector<sample>, sample>;
 
     std::vector<sample> m_sample;
     idx_pred_t          m_idx;
 
 public:
-    inline two_level_binary_search(const array_t& array)
+    inline sampled(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
