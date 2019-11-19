@@ -47,28 +47,25 @@ private:
 
     inline uint64_t get(size_t i) const {
         const size_t j = i * m_width;
-        const size_t a = j >> 6ULL;       // left border
+        const size_t a = j >> 6ULL;                    // left border
         const size_t b = (j + m_width - 1ULL) >> 6ULL; // right border
-        if(a < b) {
-            // the bits are the suffix of m_data[a] and prefix of m_data[b]
-            const size_t da = j & 63ULL;
-            const size_t wa = 64ULL - da;
-            const size_t wb = m_width - wa;
-            const size_t db = 64ULL - wb;
 
-            // get the wa highest bits from a
-            const uint64_t a_hi = m_data[a] >> da;
+        // da is the distance of a's relevant bits from the left border
+        const size_t da = j & 63ULL;
 
-            // get the wb lowest bits from b
-            const uint64_t b_lo = m_data[b] & bit_mask(wb);
+        // wa is the number of a's relevant bits
+        const size_t wa = 64ULL - da;
 
-            // combine
-            return (b_lo << wa) | a_hi;
-        } else {
-            // all the bits are contained in m_data[a]
-            const size_t dl = j & 63ULL;
-            return (m_data[a] >> dl) & m_mask;
-        }
+        // get the wa highest bits from a
+        const uint64_t a_hi = m_data[a] >> da;
+
+        // get b (its high bits will be masked away below)
+        // NOTE: we could save this step if we knew a == b,
+        //       but the branch caused by checking that is too expensive
+        const uint64_t b_lo = m_data[b];
+
+        // combine
+        return ((b_lo << wa) | a_hi) & m_mask;
     }
 
 public:
