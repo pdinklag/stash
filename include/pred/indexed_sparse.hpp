@@ -90,16 +90,16 @@ public:
         m_lo_pred = lo_pred_t(array);
     }
 
-    inline result<item_t> predecessor(const item_t x) const {
-        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
-        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
+    inline result predecessor(const item_t x) const {
+        if(unlikely(x < m_min))  return result { false, 0 };
+        if(unlikely(x >= m_max)) return result { true, m_num-1 };
         
         const uint64_t key = hi(x) - m_key_min;
         const size_t qrank = m_hi_rank(key+1);
         const size_t q = m_hi_idx[qrank ? qrank-1 : 0];
 
         if(unlikely(x == (*m_array)[q])) {
-            return result<item_t> { true, true, x };
+            return result { true, q };
         } else {
             const size_t prank = m_hi_rank(key);
             const size_t p = m_hi_idx[prank ? prank-1 : 0];

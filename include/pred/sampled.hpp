@@ -14,7 +14,7 @@ namespace pred {
 template<
     typename array_t,
     typename item_t,
-    size_t m_k,
+    size_t m_alpha,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
 class sampled {
 private:
@@ -23,27 +23,13 @@ private:
     item_t m_min;
     item_t m_max;
 
-    struct sample {
-        item_t item;
-        size_t pos;
+    std::vector<item_t> m_sample;
 
-        inline sample() : item(0), pos(0) {
-        }
-        
-        inline sample(item_t _item, size_t _pos) : item(_item), pos(_pos) {
-        }
+    using idx_pred_t = binsearch_cache<decltype(m_sample), item_t, m_cache_num>;
+    idx_pred_t m_idx;
 
-        inline bool operator < (const sample& x) const { return item <  x.item; }
-        inline bool operator <=(const sample& x) const { return item <= x.item; }
-        inline bool operator ==(const sample& x) const { return item == x.item; }
-        inline bool operator !=(const sample& x) const { return item != x.item; }
-        inline bool operator >=(const sample& x) const { return item >= x.item; }
-        inline bool operator > (const sample& x) const { return item >  x.item; }
-    };
-    using idx_pred_t = binsearch_cache<std::vector<sample>, sample>;
-
-    std::vector<sample> m_sample;
-    idx_pred_t          m_idx;
+    using pred_t = binsearch_cache<array_t, item_t, m_cache_num>;
+    pred_t m_pred;
 
 public:
     inline sampled(const array_t& array)
@@ -55,51 +41,30 @@ public:
         assert_sorted_ascending(array);
 
         // sample
-        const size_t num_samples = idiv_ceil(m_num, m_k);
-        
+        const size_t num_samples = m_num / m_alpha;
+
         m_sample.reserve(num_samples);
-        for(size_t i = 0; i < m_num; i += m_k) {
-            m_sample.emplace_back(array[i], i);
+        for(size_t i = 0; i < num_samples; i++) {
+            m_sample.emplace_back(array[i * m_alpha]);
         }
 
         m_idx = idx_pred_t(m_sample);
+        m_pred = pred_t(array);
     }
 
-    inline result<item_t> predecessor(const item_t x) const {
-        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
-        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
+    inline result predecessor(const item_t x) const {
+        if(unlikely(x < m_min))  return result { false, 0 };
+        if(unlikely(x >= m_max)) return result { true, m_num-1 };
 
-        auto idx = m_idx.predecessor(sample{x, 0}).value;
-        if(idx.item == x) {
-            return result<item_t> { true, true, x };
+        auto pred = m_idx.predecessor(x);
+        assert(pred.exists);
+
+        const size_t p = pred.pos * m_alpha;
+        if(unlikely(x == m_sample[pred.pos])) {
+            return result { true, p };
         } else {
-            size_t p = idx.pos;
-            size_t q = std::min(idx.pos + m_k, m_num - 1);
-
-            // binary search
-            while(q - p > m_cache_num) {
-                assert(x >= (*m_array)[p]);
-                assert(x < (*m_array)[q]);
-                
-                const size_t m = (p + q) >> 1ULL;
-                
-                const bool le = ((*m_array)[m] <= x);
-                const size_t le_mask = -size_t(le);
-                const size_t gt_mask = ~le_mask;
-
-                if(le) assert(le_mask == SIZE_MAX && gt_mask == 0ULL);
-                else   assert(gt_mask == SIZE_MAX && le_mask == 0ULL);
-                
-                p = (le_mask & m) | (gt_mask & p);
-                q = (gt_mask & m) | (le_mask & q);
-            }
-
-            // linear search
-            while((*m_array)[p] <= x) ++p;
-            assert((*m_array)[p-1] <= x);
-            
-            const item_t r = (*m_array)[p - 1];
-            return result<item_t> { true, r == x, r };
+            const size_t q = std::min(p + m_alpha, m_num - 1);
+            return m_pred.predecessor_seeded(x, p, q);
         }
     }
 };

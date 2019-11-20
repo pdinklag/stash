@@ -2,18 +2,16 @@
 
 namespace pred {
 
-template<typename item_t>
 struct result {
     bool   exists;
-    bool   contained;
-    item_t value;
+    size_t pos;
 
     inline operator bool() const {
         return exists;
     }
 
-    inline operator item_t() const {
-        return value;
+    inline operator size_t() const {
+        return pos;
     }
 };
 

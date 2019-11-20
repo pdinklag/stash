@@ -17,7 +17,6 @@ private:
     item_t      m_max;
     bit_vector  m_bv;
     bit_rank    m_rank;
-    bit_select1 m_select;
 
 public:
     inline rank_select(const array_t& array)
@@ -32,24 +31,19 @@ public:
             m_bv[array[i] - m_min] = 1;
         }
 
-        m_rank =   bit_rank(m_bv);
-        m_select = bit_select1(m_bv);
+        assert(m_bv[0] == 1);
+        assert(m_bv[m_num-1] == 1);
+
+        m_rank = bit_rank(m_bv);
     }
 
-    inline result<item_t> predecessor(item_t x) const {
-        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
-        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
+    inline result predecessor(item_t x) const {
+        if(unlikely(x < m_min))  return result { false, 0 };
+        if(unlikely(x >= m_max)) return result { true, m_num-1 };
 
-        x -= m_min;
-        if(m_bv[x]) {
-            return result<item_t> { true, true, x }; 
-        } else {
-            const size_t rank = m_rank(x);
-            assert(rank > 0);
-            const size_t p = m_select(rank);
-            assert(p < x);
-            return result<item_t> { true, false, p };
-        }
+        const size_t p = m_rank(x - m_min);
+        assert(p > 0);
+        return result { true, p - 1 };
     }
 };
 

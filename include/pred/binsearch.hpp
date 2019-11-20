@@ -50,9 +50,9 @@ public:
         return *this;
     }
 
-    inline result<item_t> predecessor(const item_t x) const {
-        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
-        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
+    inline result predecessor(const item_t x) const {
+        if(unlikely(x < m_min))  return result { false, 0 };
+        if(unlikely(x >= m_max)) return result { true, m_num-1 };
         
         size_t p = 0;
         size_t q = m_num - 1;
@@ -74,8 +74,7 @@ public:
             q = (gt_mask & m) | (le_mask & q);
         }
 
-        const item_t r = (*m_array)[p];
-        return result<item_t> { true, r == x, r };
+        return result { true, p };
     }
 };
 

@@ -90,9 +90,10 @@ test_result test(
     {
         auto t0 = time();
         for(value_t x : queries) {
-            auto pred_x = q.predecessor(x).value;
-            assert(x >= pred_x);
-            sum += pred_x;
+            auto r = q.predecessor(x);
+            assert(r.exists);
+            assert(x >= array[r.pos]);
+            sum += array[r.pos];
         }
         t_queries = time() - t0;
     }
@@ -147,10 +148,6 @@ int main(int argc, char** argv) {
     print_result("idx<10>", test<indexed<10>>(array, queries));
     print_result("idx<11>", test<indexed<11>>(array, queries));
     print_result("idx<12>", test<indexed<12>>(array, queries));
-    print_result("idx<13>", test<indexed<13>>(array, queries));
-    print_result("idx<14>", test<indexed<14>>(array, queries));
-    print_result("idx<15>", test<indexed<15>>(array, queries));
-    print_result("idx<16>", test<indexed<16>>(array, queries));
     print_result("cidx<4>", test<indexed_compact<4>>(array, queries));
     print_result("cidx<5>", test<indexed_compact<5>>(array, queries));
     print_result("cidx<6>", test<indexed_compact<6>>(array, queries));
@@ -160,10 +157,6 @@ int main(int argc, char** argv) {
     print_result("cidx<10>", test<indexed_compact<10>>(array, queries));
     print_result("cidx<11>", test<indexed_compact<11>>(array, queries));
     print_result("cidx<12>", test<indexed_compact<12>>(array, queries));
-    print_result("cidx<13>", test<indexed_compact<13>>(array, queries));
-    print_result("cidx<14>", test<indexed_compact<14>>(array, queries));
-    print_result("cidx<15>", test<indexed_compact<15>>(array, queries));
-    print_result("cidx<16>", test<indexed_compact<16>>(array, queries));
     print_result("sidx<4>", test<indexed_sparse<4>>(array, queries));
     print_result("sidx<5>", test<indexed_sparse<5>>(array, queries));
     print_result("sidx<6>", test<indexed_sparse<6>>(array, queries));
@@ -173,10 +166,6 @@ int main(int argc, char** argv) {
     print_result("sidx<10>", test<indexed_sparse<10>>(array, queries));
     print_result("sidx<11>", test<indexed_sparse<11>>(array, queries));
     print_result("sidx<12>", test<indexed_sparse<12>>(array, queries));
-    print_result("sidx<13>", test<indexed_sparse<13>>(array, queries));
-    print_result("sidx<14>", test<indexed_sparse<14>>(array, queries));
-    print_result("sidx<15>", test<indexed_sparse<15>>(array, queries));
-    print_result("sidx<16>", test<indexed_sparse<16>>(array, queries));
     print_result("sample<64>", test<sampled<64>>(array, queries));
     print_result("sample<128>", test<sampled<128>>(array, queries));
     print_result("sample<256>", test<sampled<256>>(array, queries));

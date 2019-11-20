@@ -50,7 +50,7 @@ public:
         return *this;
     }
 
-    inline result<item_t> predecessor_seeded(
+    inline result predecessor_seeded(
         const item_t x, size_t p, size_t q) const {
 
         assert(x >= m_min && x < m_max);
@@ -74,13 +74,12 @@ public:
         while((*m_array)[p] <= x) ++p;
         assert((*m_array)[p-1] <= x);
         
-        const item_t r = (*m_array)[p - 1];
-        return result<item_t> { true, r == x, r };
+        return result { true, p-1 };
     }
 
-    inline result<item_t> predecessor(const item_t x) const {
-        if(unlikely(x < m_min))  return result<item_t> { false, false, x };
-        if(unlikely(x >= m_max)) return result<item_t> { true, false, m_max };
+    inline result predecessor(const item_t x) const {
+        if(unlikely(x < m_min))  return result { false, 0 };
+        if(unlikely(x >= m_max)) return result { true, m_num-1 };
         return predecessor_seeded(x, 0, m_num - 1);
     }
 };
