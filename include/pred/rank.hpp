@@ -10,7 +10,7 @@
 namespace pred {
 
 template<typename array_t, typename item_t>
-class rank_select {
+class rank {
 private:
     size_t      m_num;
     item_t      m_min;
@@ -19,7 +19,7 @@ private:
     bit_rank    m_rank;
 
 public:
-    inline rank_select(const array_t& array)
+    inline rank(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]) {

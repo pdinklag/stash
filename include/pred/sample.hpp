@@ -16,7 +16,7 @@ template<
     typename item_t,
     size_t m_alpha,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
-class sampled {
+class sample {
 private:
     const array_t* m_array;
     size_t m_num;
@@ -32,7 +32,7 @@ private:
     pred_t m_pred;
 
 public:
-    inline sampled(const array_t& array)
+    inline sample(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),

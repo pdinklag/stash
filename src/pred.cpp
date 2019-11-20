@@ -10,8 +10,8 @@
 #include <pred/indexed.hpp>
 #include <pred/indexed_compact.hpp>
 #include <pred/indexed_sparse.hpp>
-#include <pred/rank_select.hpp>
-#include <pred/sampled.hpp>
+#include <pred/rank.hpp>
+#include <pred/sample.hpp>
 
 #include <io/load_file.hpp>
 #include <util/malloc_callback.hpp>
@@ -21,10 +21,10 @@
 using value_t = uint40_t;
 using binsearch       = pred::binsearch<std::vector<value_t>, value_t>;
 using binsearch_cache = pred::binsearch_cache<std::vector<value_t>, value_t>;
-using rank_select         = pred::rank_select<std::vector<value_t>, value_t>;
+using rank            = pred::rank<std::vector<value_t>, value_t>;
 
 template<size_t k>
-using sampled = pred::sampled<std::vector<value_t>, value_t, k>;
+using sample = pred::sample<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
 using indexed = pred::indexed<std::vector<value_t>, value_t, k>;
@@ -166,15 +166,15 @@ int main(int argc, char** argv) {
     print_result("sidx<10>", test<indexed_sparse<10>>(array, queries));
     print_result("sidx<11>", test<indexed_sparse<11>>(array, queries));
     print_result("sidx<12>", test<indexed_sparse<12>>(array, queries));
-    print_result("sample<64>", test<sampled<64>>(array, queries));
-    print_result("sample<128>", test<sampled<128>>(array, queries));
-    print_result("sample<256>", test<sampled<256>>(array, queries));
-    print_result("sample<512>", test<sampled<512>>(array, queries));
-    print_result("sample<1024>", test<sampled<1024>>(array, queries));
-    print_result("sample<2048>", test<sampled<2048>>(array, queries));
-    print_result("sample<4096>", test<sampled<4096>>(array, queries));
-    print_result("sample<8192>", test<sampled<8192>>(array, queries));
+    print_result("sample<64>", test<sample<64>>(array, queries));
+    print_result("sample<128>", test<sample<128>>(array, queries));
+    print_result("sample<256>", test<sample<256>>(array, queries));
+    print_result("sample<512>", test<sample<512>>(array, queries));
+    print_result("sample<1024>", test<sample<1024>>(array, queries));
+    print_result("sample<2048>", test<sample<2048>>(array, queries));
+    print_result("sample<4096>", test<sample<4096>>(array, queries));
+    print_result("sample<8192>", test<sample<8192>>(array, queries));
     print_result("bs*", test<binsearch_cache>(array, queries));
     print_result("bs", test<binsearch>(array, queries));
-    print_result("rs", test<rank_select>(array, queries));
+    print_result("rank", test<rank>(array, queries));
 }
