@@ -20,7 +20,7 @@ public:
     inline binsearch_cache(binsearch_cache&& other) {
         *this = other;
     }
-    
+
     inline binsearch_cache(const binsearch_cache& other) {
         *this = other;
     }
@@ -50,22 +50,22 @@ public:
         return *this;
     }
 
-    inline result predecessor_seeded(
-        const item_t x, size_t p, size_t q) const {
-
+    inline result predecessor_seeded(const item_t x, size_t p, size_t q) const {
         assert(x >= m_min && x < m_max);
         while(q - p > m_cache_num) {
             assert(x >= (*m_array)[p]);
-            
+
             const size_t m = (p + q) >> 1ULL;
-            
+
             const bool le = ((*m_array)[m] <= x);
+
+            /*
+                the following is a fast form of:
+                if(le) p = m; else q = m;
+            */
             const size_t le_mask = -size_t(le);
             const size_t gt_mask = ~le_mask;
 
-            if(le) assert(le_mask == SIZE_MAX && gt_mask == 0ULL);
-            else   assert(gt_mask == SIZE_MAX && le_mask == 0ULL);
-            
             p = (le_mask & m) | (gt_mask & p);
             q = (gt_mask & m) | (le_mask & q);
         }
@@ -73,7 +73,7 @@ public:
         // linear search
         while((*m_array)[p] <= x) ++p;
         assert((*m_array)[p-1] <= x);
-        
+
         return result { true, p-1 };
     }
 
@@ -81,6 +81,41 @@ public:
         if(unlikely(x < m_min))  return result { false, 0 };
         if(unlikely(x >= m_max)) return result { true, m_num-1 };
         return predecessor_seeded(x, 0, m_num - 1);
+    }
+
+    inline result successor_seeded(const item_t x, size_t p, size_t q) const {
+        assert(x >= m_min && x < m_max);
+        while(q - p > m_cache_num) {
+            assert(x > (*m_array)[p]);
+            assert(x <= (*m_array)[q]);
+
+            const size_t m = (p + q) >> 1ULL;
+
+            const bool lt = ((*m_array)[m] < x);
+
+
+            /*
+                the following is a fast form of:
+                if(lt) p = m; else q = m;
+            */
+            const size_t lt_mask = -size_t(lt);
+            const size_t ge_mask = ~lt_mask;
+
+            p = (lt_mask & m) | (ge_mask & p);
+            q = (ge_mask & m) | (lt_mask & q);
+        }
+
+        // linear search
+        while((*m_array)[p] < x) ++p;
+        assert((*m_array)[p] >= x);
+
+        return result { true, p };
+    }
+
+    inline result successor(const item_t x) const {
+        if(unlikely(x <= m_min)) return result { true, 0 };
+        if(unlikely(x > m_max))  return result { false, 0 };
+        return successor_seeded(x, 0, m_num - 1);
     }
 };
 

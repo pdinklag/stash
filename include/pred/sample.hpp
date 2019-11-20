@@ -67,6 +67,22 @@ public:
             return m_pred.predecessor_seeded(x, p, q);
         }
     }
+
+    inline result successor(const item_t x) const {
+        if(unlikely(x <= m_min)) return result { true, 0 };
+        if(unlikely(x > m_max))  return result { false, 0 };
+
+        auto succ = m_idx.successor(x);
+        assert(succ.exists);
+
+        const size_t q = succ.pos * m_alpha;
+        if(unlikely(x == m_sample[succ.pos])) {
+            return result { true, q };
+        } else {
+            const size_t p = (q - m_alpha) & (-(q >= m_alpha)); // std::max(q - m_alpha, 0)
+            return m_pred.successor_seeded(x, p, q);
+        }
+    }
 };
 
 }

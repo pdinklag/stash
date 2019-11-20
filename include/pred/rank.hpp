@@ -12,6 +12,7 @@ namespace pred {
 template<typename array_t, typename item_t>
 class rank {
 private:
+    const array_t* m_array;
     size_t      m_num;
     item_t      m_min;
     item_t      m_max;
@@ -20,7 +21,8 @@ private:
 
 public:
     inline rank(const array_t& array)
-        : m_num(array.size()),
+        : m_array(&array),
+          m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]) {
 
@@ -44,6 +46,15 @@ public:
         const size_t p = m_rank(x - m_min);
         assert(p > 0);
         return result { true, p - 1 };
+    }
+
+    inline result successor(item_t x) const {
+        if(unlikely(x <= m_min))  return result { true, 0 };
+        if(unlikely(x > m_max)) return result { false, 0 };
+
+        const size_t p = m_rank(x - m_min);
+        assert(p > 0);
+        return result { true, p - 1 + (x > (*m_array)[p - 1]) };
     }
 };
 

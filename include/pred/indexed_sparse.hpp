@@ -62,7 +62,7 @@ public:
         m_hi_idx[used++] = 0;
 
         m_hi_bv = bit_vector(cap);
-        
+
         uint64_t prev_key = m_key_min;
         for(size_t i = 1; i < m_num; i++) {
             const uint64_t cur_key = hi(array[i]);
@@ -78,7 +78,7 @@ public:
         // compress
         m_hi_idx[used++] = m_num - 1;
         m_hi_bv[m_key_max - m_key_min] = 1;
-        
+
         if(used < cap) {
             m_hi_idx.rebuild(used);
         }
@@ -93,7 +93,7 @@ public:
     inline result predecessor(const item_t x) const {
         if(unlikely(x < m_min))  return result { false, 0 };
         if(unlikely(x >= m_max)) return result { true, m_num-1 };
-        
+
         const uint64_t key = hi(x) - m_key_min;
         const size_t qrank = m_hi_rank(key+1);
         const size_t q = m_hi_idx[qrank ? qrank-1 : 0];
@@ -104,6 +104,23 @@ public:
             const size_t prank = m_hi_rank(key);
             const size_t p = m_hi_idx[prank ? prank-1 : 0];
             return m_lo_pred.predecessor_seeded(x, p, q);
+        }
+    }
+
+    inline result successor(const item_t x) const {
+        if(unlikely(x <= m_min)) return result { true, 0 };
+        if(unlikely(x > m_max))  return result { false, 0 };
+
+        const uint64_t key = hi(x) - m_key_min;
+        const size_t qrank = m_hi_rank(key+1);
+        const size_t q = m_hi_idx[qrank];
+
+        if(unlikely(x == (*m_array)[q])) {
+            return result { true, q };
+        } else {
+            const size_t prank = m_hi_rank(key);
+            const size_t p = m_hi_idx[prank];
+            return m_lo_pred.successor_seeded(x, p, q);
         }
     }
 };

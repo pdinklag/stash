@@ -54,7 +54,7 @@ public:
         std::vector<size_t> idx;
         idx.reserve(m_key_max - m_key_min + 2);
         idx.emplace_back(0);
-        
+
         uint64_t prev_key = m_key_min;
         for(size_t i = 1; i < m_num; i++) {
             const uint64_t cur_key = hi(array[i]);
@@ -78,7 +78,7 @@ public:
     inline result predecessor(const item_t x) const {
         if(unlikely(x < m_min))  return result { false, 0 };
         if(unlikely(x >= m_max)) return result { true, m_num-1 };
-        
+
         const uint64_t key = hi(x) - m_key_min;
         const size_t q = m_hi_idx[key+1];
 
@@ -87,6 +87,22 @@ public:
         } else {
             const size_t p = m_hi_idx[key];
             return m_lo_pred.predecessor_seeded(x, p, q);
+        }
+    }
+
+    inline result successor(const item_t x) const {
+        if(unlikely(x <= m_min)) return result { true, 0 };
+        if(unlikely(x > m_max))  return result { false, 0 };
+
+        const uint64_t key = hi(x) - m_key_min;
+        const size_t _q = m_hi_idx[key+1] + 1;
+        const size_t q = _q - (_q >= m_num); // std::min(_q, m_num - 1);
+
+        if(unlikely(x == (*m_array)[q])) {
+            return result { true, q };
+        } else {
+            const size_t p = m_hi_idx[key] + 1;
+            return m_lo_pred.successor_seeded(x, p, q);
         }
     }
 };

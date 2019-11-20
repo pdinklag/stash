@@ -20,7 +20,7 @@ public:
     inline binsearch(binsearch&& other) {
         *this = other;
     }
-    
+
     inline binsearch(const binsearch& other) {
         *this = other;
     }
@@ -53,28 +53,62 @@ public:
     inline result predecessor(const item_t x) const {
         if(unlikely(x < m_min))  return result { false, 0 };
         if(unlikely(x >= m_max)) return result { true, m_num-1 };
-        
+
         size_t p = 0;
         size_t q = m_num - 1;
 
         while(p < q - 1) {
             assert(x >= (*m_array)[p]);
             assert(x < (*m_array)[q]);
-            
+
             const size_t m = (p + q) >> 1ULL;
-            
+
             const bool le = ((*m_array)[m] <= x);
+
+            /*
+                the following is a fast form of:
+                if(le) p = m; else q = m;
+            */
             const size_t le_mask = -size_t(le);
             const size_t gt_mask = ~le_mask;
 
             if(le) assert(le_mask == SIZE_MAX && gt_mask == 0ULL);
             else   assert(gt_mask == SIZE_MAX && le_mask == 0ULL);
-            
+
             p = (le_mask & m) | (gt_mask & p);
             q = (gt_mask & m) | (le_mask & q);
         }
 
         return result { true, p };
+    }
+
+    inline result successor(const item_t x) const {
+        if(unlikely(x <= m_min)) return result { true, 0 };
+        if(unlikely(x > m_max))  return result { false, 0 };
+
+        size_t p = 0;
+        size_t q = m_num - 1;
+
+        while(p < q - 1) {
+            assert(x > (*m_array)[p]);
+            assert(x <= (*m_array)[q]);
+
+            const size_t m = (p + q) >> 1ULL;
+
+            const bool lt = ((*m_array)[m] < x);
+
+            /*
+                the following is a fast form of:
+                if(lt) p = m; else q = m;
+            */
+            const size_t lt_mask = -size_t(lt);
+            const size_t ge_mask = ~lt_mask;
+
+            p = (lt_mask & m) | (ge_mask & p);
+            q = (ge_mask & m) | (lt_mask & q);
+        }
+
+        return result { true, q };
     }
 };
 
