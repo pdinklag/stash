@@ -1,6 +1,5 @@
 #pragma once
     
-#include <vector>
 #include <utility>
 
 #include <vec/bit_vector.hpp>
@@ -10,19 +9,20 @@
 
 class unary_sorted_sequence {
 private:
-    template<typename T>
-    static void encode_unary(std::vector<bool>& bits, T value) {
-        while(value) {
-            bits.emplace_back(1);
-            --value;
-        }
-        bits.emplace_back(0);
-    }
-
     size_t      m_size;
     bit_vector  m_bits;
     bit_rank    m_rank;
     bit_select0 m_sel0;
+
+    template<typename T>
+    size_t encode_unary(size_t pos, T value) {
+        while(value) {
+            m_bits[pos++] = 1;
+            --value;
+        }
+        m_bits[pos++] = 0;
+        return pos;
+    }
 
 public:
     inline unary_sorted_sequence() : m_size(0) {
@@ -43,20 +43,18 @@ public:
         // unary encoding
         {
             const size_t max = size_t(array[m_size-1]);
-            const size_t initial_cap = m_size + max; // should be exact?
+            const size_t num_bits = m_size + max;
+            m_bits = bit_vector(num_bits);
             
-            std::vector<bool> bits;
-            bits.reserve(initial_cap);
-
             auto prev = array[0];
-            encode_unary(bits, prev);
+            size_t pos = encode_unary(0, prev);
             for(size_t i = 1; i < m_size; i++) {
                 const auto v = array[i];
-                encode_unary(bits, v - prev);
+                pos = encode_unary(pos, v - prev);
                 prev = v;
             }
 
-            m_bits = bit_vector(bits);
+            assert(pos == num_bits);
         }
         
         // rank + select
