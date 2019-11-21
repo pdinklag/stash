@@ -9,8 +9,9 @@ The methods provided are `predecessor` and `successor`, which report the _positi
 ## Overview
 
 A brief overview over the relevant implementations is given in the following table:
-| Class   | Description |
-| - | - |
+
+| Class | Description |
+| --- | --- |
 | `binary_search` | Stores no data but simply performs a binary search on the input. |
 | `binary_search_cache` | Like `binary_search`, but proceeds with linear search once the search interval becomes smaller than `m_cache_num` (template parameter). If the parameter is chosen well (the default asssumes cache lines of 512 bytes), this is practically faster than binary search by some percents. |
 | `sample` | Samples every `m_alpha`-th value (template parameter) and splits the binary search up into two binary searches on smaller memory regions, which are done using `binary_search_cache`. Very low memory profile, but only marginal speed improvements compared to binary searches. |
