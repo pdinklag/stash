@@ -23,7 +23,7 @@ A brief overview over the relevant implementations is given in the following tab
 
 Here's an example for using `index`:
 
-```
+```cpp
 // a simple array - values MUST be in ascending order
 std::vector<uint8_t> array = { 2, 4, 19, 37, 55, 78, 98, 102, 147, 200 };
 
