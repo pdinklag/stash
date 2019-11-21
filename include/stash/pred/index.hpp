@@ -7,8 +7,6 @@
 
 #include <stash/pred/binsearch_cache.hpp>
 
-#include <stash/vec/bit_vector.hpp>
-#include <stash/vec/bit_rank.hpp>
 #include <stash/vec/int_vector.hpp>
 #include <stash/util/math.hpp>
 
@@ -20,7 +18,7 @@ template<
     typename item_t,
     size_t m_lo_bits,
     size_t m_cache_num = 512ULL / sizeof(item_t)>
-class indexed_sparse {
+class index {
 private:
     static constexpr size_t m_hi_bits = 8 * sizeof(item_t) - m_lo_bits;
 
@@ -37,14 +35,12 @@ private:
     uint64_t m_key_max;
 
     int_vector m_hi_idx;
-    bit_vector m_hi_bv;
-    bit_rank   m_hi_rank;
 
     using lo_pred_t = binsearch_cache<array_t, item_t, m_cache_num>;
     lo_pred_t m_lo_pred;
 
 public:
-    inline indexed_sparse(const array_t& array)
+    inline index(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
           m_max(array[m_num-1]),
@@ -56,36 +52,21 @@ public:
         m_key_min = uint64_t(m_min) >> m_lo_bits;
         m_key_max = uint64_t(m_max) >> m_lo_bits;
 
-        size_t cap = m_key_max - m_key_min + 2;
-        size_t used = 0;
-
-        m_hi_idx = int_vector(cap, log2_ceil(m_num-1));
-        m_hi_idx[used++] = 0;
-
-        m_hi_bv = bit_vector(cap);
-
+        m_hi_idx = int_vector(m_key_max - m_key_min + 2, log2_ceil(m_num-1));
+        m_hi_idx[0] = 0;
         uint64_t prev_key = m_key_min;
         for(size_t i = 1; i < m_num; i++) {
             const uint64_t cur_key = hi(array[i]);
             if(cur_key > prev_key) {
-                m_hi_idx[used++] = i-1;
-                m_hi_bv[prev_key + 1 - m_key_min] = 1;
+                for(uint64_t key = prev_key + 1; key <= cur_key; key++) {
+                    m_hi_idx[key - m_key_min] = i - 1;
+                }
             }
             prev_key = cur_key;
         }
 
         assert(prev_key == m_key_max);
-
-        // compress
-        m_hi_idx[used++] = m_num - 1;
-        m_hi_bv[m_key_max - m_key_min] = 1;
-
-        if(used < cap) {
-            m_hi_idx.rebuild(used);
-        }
-
-        // rank support
-        m_hi_rank = bit_rank(m_hi_bv);
+        m_hi_idx[m_key_max - m_key_min] = m_num - 1;
 
         // build the predecessor data structure for low bits
         m_lo_pred = lo_pred_t(array);
@@ -96,14 +77,12 @@ public:
         if(unlikely(x >= m_max)) return result { true, m_num-1 };
 
         const uint64_t key = hi(x) - m_key_min;
-        const size_t qrank = m_hi_rank(key+1);
-        const size_t q = m_hi_idx[qrank ? qrank-1 : 0];
+        const size_t q = m_hi_idx[key+1];
 
         if(unlikely(x == (*m_array)[q])) {
             return result { true, q };
         } else {
-            const size_t prank = m_hi_rank(key);
-            const size_t p = m_hi_idx[prank ? prank-1 : 0];
+            const size_t p = m_hi_idx[key];
             return m_lo_pred.predecessor_seeded(x, p, q);
         }
     }
@@ -113,14 +92,13 @@ public:
         if(unlikely(x > m_max))  return result { false, 0 };
 
         const uint64_t key = hi(x) - m_key_min;
-        const size_t qrank = m_hi_rank(key+1);
-        const size_t q = m_hi_idx[qrank];
+        const size_t _q = m_hi_idx[key+1] + 1;
+        const size_t q = _q - (_q >= m_num); // std::min(_q, m_num - 1);
 
         if(unlikely(x == (*m_array)[q])) {
             return result { true, q };
         } else {
-            const size_t prank = m_hi_rank(key);
-            const size_t p = m_hi_idx[prank];
+            const size_t p = m_hi_idx[key] + 1;
             return m_lo_pred.successor_seeded(x, p, q);
         }
     }

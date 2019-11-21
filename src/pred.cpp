@@ -7,9 +7,9 @@
 
 #include <stash/pred/binsearch.hpp>
 #include <stash/pred/binsearch_cache.hpp>
-#include <stash/pred/indexed.hpp>
-#include <stash/pred/indexed_compact.hpp>
-#include <stash/pred/indexed_sparse.hpp>
+#include <stash/pred/index.hpp>
+#include <stash/pred/index_compact.hpp>
+#include <stash/pred/index_sparse.hpp>
 #include <stash/pred/rank.hpp>
 #include <stash/pred/sample.hpp>
 
@@ -29,13 +29,13 @@ template<size_t k>
 using sample = pred::sample<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using indexed = pred::indexed<std::vector<value_t>, value_t, k>;
+using index = pred::index<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using indexed_compact = pred::indexed_compact<std::vector<value_t>, value_t, k>;
+using index_compact = pred::index_compact<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
-using indexed_sparse = pred::indexed_sparse<std::vector<value_t>, value_t, k>;
+using index_sparse = pred::index_sparse<std::vector<value_t>, value_t, k>;
 
 size_t mem = 0;
 
@@ -185,33 +185,33 @@ int main(int argc, char** argv) {
     print_result("sample<2048>", test_predecessor<sample<2048>>(array, queries));
     print_result("sample<4096>", test_predecessor<sample<4096>>(array, queries));
     print_result("sample<8192>", test_predecessor<sample<8192>>(array, queries));
-    print_result("idx<4>", test_predecessor<indexed<4>>(array, queries));
-    print_result("idx<5>", test_predecessor<indexed<5>>(array, queries));
-    print_result("idx<6>", test_predecessor<indexed<6>>(array, queries));
-    print_result("idx<7>", test_predecessor<indexed<7>>(array, queries));
-    print_result("idx<8>", test_predecessor<indexed<8>>(array, queries));
-    print_result("idx<9>", test_predecessor<indexed<9>>(array, queries));
-    print_result("idx<10>", test_predecessor<indexed<10>>(array, queries));
-    print_result("idx<11>", test_predecessor<indexed<11>>(array, queries));
-    print_result("idx<12>", test_predecessor<indexed<12>>(array, queries));
-    print_result("cidx<4>", test_predecessor<indexed_compact<4>>(array, queries));
-    print_result("cidx<5>", test_predecessor<indexed_compact<5>>(array, queries));
-    print_result("cidx<6>", test_predecessor<indexed_compact<6>>(array, queries));
-    print_result("cidx<7>", test_predecessor<indexed_compact<7>>(array, queries));
-    print_result("cidx<8>", test_predecessor<indexed_compact<8>>(array, queries));
-    print_result("cidx<9>", test_predecessor<indexed_compact<9>>(array, queries));
-    print_result("cidx<10>", test_predecessor<indexed_compact<10>>(array, queries));
-    print_result("cidx<11>", test_predecessor<indexed_compact<11>>(array, queries));
-    print_result("cidx<12>", test_predecessor<indexed_compact<12>>(array, queries));
-    print_result("sidx<4>", test_predecessor<indexed_sparse<4>>(array, queries));
-    print_result("sidx<5>", test_predecessor<indexed_sparse<5>>(array, queries));
-    print_result("sidx<6>", test_predecessor<indexed_sparse<6>>(array, queries));
-    print_result("sidx<7>", test_predecessor<indexed_sparse<7>>(array, queries));
-    print_result("sidx<8>", test_predecessor<indexed_sparse<8>>(array, queries));
-    print_result("sidx<9>", test_predecessor<indexed_sparse<9>>(array, queries));
-    print_result("sidx<10>", test_predecessor<indexed_sparse<10>>(array, queries));
-    print_result("sidx<11>", test_predecessor<indexed_sparse<11>>(array, queries));
-    print_result("sidx<12>", test_predecessor<indexed_sparse<12>>(array, queries));
+    print_result("idx<4>", test_predecessor<index<4>>(array, queries));
+    print_result("idx<5>", test_predecessor<index<5>>(array, queries));
+    print_result("idx<6>", test_predecessor<index<6>>(array, queries));
+    print_result("idx<7>", test_predecessor<index<7>>(array, queries));
+    print_result("idx<8>", test_predecessor<index<8>>(array, queries));
+    print_result("idx<9>", test_predecessor<index<9>>(array, queries));
+    print_result("idx<10>", test_predecessor<index<10>>(array, queries));
+    print_result("idx<11>", test_predecessor<index<11>>(array, queries));
+    print_result("idx<12>", test_predecessor<index<12>>(array, queries));
+    print_result("cidx<4>", test_predecessor<index_compact<4>>(array, queries));
+    print_result("cidx<5>", test_predecessor<index_compact<5>>(array, queries));
+    print_result("cidx<6>", test_predecessor<index_compact<6>>(array, queries));
+    print_result("cidx<7>", test_predecessor<index_compact<7>>(array, queries));
+    print_result("cidx<8>", test_predecessor<index_compact<8>>(array, queries));
+    print_result("cidx<9>", test_predecessor<index_compact<9>>(array, queries));
+    print_result("cidx<10>", test_predecessor<index_compact<10>>(array, queries));
+    print_result("cidx<11>", test_predecessor<index_compact<11>>(array, queries));
+    print_result("cidx<12>", test_predecessor<index_compact<12>>(array, queries));
+    print_result("sidx<4>", test_predecessor<index_sparse<4>>(array, queries));
+    print_result("sidx<5>", test_predecessor<index_sparse<5>>(array, queries));
+    print_result("sidx<6>", test_predecessor<index_sparse<6>>(array, queries));
+    print_result("sidx<7>", test_predecessor<index_sparse<7>>(array, queries));
+    print_result("sidx<8>", test_predecessor<index_sparse<8>>(array, queries));
+    print_result("sidx<9>", test_predecessor<index_sparse<9>>(array, queries));
+    print_result("sidx<10>", test_predecessor<index_sparse<10>>(array, queries));
+    print_result("sidx<11>", test_predecessor<index_sparse<11>>(array, queries));
+    print_result("sidx<12>", test_predecessor<index_sparse<12>>(array, queries));
 
     std::cout << "# successor ..." << std::endl;
     print_result("bs", test_successor<binsearch>(array, queries));
@@ -225,31 +225,31 @@ int main(int argc, char** argv) {
     print_result("sample<2048>", test_successor<sample<2048>>(array, queries));
     print_result("sample<4096>", test_successor<sample<4096>>(array, queries));
     print_result("sample<8192>", test_successor<sample<8192>>(array, queries));
-    print_result("idx<4>", test_successor<indexed<4>>(array, queries));
-    print_result("idx<5>", test_successor<indexed<5>>(array, queries));
-    print_result("idx<6>", test_successor<indexed<6>>(array, queries));
-    print_result("idx<7>", test_successor<indexed<7>>(array, queries));
-    print_result("idx<8>", test_successor<indexed<8>>(array, queries));
-    print_result("idx<9>", test_successor<indexed<9>>(array, queries));
-    print_result("idx<10>", test_successor<indexed<10>>(array, queries));
-    print_result("idx<11>", test_successor<indexed<11>>(array, queries));
-    print_result("idx<12>", test_successor<indexed<12>>(array, queries));
-    print_result("cidx<4>", test_successor<indexed_compact<4>>(array, queries));
-    print_result("cidx<5>", test_successor<indexed_compact<5>>(array, queries));
-    print_result("cidx<6>", test_successor<indexed_compact<6>>(array, queries));
-    print_result("cidx<7>", test_successor<indexed_compact<7>>(array, queries));
-    print_result("cidx<8>", test_successor<indexed_compact<8>>(array, queries));
-    print_result("cidx<9>", test_successor<indexed_compact<9>>(array, queries));
-    print_result("cidx<10>", test_successor<indexed_compact<10>>(array, queries));
-    print_result("cidx<11>", test_successor<indexed_compact<11>>(array, queries));
-    print_result("cidx<12>", test_successor<indexed_compact<12>>(array, queries));
-    print_result("sidx<4>", test_successor<indexed_sparse<4>>(array, queries));
-    print_result("sidx<5>", test_successor<indexed_sparse<5>>(array, queries));
-    print_result("sidx<6>", test_successor<indexed_sparse<6>>(array, queries));
-    print_result("sidx<7>", test_successor<indexed_sparse<7>>(array, queries));
-    print_result("sidx<8>", test_successor<indexed_sparse<8>>(array, queries));
-    print_result("sidx<9>", test_successor<indexed_sparse<9>>(array, queries));
-    print_result("sidx<10>", test_successor<indexed_sparse<10>>(array, queries));
-    print_result("sidx<11>", test_successor<indexed_sparse<11>>(array, queries));
-    print_result("sidx<12>", test_successor<indexed_sparse<12>>(array, queries));
+    print_result("idx<4>", test_successor<index<4>>(array, queries));
+    print_result("idx<5>", test_successor<index<5>>(array, queries));
+    print_result("idx<6>", test_successor<index<6>>(array, queries));
+    print_result("idx<7>", test_successor<index<7>>(array, queries));
+    print_result("idx<8>", test_successor<index<8>>(array, queries));
+    print_result("idx<9>", test_successor<index<9>>(array, queries));
+    print_result("idx<10>", test_successor<index<10>>(array, queries));
+    print_result("idx<11>", test_successor<index<11>>(array, queries));
+    print_result("idx<12>", test_successor<index<12>>(array, queries));
+    print_result("cidx<4>", test_successor<index_compact<4>>(array, queries));
+    print_result("cidx<5>", test_successor<index_compact<5>>(array, queries));
+    print_result("cidx<6>", test_successor<index_compact<6>>(array, queries));
+    print_result("cidx<7>", test_successor<index_compact<7>>(array, queries));
+    print_result("cidx<8>", test_successor<index_compact<8>>(array, queries));
+    print_result("cidx<9>", test_successor<index_compact<9>>(array, queries));
+    print_result("cidx<10>", test_successor<index_compact<10>>(array, queries));
+    print_result("cidx<11>", test_successor<index_compact<11>>(array, queries));
+    print_result("cidx<12>", test_successor<index_compact<12>>(array, queries));
+    print_result("sidx<4>", test_successor<index_sparse<4>>(array, queries));
+    print_result("sidx<5>", test_successor<index_sparse<5>>(array, queries));
+    print_result("sidx<6>", test_successor<index_sparse<6>>(array, queries));
+    print_result("sidx<7>", test_successor<index_sparse<7>>(array, queries));
+    print_result("sidx<8>", test_successor<index_sparse<8>>(array, queries));
+    print_result("sidx<9>", test_successor<index_sparse<9>>(array, queries));
+    print_result("sidx<10>", test_successor<index_sparse<10>>(array, queries));
+    print_result("sidx<11>", test_successor<index_sparse<11>>(array, queries));
+    print_result("sidx<12>", test_successor<index_sparse<12>>(array, queries));
 }
