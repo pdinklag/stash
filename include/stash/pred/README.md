@@ -18,3 +18,26 @@ A brief overview over the relevant implementations is given in the following tab
 | `index` | Indexes the sequence based on the universe defined by `item_t` by saving a search interval of size at most 2 to the `m_lo_bits`-th power (template parameter) for each possible combination of high bits (`8 * sizeof(item_t) - m_lo_bits`). The interval is then searched using `binary_search_cache`. This implementation yields very good time/space trade-offs. |
 | `index_compact` | Same as `index`, but compresses the stored the interval borders. Saves a lot of RAM, but comes at the cost of slower queries. |
 | `rank` | Constructs a bit vector with constant-time rank support for the given input sequence. Fastest implementation, but the required RAM depends directly on the difference between the largest and smallest value in the input sequence. |
+
+## Usage Example
+
+Here's an example for using `index`:
+
+```
+// a simple array - values MUST be in ascending order
+std::vector<uint8_t> array = { 2, 4, 19, 37, 55, 78, 98, 102, 147, 200 };
+
+// specify the type for our index
+// in this example, we index the upper 3 bits of each value
+using index = stash::pred::index<decltype(array), uint8_t, 3>;
+
+// construct the index
+index idx(array);
+
+// send a predecessor query
+auto r = idx.predecessor(128);
+
+// print the result (should be 102)
+std::cout << "result: " << uint(array[r.pos])
+          << ", expected: 102" << std::endl;
+```
