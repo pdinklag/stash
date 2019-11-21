@@ -10,7 +10,7 @@ void assert_sorted_ascending(const array_t& a) {
         auto prev = a[0];
         for(size_t i = 1; i < num; i++) {
             auto next = a[i];
-            assert(prev < next);
+            assert(prev <= next);
             prev = next;
         }
     }
