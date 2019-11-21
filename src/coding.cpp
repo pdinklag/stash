@@ -5,20 +5,23 @@
 
 #include <tlx/cmdline_parser.hpp>
 
-#include <code/ascii_coder.hpp>
-#include <code/binary_coder.hpp>
-#include <code/delta_coder.hpp>
-#include <code/delta0_coder.hpp>
-#include <code/mtf_coder.hpp>
-#include <code/coding.hpp>
+#include <stash/code/ascii_coder.hpp>
+#include <stash/code/binary_coder.hpp>
+#include <stash/code/delta_coder.hpp>
+#include <stash/code/delta0_coder.hpp>
+#include <stash/code/mtf_coder.hpp>
+#include <stash/code/coding.hpp>
 
-#include <huff/huffman_coder.hpp>
-#include <huff/knuth_coder.hpp>
-#include <huff/forward_coder.hpp>
-#include <huff/hybrid_coder.hpp>
+#include <stash/huff/huffman_coder.hpp>
+#include <stash/huff/knuth_coder.hpp>
+#include <stash/huff/forward_coder.hpp>
+#include <stash/huff/hybrid_coder.hpp>
 
-#include <io/load_file.hpp>
-#include <util/time.hpp>
+#include <stash/io/load_file.hpp>
+#include <stash/util/time.hpp>
+
+using namespace stash;
+using namespace stash::code;
 
 using mtf_coder_t = mtf_coder<ascii_coder, ascii_coder, binary_coder<>>;
 
@@ -111,7 +114,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    auto text = load_file_as_string(input_filename);
+    auto text = io::load_file_as_string(input_filename);
 
     //test<ascii_coder>(text, outfile_prefix + "ascii", verify);
     test<huff::huffman_coder<ascii_coder, delta_coder>>(text, outfile_prefix + "huffman", verify);

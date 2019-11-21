@@ -5,18 +5,20 @@
 
 #include <tlx/cmdline_parser.hpp>
 
-#include <pred/binsearch.hpp>
-#include <pred/binsearch_cache.hpp>
-#include <pred/indexed.hpp>
-#include <pred/indexed_compact.hpp>
-#include <pred/indexed_sparse.hpp>
-#include <pred/rank.hpp>
-#include <pred/sample.hpp>
+#include <stash/pred/binsearch.hpp>
+#include <stash/pred/binsearch_cache.hpp>
+#include <stash/pred/indexed.hpp>
+#include <stash/pred/indexed_compact.hpp>
+#include <stash/pred/indexed_sparse.hpp>
+#include <stash/pred/rank.hpp>
+#include <stash/pred/sample.hpp>
 
-#include <io/load_file.hpp>
-#include <util/malloc_callback.hpp>
-#include <util/time.hpp>
-#include <util/uint_types.hpp>
+#include <stash/io/load_file.hpp>
+#include <stash/util/malloc_callback.hpp>
+#include <stash/util/time.hpp>
+#include <stash/util/uint_types.hpp>
+
+using namespace stash;
 
 using value_t = uint40_t;
 using binsearch       = pred::binsearch<std::vector<value_t>, value_t>;
@@ -151,7 +153,7 @@ int main(int argc, char** argv) {
 
     // load input
     std::cout << "# loading input ..." << std::endl;
-    auto array = load_file_as_vector<value_t>(input_filename);
+    auto array = io::load_file_as_vector<value_t>(input_filename);
 
     // generate queries
     std::cout << "# generating queries ..." << std::endl;

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 
-#include <util/file_size.hpp>
+#include <stash/util/file_size.hpp>
 
 #include <divsufsort64.h>
 #include <tlx/cmdline_parser.hpp>
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     }
 
     // read input file
-    const size_t input_filesize = file_size(input_filename);
+    const size_t input_filesize = stash::file_size(input_filename);
     const size_t n = input_filesize + 1;
 
     sauchar_t* input = new sauchar_t[n];

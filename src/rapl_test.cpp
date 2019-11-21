@@ -1,13 +1,15 @@
 #include <iostream>
 
-#include <rapl/reader.hpp>
-#include <rapl/power.hpp>
-#include <util/time.hpp>
+#include <stash/rapl/reader.hpp>
+#include <stash/rapl/power.hpp>
+#include <stash/util/time.hpp>
 
 #include <algorithm>
 #include <unordered_set>
 #include <random>
 #include <unistd.h>
+
+using namespace stash;
 
 volatile int x;
 

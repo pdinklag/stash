@@ -5,8 +5,10 @@
 
 #include <tlx/cmdline_parser.hpp>
 
-#include <io/bit_ostream.hpp>
-#include <util/file_size.hpp>
+#include <stash/io/bit_ostream.hpp>
+#include <stash/util/file_size.hpp>
+
+using namespace stash;
 
 int main(int argc, char** argv) {
     // params
@@ -55,10 +57,10 @@ int main(int argc, char** argv) {
         }
 
         std::unique_ptr<std::ofstream> bvs;
-        std::unique_ptr<bit_ostream> bv;
+        std::unique_ptr<io::bit_ostream> bv;
         if(!bv_filename.empty()) {
             bvs = std::make_unique<std::ofstream>(bv_filename);
-            bv = std::make_unique<bit_ostream>(*bvs);
+            bv = std::make_unique<io::bit_ostream>(*bvs);
         }
 
         char* buf = new char[bufsize];
