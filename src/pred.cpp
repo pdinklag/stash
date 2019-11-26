@@ -147,13 +147,20 @@ int main(int argc, char** argv) {
     size_t universe = std::numeric_limits<value_t>::max();
     cp.add_bytes('u', "universe", universe, "The universe to draw query numbers from.");
 
+    bool add_max = false;
+    cp.add_flag('m', "max", add_max, "Append the maximum possible value to the input sequence.");
+
     if (!cp.process(argc, argv)) {
         return -1;
     }
 
     // load input
     std::cout << "# loading input ..." << std::endl;
-    auto array = io::load_file_as_vector<value_t>(input_filename);
+    auto array = io::load_file_as_vector<uint40_t, value_t>(input_filename);
+
+    if(add_max) {
+        array.push_back(UINT64_MAX);
+    }
 
     // generate queries
     std::cout << "# generating queries ..." << std::endl;
