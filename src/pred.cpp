@@ -12,6 +12,7 @@
 #include <stash/pred/index_sparse.hpp>
 #include <stash/pred/rank.hpp>
 #include <stash/pred/sample.hpp>
+#include <stash/pred/tree3.hpp>
 
 #include <stash/io/load_file.hpp>
 #include <stash/util/malloc_callback.hpp>
@@ -36,6 +37,9 @@ using index_compact = pred::index_compact<std::vector<value_t>, value_t, k>;
 
 template<size_t k>
 using index_sparse = pred::index_sparse<std::vector<value_t>, value_t, k>;
+
+template<size_t l1, size_t l2, size_t l3>
+using tree3 = pred::tree3<std::vector<value_t>, value_t, l1, l2, l3>;
 
 size_t mem = 0;
 
