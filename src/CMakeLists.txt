@@ -16,6 +16,12 @@ add_executable(bwt bwt.cpp)
 target_include_directories(bwt PUBLIC ${TLX_INCLUDE_DIRS} ${DIVSUFSORT_INCLUDE_DIRS})
 target_link_libraries(bwt ${TLX_LIBRARIES} ${DIVSUFSORT_LIBRARIES})
 
+# interface benchmark
+add_executable(interface interface.cpp)
+
+target_include_directories(interface PUBLIC ${TLX_INCLUDE_DIRS} ${DIVSUFSORT_INCLUDE_DIRS})
+target_link_libraries(interface ${TLX_LIBRARIES} ${DIVSUFSORT_LIBRARIES})
+
 # runs
 add_executable(runs runs.cpp)
 
