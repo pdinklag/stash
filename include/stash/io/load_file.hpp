@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -7,7 +9,7 @@
 namespace stash {
 namespace io {
 
-std::string load_file_as_string(const std::string& filename) {
+inline std::string load_file_as_string(const std::string& filename) {
     std::string s;
     std::ifstream f(filename);
     f.seekg(0, std::ios::end);   
@@ -19,7 +21,7 @@ std::string load_file_as_string(const std::string& filename) {
 }
 
 template<typename I, typename O = I>
-std::vector<O> load_file_as_vector(
+inline std::vector<O> load_file_as_vector(
     const std::string& filename,
     const size_t bufsize = 16384ULL) {
 
@@ -48,6 +50,21 @@ std::vector<O> load_file_as_vector(
     }
     
     delete[] buffer;
+    return v;
+}
+
+template<typename O>
+inline std::vector<O> load_file_lines_as_vector(const std::string& filename) {
+    std::vector<O> v;
+    std::ifstream f(filename);
+
+    // 2^64 has 20 decimal digits, so a buffer of size 24 should be safe
+    for(std::array<char, 24> linebuf; f.getline(&linebuf[0], 24);) {
+        if(linebuf[0]) {
+            v.push_back(std::atoll(&linebuf[0]));
+        }
+    }
+
     return v;
 }
 
