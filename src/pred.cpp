@@ -21,7 +21,7 @@
 
 using namespace stash;
 
-using value_t = uint40_t;
+using value_t = uint32_t;
 using binsearch       = pred::binsearch<std::vector<value_t>, value_t>;
 using binsearch_cache = pred::binsearch_cache<std::vector<value_t>, value_t>;
 using rank            = pred::rank<std::vector<value_t>, value_t>;
@@ -148,11 +148,20 @@ int main(int argc, char** argv) {
     size_t num_queries = 10'000'000ULL;
     cp.add_bytes('q', "queries", num_queries, "The number of queries to perform.");
 
-    size_t universe = std::numeric_limits<value_t>::max();
-    cp.add_bytes('u', "universe", universe, "The universe to draw query numbers from.");
+    size_t universe = 0;
+    cp.add_bytes('u', "universe", universe, "The universe to draw query numbers from. Default is maximum value + 1.");
 
     bool add_max = false;
     cp.add_flag('m', "max", add_max, "Append the maximum possible value to the input sequence.");
+
+    bool lines = false;
+    cp.add_flag("lines", lines, "Input file contains string representations of the input sequence, one per line.");
+
+    bool no_pred = false;
+    cp.add_bool("no-pred", no_pred, "Don't do predecessor benchmark.");
+
+    bool no_succ = false;
+    cp.add_bool("no-succ", no_succ, "Don't do successor benchmark.");
 
     if (!cp.process(argc, argv)) {
         return -1;
@@ -160,10 +169,20 @@ int main(int argc, char** argv) {
 
     // load input
     std::cout << "# loading input ..." << std::endl;
-    auto array = io::load_file_as_vector<uint40_t, value_t>(input_filename);
+
+    std::vector<value_t> array;
+    if(lines) {
+        array = io::load_file_lines_as_vector<value_t>(input_filename);
+    } else {
+        array = io::load_file_as_vector<uint40_t, value_t>(input_filename);
+    }
+
+    if(!universe) {
+        universe = (size_t)array[array.size() - 1] + 1;
+    }
 
     if(add_max) {
-        array.push_back(UINT64_MAX);
+        array.push_back(value_t(UINT64_MAX));
     }
 
     // generate queries
@@ -184,6 +203,7 @@ int main(int argc, char** argv) {
     };
 
     // run tests
+    if(!no_pred) {
     std::cout << "# predecessor ..." << std::endl;
     print_result("bs", test_predecessor<binsearch>(array, queries));
     print_result("bs*", test_predecessor<binsearch_cache>(array, queries));
@@ -223,7 +243,9 @@ int main(int argc, char** argv) {
     print_result("sidx<10>", test_predecessor<index_sparse<10>>(array, queries));
     print_result("sidx<11>", test_predecessor<index_sparse<11>>(array, queries));
     print_result("sidx<12>", test_predecessor<index_sparse<12>>(array, queries));
+    }
 
+    if(!no_succ) {
     std::cout << "# successor ..." << std::endl;
     print_result("bs", test_successor<binsearch>(array, queries));
     print_result("bs*", test_successor<binsearch_cache>(array, queries));
@@ -263,4 +285,5 @@ int main(int argc, char** argv) {
     print_result("sidx<10>", test_successor<index_sparse<10>>(array, queries));
     print_result("sidx<11>", test_successor<index_sparse<11>>(array, queries));
     print_result("sidx<12>", test_successor<index_sparse<12>>(array, queries));
+    }
 }
