@@ -213,9 +213,6 @@ int main(int argc, char** argv) {
     print_result("sample<256>", test_predecessor<sample<256>>(array, queries));
     print_result("sample<512>", test_predecessor<sample<512>>(array, queries));
     print_result("sample<1024>", test_predecessor<sample<1024>>(array, queries));
-    print_result("sample<2048>", test_predecessor<sample<2048>>(array, queries));
-    print_result("sample<4096>", test_predecessor<sample<4096>>(array, queries));
-    print_result("sample<8192>", test_predecessor<sample<8192>>(array, queries));
     print_result("idx<4>", test_predecessor<index<4>>(array, queries));
     print_result("idx<5>", test_predecessor<index<5>>(array, queries));
     print_result("idx<6>", test_predecessor<index<6>>(array, queries));
@@ -255,9 +252,6 @@ int main(int argc, char** argv) {
     print_result("sample<256>", test_successor<sample<256>>(array, queries));
     print_result("sample<512>", test_successor<sample<512>>(array, queries));
     print_result("sample<1024>", test_successor<sample<1024>>(array, queries));
-    print_result("sample<2048>", test_successor<sample<2048>>(array, queries));
-    print_result("sample<4096>", test_successor<sample<4096>>(array, queries));
-    print_result("sample<8192>", test_successor<sample<8192>>(array, queries));
     print_result("idx<4>", test_successor<index<4>>(array, queries));
     print_result("idx<5>", test_successor<index<5>>(array, queries));
     print_result("idx<6>", test_successor<index<6>>(array, queries));
