@@ -30,15 +30,8 @@ private:
 
     inline void bitset(size_t i, bool b) {
         const size_t q = block(i);
-        const size_t k = offset(i);
-        const size_t mask = (1ULL << k);
-
-        // TODO: avoid branch!
-        if(b) {
-            m_bits[q] |= mask;
-        } else {
-            m_bits[q] &= ~mask;
-        }
+        const size_t mask = (1ULL << offset(i));
+        m_bits[q] = (m_bits[q] & ~mask) | (-b & mask);
     }
 
 public:
