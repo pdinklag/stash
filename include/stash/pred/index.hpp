@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <utility>
 
 #include <stash/pred/util.hpp>
 #include <stash/pred/result.hpp>
@@ -40,6 +41,17 @@ private:
     lo_pred_t m_lo_pred;
 
 public:
+    inline index() : m_num(0), m_min(0), m_max(0), m_array(nullptr) {
+    }
+
+    inline index(const index& other) {
+        *this = other;
+    }
+
+    inline index(index&& other) {
+        *this = std::move(other);
+    }
+
     inline index(const array_t& array)
         : m_num(array.size()),
           m_min(array[0]),
@@ -70,6 +82,30 @@ public:
 
         // build the predecessor data structure for low bits
         m_lo_pred = lo_pred_t(array);
+    }
+
+    inline index& operator=(const index& other) {
+        m_array = other.m_array;
+        m_num = other.m_num;
+        m_min = other.m_min;
+        m_max = other.m_max;
+        m_key_min = other.m_key_min;
+        m_key_max = other.m_key_max;
+        m_hi_idx = other.m_hi_idx;
+        m_lo_pred = other.m_lo_pred;
+        return *this;
+    }
+
+    inline index& operator=(index&& other) {
+        m_array = other.m_array;
+        m_num = other.m_num;
+        m_min = other.m_min;
+        m_max = other.m_max;
+        m_key_min = other.m_key_min;
+        m_key_max = other.m_key_max;
+        m_hi_idx = std::move(other.m_hi_idx);
+        m_lo_pred = std::move(other.m_lo_pred);
+        return *this;
     }
 
     inline result predecessor(const item_t x) const {
