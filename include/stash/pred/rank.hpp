@@ -29,7 +29,7 @@ public:
 
         assert_sorted_ascending(array);
 
-        m_bv = bit_vector(m_max - m_min + 1);
+        m_bv = bit_vector(size_t(m_max - m_min) + 1);
         for(size_t i = 0; i < m_num; i++) {
             m_bv[array[i] - m_min] = 1;
         }

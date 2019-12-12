@@ -21,7 +21,7 @@
 
 using namespace stash;
 
-using value_t = uint32_t;
+using value_t = uint40_t;
 using binsearch       = pred::binsearch<std::vector<value_t>, value_t>;
 using binsearch_cache = pred::binsearch_cache<std::vector<value_t>, value_t>;
 using rank            = pred::rank<std::vector<value_t>, value_t>;

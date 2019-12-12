@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <cstdlib>
 #include <fstream>
 #include <string>
@@ -61,7 +62,7 @@ inline std::vector<O> load_file_lines_as_vector(const std::string& filename) {
     // 2^64 has 20 decimal digits, so a buffer of size 24 should be safe
     for(std::array<char, 24> linebuf; f.getline(&linebuf[0], 24);) {
         if(linebuf[0]) {
-            v.push_back(std::atoll(&linebuf[0]));
+            v.push_back(O(uint64_t(std::atoll(&linebuf[0]))));
         }
     }
 
