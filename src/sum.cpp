@@ -5,13 +5,20 @@
 #include <immintrin.h>
 
 #include <stash/io/load_file.hpp>
+
+#include <stash/rapl/reader.hpp>
+#include <stash/rapl/power.hpp>
+#include <stash/util/time.hpp>
+
 #include <tlx/cmdline_parser.hpp>
 
 #ifndef __AVX512F__
 #pragma message("AVX-512F not supported by CPU")
 #endif
 
-uint64_t sum_onebyone(const std::vector<uint64_t>& a) {
+using namespace stash;
+
+uint64_t sum_for(const std::vector<uint64_t>& a) {
     const size_t n = a.size();
     uint64_t sum = 0;
     for(size_t i = 0; i < a.size(); i++) {
@@ -47,19 +54,58 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    auto a = stash::io::load_file_lines_as_vector<uint64_t>(filename);
+    rapl::reader r;
+    auto a = io::load_file_lines_as_vector<uint64_t>(filename);
 
-    // one by one
+    // for
     {
-        auto sum = sum_onebyone(a);
-        std::cout << "sum_onebyone: " << sum << std::endl;
+        auto t0 = time();
+        auto e0 = r.read();
+        
+        auto sum = sum_for(a);
+
+        const auto t = time() - t0;
+        const auto e = r.read() - e0;
+        const auto p = rapl::power(e, t);
+        std::cout << "RESULT"
+                  << " method=for"
+                  << " time=" << t
+                  << " e.core=" << e.core
+                  << " e.uncore=" << e.uncore
+                  << " e.dram=" << e.dram
+                  << " e.total=" << e.total()
+                  << " p.core=" << p.core
+                  << " p.uncore=" << p.uncore
+                  << " p.dram=" << p.dram
+                  << " p.total=" << p.total()
+                  << " sum=" << sum
+                  << std::endl;
     }
 
     // AVX512
     #ifdef __AVX512F__
     {
+        auto t0 = time();
+        auto e0 = r.read();
+        
         auto sum = sum_avx512(a);
-        std::cout << "sum_avx512: " << sum << std::endl;
+
+        const auto t = time() - t0;
+        const auto e = r.read() - e0;
+        const auto p = rapl::power(e, t);
+        std::cout << "RESULT"
+                  << " method=avx512"
+                  << " time=" << t
+                  << " e.core=" << e.core
+                  << " e.uncore=" << e.uncore
+                  << " e.dram=" << e.dram
+                  << " e.total=" << e.total()
+                  << " p.core=" << p.core
+                  << " p.uncore=" << p.uncore
+                  << " p.dram=" << p.dram
+                  << " p.total=" << p.total()
+                  << " sum=" << sum
+                  << std::endl;
     }
     #endif
 
