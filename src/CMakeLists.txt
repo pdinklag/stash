@@ -4,6 +4,12 @@ add_executable(rapl-test rapl_test.cpp)
 target_include_directories(rapl-test PUBLIC ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
 target_link_libraries(rapl-test ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
 
+# rank energy benchmark
+add_executable(rank rank.cpp)
+
+target_include_directories(rank PUBLIC ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
+target_link_libraries(rank ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
+
 # sum energy benchmark
 add_executable(sum sum.cpp)
 
