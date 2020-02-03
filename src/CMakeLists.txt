@@ -1,14 +1,24 @@
 # rapl-test
-add_executable(rapl-test rapl_test.cpp)
+if(POWERCAP_FOUND)
+    add_executable(rapl-test rapl_test.cpp)
 
-target_include_directories(rapl-test PUBLIC ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
-target_link_libraries(rapl-test ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
+    target_include_directories(rapl-test PUBLIC ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
+    target_link_libraries(rapl-test ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
+endif()
+
+# pcm-test
+if(PCM_FOUND)
+    add_executable(pcm-test pcm_test.cpp)
+
+    target_include_directories(pcm-test PUBLIC ${PCM_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
+    target_link_libraries(pcm-test ${PCM_LIBRARIES} ${TLX_LIBRARIES})
+endif()
 
 # rank energy benchmark
 add_executable(rank rank.cpp)
 
-target_include_directories(rank PUBLIC ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
-target_link_libraries(rank ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
+target_include_directories(rank PUBLIC ${POWERCAP_INCLUDE_DIRS} ${VTUNE_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
+target_link_libraries(rank ${POWERCAP_LIBRARIES} ${VTUNE_LIBRARIES} ${TLX_LIBRARIES})
 
 # sum energy benchmark
 add_executable(sum sum.cpp)
