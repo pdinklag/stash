@@ -7,11 +7,11 @@ if(POWERCAP_FOUND)
 endif()
 
 # pcm-test
-if(PCM_FOUND)
+if(PCM_FOUND AND POWERCAP_FOUND)
     add_executable(pcm-test pcm_test.cpp)
 
-    target_include_directories(pcm-test PUBLIC ${PCM_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
-    target_link_libraries(pcm-test ${PCM_LIBRARIES} ${TLX_LIBRARIES})
+    target_include_directories(pcm-test PUBLIC ${PCM_INCLUDE_DIRS} ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
+    target_link_libraries(pcm-test ${PCM_LIBRARIES} ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
 endif()
 
 # rank energy benchmark
