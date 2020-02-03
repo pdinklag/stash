@@ -244,18 +244,14 @@ void bench(
 
     const auto t = time() - t0;
     const auto e = r.read() - e0;
-    const auto p = rapl::power(e, t);
     std::cout << "RESULT"
               << " name=" << name
               << " t=" << t
+              << " e.package=" << e.package
               << " e.core=" << e.core
               << " e.uncore=" << e.uncore
               << " e.dram=" << e.dram
-              << " e.total=" << e.total()
-              << " p.core=" << p.core
-              << " p.uncore=" << p.uncore
-              << " p.dram=" << p.dram
-              << " p.total=" << p.total()
+              << " e.psys=" << e.psys
               << " sum=" << sum
               << std::endl;
 }

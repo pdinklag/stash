@@ -81,11 +81,11 @@ int main(int argc, char** argv) {
         auto p_xor = test_xor(r, a, n);
         auto p_mul = test_mul(r, a, n);
 
-        std::cout << "RESULT op=sleep it=" << (it+1) << " power=" << p_sleep.total() << std::endl;
-        std::cout << "RESULT op=rnd it=" << (it+1) << " power=" << p_random.total() << " power_denoise=" << (p_random.total() - p_sleep.total()) << std::endl;
-        std::cout << "RESULT op=add it=" << (it+1) << " power=" << p_add.total() << " power_denoise=" << (p_add.total() - p_sleep.total()) << std::endl;
-        std::cout << "RESULT op=xor it=" << (it+1) << " power=" << p_xor.total() << " power_denoise=" << (p_xor.total() - p_sleep.total()) << std::endl;
-        std::cout << "RESULT op=mul it=" << (it+1) << " power=" << p_mul.total() << " power_denoise=" << (p_mul.total() - p_sleep.total()) << std::endl;
+        std::cout << "RESULT op=sleep it=" << (it+1) << " power=" << p_sleep << std::endl;
+        std::cout << "RESULT op=rnd it=" << (it+1) << " power=" << p_random << " power_denoise=" << (p_random - p_sleep) << std::endl;
+        std::cout << "RESULT op=add it=" << (it+1) << " power=" << p_add << " power_denoise=" << (p_add - p_sleep) << std::endl;
+        std::cout << "RESULT op=xor it=" << (it+1) << " power=" << p_xor << " power_denoise=" << (p_xor - p_sleep) << std::endl;
+        std::cout << "RESULT op=mul it=" << (it+1) << " power=" << p_mul << " power_denoise=" << (p_mul - p_sleep) << std::endl;
     }
 
     delete[] a;

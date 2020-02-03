@@ -12,10 +12,6 @@
 
 #include <tlx/cmdline_parser.hpp>
 
-#ifndef __AVX512F__
-#pragma message("AVX-512F not supported by CPU")
-#endif
-
 using namespace stash;
 
 uint64_t sum_for(const std::vector<uint64_t>& a) {
@@ -66,18 +62,12 @@ int main(int argc, char** argv) {
 
         const auto t = time() - t0;
         const auto e = r.read() - e0;
-        const auto p = rapl::power(e, t);
         std::cout << "RESULT"
                   << " method=for"
                   << " time=" << t
                   << " e.core=" << e.core
                   << " e.uncore=" << e.uncore
                   << " e.dram=" << e.dram
-                  << " e.total=" << e.total()
-                  << " p.core=" << p.core
-                  << " p.uncore=" << p.uncore
-                  << " p.dram=" << p.dram
-                  << " p.total=" << p.total()
                   << " sum=" << sum
                   << std::endl;
     }
