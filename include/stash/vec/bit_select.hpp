@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <utility>
 
 #include <stash/util/math.hpp>
@@ -17,7 +18,7 @@ private:
     static constexpr uint8_t basic_select(uint64_t v, uint8_t k);
     static constexpr uint8_t basic_select(uint64_t v, uint8_t l, uint8_t k);
 
-    const bit_vector* m_bv;
+    std::shared_ptr<const bit_vector> m_bv;
 
     size_t m_max;
     size_t m_block_size;
@@ -28,10 +29,8 @@ private:
     int_vector m_supblocks;
 
 public:
-    inline bit_select(const bit_vector& bv) {
-        m_bv = &bv;
-
-        const size_t n = bv.size();
+    inline bit_select(std::shared_ptr<const bit_vector> bv) : m_bv(bv) {
+        const size_t n = m_bv->size();
         const size_t log_n = log2_ceil(n - 1);
 
         // construct
@@ -52,10 +51,10 @@ public:
 
         size_t cur_b = 0; // current block
 
-        const size_t num_blocks = bv.num_blocks();
+        const size_t num_blocks = m_bv->num_blocks();
         
         for(size_t i = 0; i < num_blocks; i++) {
-            const auto v = bv.block64(i);
+            const auto v = m_bv->block64(i);
             
             uint8_t r;
             if(i + 1 < num_blocks) {
@@ -154,7 +153,7 @@ public:
     }
 
     inline bit_select& operator=(bit_select&& other) {
-        m_bv = other.m_bv;
+        m_bv = std::move(other.m_bv);
         m_max = other.m_max;
         m_block_size = other.m_block_size;
         m_supblock_size = other.m_supblock_size;
@@ -162,12 +161,6 @@ public:
         m_blocks = std::move(other.m_blocks);
         m_supblocks = std::move(other.m_supblocks);
         return *this;
-    }
-
-    inline void reassign(bit_select&& other, const bit_vector& bv) {
-        // FIXME: this shouldn't be necessary
-        *this = std::move(other),
-        m_bv = &bv;
     }
 
     inline size_t select(size_t x) const {

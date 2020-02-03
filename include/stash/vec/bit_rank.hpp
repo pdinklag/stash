@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <utility>
 
 #include <stash/vec/bit_vector.hpp>
@@ -17,13 +18,13 @@ private:
     static constexpr size_t BLOCKS_PER_SB = SUP_SZ >> 6ULL;
     static constexpr size_t SB_INNER_RS = SUP_W - 6ULL;
         
-    const bit_vector* m_bv;
+    std::shared_ptr<const bit_vector> m_bv;
 
     int_vector m_blocks;    // size 64 each
     int_vector m_supblocks; // size SUP_SZ each
 
 public:
-    inline bit_rank(const bit_vector& bv) : m_bv(&bv) {
+    inline bit_rank(std::shared_ptr<const bit_vector> bv) : m_bv(bv) {
         const size_t n = m_bv->size();
 
         // determine number of superblocks and superblock entry width
@@ -80,16 +81,10 @@ public:
     }
 
     inline bit_rank& operator=(bit_rank&& other) {
-        m_bv = other.m_bv;
+        m_bv = std::move(other.m_bv);
         m_blocks = std::move(other.m_blocks);
         m_supblocks = std::move(other.m_supblocks);
         return *this;
-    }
-
-    inline void reassign(bit_rank&& other, const bit_vector& bv) {
-        // FIXME: this shouldn't be necessary
-        *this = std::move(other),
-        m_bv = &bv;
     }
 
     inline size_t rank1(const size_t x) const {

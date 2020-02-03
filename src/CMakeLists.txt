@@ -33,10 +33,12 @@ target_include_directories(coding PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(coding ${TLX_LIBRARIES})
 
 # bwt
-add_executable(bwt bwt.cpp)
+if(DIVSUFSORT64_FOUND)
+    add_executable(bwt bwt.cpp)
 
-target_include_directories(bwt PUBLIC ${TLX_INCLUDE_DIRS} ${DIVSUFSORT_INCLUDE_DIRS})
-target_link_libraries(bwt ${TLX_LIBRARIES} ${DIVSUFSORT_LIBRARIES})
+    target_include_directories(bwt PUBLIC ${TLX_INCLUDE_DIRS} ${DIVSUFSORT_INCLUDE_DIRS})
+    target_link_libraries(bwt ${TLX_LIBRARIES} ${DIVSUFSORT_LIBRARIES})
+endif()
 
 # interface benchmark
 add_executable(interface interface.cpp)

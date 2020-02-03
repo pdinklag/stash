@@ -17,8 +17,9 @@ private:
     size_t      m_num;
     item_t      m_min;
     item_t      m_max;
-    bit_vector  m_bv;
-    bit_rank    m_rank;
+    
+    std::shared_ptr<bit_vector> m_bv;
+    bit_rank                    m_rank;
 
 public:
     inline rank(const array_t& array)
@@ -29,13 +30,13 @@ public:
 
         assert_sorted_ascending(array);
 
-        m_bv = bit_vector(size_t(m_max - m_min) + 1);
+        m_bv = std::make_shared<bit_vector>(size_t(m_max - m_min) + 1);
         for(size_t i = 0; i < m_num; i++) {
-            m_bv[array[i] - m_min] = 1;
+            (*m_bv)[array[i] - m_min] = 1;
         }
 
-        assert(m_bv[0] == 1);
-        assert(m_bv[m_max-m_min] == 1);
+        assert((*m_bv)[0] == 1);
+        assert((*m_bv)[m_max-m_min] == 1);
 
         m_rank = bit_rank(m_bv);
     }

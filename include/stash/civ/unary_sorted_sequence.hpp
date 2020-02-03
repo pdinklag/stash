@@ -1,5 +1,6 @@
 #pragma once
-    
+
+#include <memory>
 #include <utility>
 
 #include <stash/vec/bit_vector.hpp>
@@ -12,18 +13,19 @@ namespace civ {
 
 class unary_sorted_sequence {
 private:
-    size_t      m_size;
-    bit_vector  m_bits;
-    bit_rank    m_rank;
-    bit_select0 m_sel0;
+    size_t                      m_size;
+    std::shared_ptr<bit_vector> m_bits;
+    bit_rank                    m_rank;
+    bit_select0                 m_sel0;
 
     template<typename T>
     size_t encode_unary(size_t pos, T value) {
+        auto& bits = *m_bits;
         while(value) {
-            m_bits[pos++] = 1;
+            bits[pos++] = 1;
             --value;
         }
-        m_bits[pos++] = 0;
+        bits[pos++] = 0;
         return pos;
     }
 
@@ -47,7 +49,7 @@ public:
         {
             const size_t max = size_t(array[m_size-1]);
             const size_t num_bits = m_size + max;
-            m_bits = bit_vector(num_bits);
+            m_bits = std::make_shared<bit_vector>(num_bits);
             
             auto prev = array[0];
             size_t pos = encode_unary(0, prev);
@@ -75,9 +77,9 @@ public:
 
     inline unary_sorted_sequence& operator=(unary_sorted_sequence&& other) {
         m_size = other.m_size;
-        m_bits = std::move(other.m_bits); // FIXME: this BREAKS m_rank and m_sel0 !!
-        m_rank.reassign(std::move(other.m_rank), m_bits);
-        m_sel0.reassign(std::move(other.m_sel0), m_bits);
+        m_bits = std::move(other.m_bits);
+        m_rank = std::move(other.m_rank);
+        m_sel0 = std::move(other.m_sel0);
         return *this;
     }
 
