@@ -52,6 +52,12 @@ add_executable(runs runs.cpp)
 target_include_directories(runs PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(runs ${TLX_LIBRARIES})
 
+# runs
+add_executable(hash hash.cpp)
+
+target_include_directories(hash PUBLIC ${TLX_INCLUDE_DIRS})
+target_link_libraries(hash ${TLX_LIBRARIES})
+
 # pred
 add_executable(pred pred.cpp malloc.cpp)
 
