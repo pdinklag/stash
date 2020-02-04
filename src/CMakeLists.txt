@@ -6,14 +6,6 @@ if(POWERCAP_FOUND)
     target_link_libraries(rapl-test ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
 endif()
 
-# pcm-test
-if(PCM_FOUND AND POWERCAP_FOUND)
-    add_executable(pcm-test pcm_test.cpp)
-
-    target_include_directories(pcm-test PUBLIC ${PCM_INCLUDE_DIRS} ${POWERCAP_INCLUDE_DIRS} ${TLX_INCLUDE_DIRS})
-    target_link_libraries(pcm-test ${PCM_LIBRARIES} ${POWERCAP_LIBRARIES} ${TLX_LIBRARIES})
-endif()
-
 # rank energy benchmark
 add_executable(rank rank.cpp)
 
