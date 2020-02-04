@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
     #ifdef __AVX512F__
     {
         auto t0 = time();
-        auto e0 = r.read();
+        auto e0 = r.read().total();
         
         auto sum = sum_avx512(a);
 
