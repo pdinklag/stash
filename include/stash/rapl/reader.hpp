@@ -1,9 +1,15 @@
 #pragma once
 
-#include <stash/rapl/energy.hpp>
-#include <stash/rapl/rapl_error.hpp>
+#include <array>
+#include <iostream>
+
+#include <stash/rapl/config.hpp>
+#include <stash/rapl/energy_buffer.hpp>
+
+#ifdef POWERCAP_FOUND
 
 #include <powercap/powercap-rapl.h>
+#define RAPL
 
 namespace stash {
 namespace rapl {
@@ -18,44 +24,85 @@ public:
         bool psys    : 1;
     };
 
-private:
-    powercap_rapl_pkg m_pkg;
-    feature_support m_support;
-
-public:
     static inline uint32_t num_packages() {
         return powercap_rapl_get_num_packages();
     }
 
-    inline reader(uint32_t package = 0) {
-        if(num_packages() < package) {
-            throw rapl_error("package not available");
+private:
+    uint32_t m_num_packages;
+    std::array<powercap_rapl_pkg, max_rapl_packages> m_pkg;
+
+public:
+    inline reader() {
+        m_num_packages = num_packages();
+        
+        if(max_rapl_packages < m_num_packages) {
+            std::cerr
+                << "WARNING: There are more RAPL packages available (" << m_num_packages
+                << ") than configured by the MAX_RAPL_PACKAGES macro (" << max_rapl_packages
+                << "). RAPL read results may be incomplete!"
+                << std::endl;
+
+            m_num_packages = max_rapl_packages;
         }
 
-        powercap_rapl_init(package, &m_pkg, true);
-
-        m_support.package = powercap_rapl_is_zone_supported(&m_pkg, POWERCAP_RAPL_ZONE_PACKAGE);
-        m_support.core    = powercap_rapl_is_zone_supported(&m_pkg, POWERCAP_RAPL_ZONE_CORE);
-        m_support.uncore  = powercap_rapl_is_zone_supported(&m_pkg, POWERCAP_RAPL_ZONE_UNCORE);
-        m_support.dram    = powercap_rapl_is_zone_supported(&m_pkg, POWERCAP_RAPL_ZONE_DRAM);
-        m_support.psys    = powercap_rapl_is_zone_supported(&m_pkg, POWERCAP_RAPL_ZONE_PSYS);
+        for(uint32_t i = 0; i < m_num_packages; i++) {
+            powercap_rapl_init(i, &m_pkg[i], true);
+        }
     }
 
-    inline energy read() const {
+    inline feature_support support(uint32_t package) const {
+        feature_support s;
+        s.package = powercap_rapl_is_zone_supported(&m_pkg[package], POWERCAP_RAPL_ZONE_PACKAGE);
+        s.core    = powercap_rapl_is_zone_supported(&m_pkg[package], POWERCAP_RAPL_ZONE_CORE);
+        s.uncore  = powercap_rapl_is_zone_supported(&m_pkg[package], POWERCAP_RAPL_ZONE_UNCORE);
+        s.dram    = powercap_rapl_is_zone_supported(&m_pkg[package], POWERCAP_RAPL_ZONE_DRAM);
+        s.psys    = powercap_rapl_is_zone_supported(&m_pkg[package], POWERCAP_RAPL_ZONE_PSYS);
+        return s;
+    }
+
+    inline feature_support support() const {
+        feature_support s = support(0);
+        feature_support spkg;
+        for(uint32_t i = 1; i < m_num_packages; i++) {
+            spkg = support(i);
+            s.package = s.package && spkg.package;
+            s.core    = s.core    && spkg.core;
+            s.uncore  = s.uncore  && spkg.uncore;
+            s.dram    = s.dram    && spkg.dram;
+            s.psys    = s.psys    && spkg.psys;
+        }
+        return s;
+    }
+
+    inline energy read(uint32_t package) const {
         energy e;
-        powercap_rapl_get_energy_uj(&m_pkg, POWERCAP_RAPL_ZONE_PACKAGE, &e.package);
-        powercap_rapl_get_energy_uj(&m_pkg, POWERCAP_RAPL_ZONE_CORE, &e.core);
-        powercap_rapl_get_energy_uj(&m_pkg, POWERCAP_RAPL_ZONE_UNCORE, &e.uncore);
-        powercap_rapl_get_energy_uj(&m_pkg, POWERCAP_RAPL_ZONE_DRAM, &e.dram);
-        powercap_rapl_get_energy_uj(&m_pkg, POWERCAP_RAPL_ZONE_PSYS, &e.psys);
+        powercap_rapl_get_energy_uj(&m_pkg[package], POWERCAP_RAPL_ZONE_PACKAGE, &e.package);
+        powercap_rapl_get_energy_uj(&m_pkg[package], POWERCAP_RAPL_ZONE_CORE,    &e.core);
+        powercap_rapl_get_energy_uj(&m_pkg[package], POWERCAP_RAPL_ZONE_UNCORE,  &e.uncore);
+        powercap_rapl_get_energy_uj(&m_pkg[package], POWERCAP_RAPL_ZONE_DRAM,    &e.dram);
+        powercap_rapl_get_energy_uj(&m_pkg[package], POWERCAP_RAPL_ZONE_PSYS,    &e.psys);
         return e;
     }
 
-    inline ~reader() {
-        powercap_rapl_destroy(&m_pkg);
+    inline energy_buffer read() const {
+        energy_buffer buf;
+        for(uint32_t i = 0; i < m_num_packages; i++) {
+            buf[i] = read(i);
+        }
+        return buf;
     }
 
-    const feature_support& support = m_support;
+    inline ~reader() {
+        for(uint32_t i = 0; i < m_num_packages; i++) {
+            powercap_rapl_destroy(&m_pkg[i]);
+        }
+    }
 };
 
 }}
+
+#else
+#undef RAPL
+#pragma message("the RAPL reader requires powercap")
+#endif

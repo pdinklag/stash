@@ -56,12 +56,12 @@ int main(int argc, char** argv) {
     // for
     {
         auto t0 = time();
-        auto e0 = r.read();
+        auto e0 = r.read().total();
         
         auto sum = sum_for(a);
 
         const auto t = time() - t0;
-        const auto e = r.read() - e0;
+        const auto e = r.read().total() - e0;
         std::cout << "RESULT"
                   << " method=for"
                   << " time=" << t
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
         auto sum = sum_avx512(a);
 
         const auto t = time() - t0;
-        const auto e = r.read() - e0;
+        const auto e = r.read().total() - e0;
         const auto p = rapl::power(e, t);
         std::cout << "RESULT"
                   << " method=avx512"
@@ -89,11 +89,9 @@ int main(int argc, char** argv) {
                   << " e.core=" << e.core
                   << " e.uncore=" << e.uncore
                   << " e.dram=" << e.dram
-                  << " e.total=" << e.total()
                   << " p.core=" << p.core
                   << " p.uncore=" << p.uncore
                   << " p.dram=" << p.dram
-                  << " p.total=" << p.total()
                   << " sum=" << sum
                   << std::endl;
     }

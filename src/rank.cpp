@@ -238,12 +238,12 @@ void bench(
     const size_t num = queries.size() - 8;
     
     auto t0 = time();
-    auto e0 = r.read();
+    auto e0 = r.read().total();
 
     const uint64_t sum = rank(queries);
 
     const auto t = time() - t0;
-    const auto e = r.read() - e0;
+    const auto e = r.read().total() - e0;
     std::cout << "RESULT"
               << " name=" << name
               << " t=" << t

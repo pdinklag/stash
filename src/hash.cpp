@@ -8,6 +8,7 @@
 #include <stash/hash/quadratic_probing.hpp>
 
 #include <stash/io/load_file.hpp>
+#include <stash/rapl/reader.hpp>
 #include <stash/util/malloc_callback.hpp>
 #include <stash/util/random.hpp>
 #include <stash/util/time.hpp>
@@ -73,7 +74,7 @@ void test(
 
     malloc_callback::reset();
     hash::table<uint64_t> h(hfunc, p.capacity, p.load_factor, p.growth_factor, pfunc);
-
+    
     uint64_t t_insert;
     {
         const auto t0 = time();

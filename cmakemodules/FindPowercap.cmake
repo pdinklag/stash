@@ -9,4 +9,15 @@ if(POWERCAP_FOUND)
     add_definitions(-DPOWERCAP_FOUND)
     set(POWERCAP_INCLUDE_DIRS ${POWERCAP_INCLUDE_DIR})
     set(POWERCAP_LIBRARIES ${POWERCAP_LIBRARY})
+
+    # try to find number of RAPL packages
+    execute_process(
+        COMMAND rapl-info -n
+        RESULT_VARIABLE RAPL_INFO_RESULT
+        OUTPUT_VARIABLE RAPL_INFO_OUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if(${RAPL_INFO_RESULT} EQUAL 0)
+        add_definitions(-DMAX_RAPL_PACKAGES=${RAPL_INFO_OUT})
+    endif()
 endif()

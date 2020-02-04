@@ -13,6 +13,25 @@ struct energy {
         : package(_package), core(_core), uncore(_uncore), dram(_dram), psys(_psys) {
     }
 
+    inline energy operator+(const energy& other) {
+        return energy (
+            package + other.package,
+            core    + other.core,
+            uncore  + other.uncore,
+            dram    + other.dram,
+            psys    + other.psys
+        );
+    }
+
+    inline energy& operator+=(const energy& other) {
+        package += other.package;
+        core    += other.core;
+        uncore  += other.uncore;
+        dram    += other.dram;
+        psys    += other.psys;
+        return *this;
+    }
+
     inline energy operator-(const energy& other) {
         return energy (
             package - other.package,
@@ -21,6 +40,15 @@ struct energy {
             dram    - other.dram,
             psys    - other.psys
         );
+    }
+
+    inline energy& operator-=(const energy& other) {
+        package -= other.package;
+        core    -= other.core;
+        uncore  -= other.uncore;
+        dram    -= other.dram;
+        psys    -= other.psys;
+        return *this;
     }
 };
 

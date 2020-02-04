@@ -15,44 +15,44 @@ volatile int x;
 
 rapl::power test_add(const rapl::reader& r, const int* a, size_t n) {
     auto t0 = time();
-    auto e0 = r.read();
+    auto e0 = r.read().total();
     for(size_t i = 0; i < n; i++) {
         x += a[i];
     }
-    return rapl::power(r.read() - e0, time() - t0);
+    return rapl::power(r.read().total() - e0, time() - t0);
 }
 
 rapl::power test_xor(const rapl::reader& r, const int* a, size_t n) {
     auto t0 = time();
-    auto e0 = r.read();
+    auto e0 = r.read().total();
     for(size_t i = 0; i < n; i++) {
         x ^= a[i];
     }
-    return rapl::power(r.read() - e0, time() - t0);
+    return rapl::power(r.read().total() - e0, time() - t0);
 }
 
 rapl::power test_mul(const rapl::reader& r, const int* a, size_t n) {
     auto t0 = time();
-    auto e0 = r.read();
+    auto e0 = r.read().total();
     for(size_t i = 0; i < n; i++) {
         x *= a[i];
     }
-    return rapl::power(r.read() - e0, time() - t0);
+    return rapl::power(r.read().total() - e0, time() - t0);
 }
 
 rapl::power test_sleep(const rapl::reader& r, size_t iterations = 5) {
     rapl::power p;
     for(size_t i = 0; i < iterations; i++) {
         auto t0 = time();
-        auto e0 = r.read();
+        auto e0 = r.read().total();
         usleep(250'000);
-        p += rapl::power(r.read() - e0, time() - t0);
+        p += rapl::power(r.read().total() - e0, time() - t0);
     }
     return p / double(iterations);
 }
 
 int main(int argc, char** argv) {
-    rapl::reader r(0);
+    rapl::reader r;
 
     const size_t n = 10'000'000;
     const size_t iterations = 100;
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
         rapl::power p_random;
         {
             auto t0 = time();
-            auto e0 = r.read();
+            auto e0 = r.read().total();
             
             std::random_device rnd;
             std::default_random_engine e(rnd());
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
                 a[i] = uniform_dist(e);
             }
 
-            p_random = rapl::power(r.read() - e0, time() - t0);
+            p_random = rapl::power(r.read().total() - e0, time() - t0);
         }
 
         auto p_sleep = test_sleep(r);
