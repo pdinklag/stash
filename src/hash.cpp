@@ -17,6 +17,10 @@
 
 using namespace stash;
 
+#ifdef RAPL
+rapl::reader raplr;
+#endif
+
 namespace malloc_callback {
     size_t current = 0;
     size_t peak = 0;
@@ -76,12 +80,22 @@ void test(
     hash::table<uint64_t> h(hfunc, p.capacity, p.load_factor, p.growth_factor, pfunc);
     
     uint64_t t_insert;
+
+    #ifdef RAPL
+    uint64_t e_insert;
+    uint64_t e0 = raplr.read().total().package;
+    #endif
+    
     {
         const auto t0 = time();
         for(auto k : keys) {
             h.insert(k);
         }
         t_insert = time() - t0;
+
+        #ifdef RAPL
+        e_insert = raplr.read().total().package - e0;
+        #endif
     }
 
     const auto m = malloc_callback::current;
@@ -90,21 +104,40 @@ void test(
 
     size_t chksum = 0;
     uint64_t t_member;
+    
+    #ifdef RAPL
+    uint64_t e_member;
+    e0 = raplr.read().total().package;
+    #endif
+    
     {
         const auto t0 = time();
         for(size_t i = 0; i < p.num_queries; i++) {
             chksum += h.contains(keys[queries[i]]);
         }
         t_member = time() - t0;
+        
+        #ifdef RAPL
+        e_member = raplr.read().total().package - e0;
+        #endif
     }
 
-    std::cout << "RESULT"
+    std::cout
+        << "RESULT"
         << " hfunc=" << name
+        << " m=" << m
         << " t_insert=" << t_insert
+        << " t_member=" << t_member;
+        
+    #ifdef RAPL
+    std::cout
+        << " e_insert=" << e_insert
+        << " e_member=" << e_member;
+    #endif
+
+    std::cout
         << " queries=" << p.num_queries
         << " chksum=" << chksum
-        << " t_member=" << t_member
-        << " m=" << m
         << " mratio=" << mratio
         << " mpeak=" << mpeak
         << " size=" << h.size()
@@ -137,23 +170,23 @@ int main(int argc, char** argv) {
         p.capacity = keys.size();
     }
 
-    test("lp1.knuth",      mul_hash{2654435761ULL},                 hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mul_prime1", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mul_prime2", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mul_prime3", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mix",        mix,                                     hash::linear_probing<>{}, p, keys, queries);
+    test("lp1.knuth      ", mul_hash{2654435761ULL},                 hash::linear_probing<>{}, p, keys, queries);
+    test("lp1.mul_prime1 ", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<>{}, p, keys, queries);
+    test("lp1.mul_prime2 ", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<>{}, p, keys, queries);
+    test("lp1.mul_prime3 ", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<>{}, p, keys, queries);
+    test("lp1.mix        ", mix,                                     hash::linear_probing<>{}, p, keys, queries);
     
-    test("lp7.knuth",      mul_hash{2654435761ULL},                 hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mul_prime1", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mul_prime2", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mul_prime3", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mix",        mix,                                     hash::linear_probing<7>{}, p, keys, queries);
+    test("lp7.knuth      ", mul_hash{2654435761ULL},                 hash::linear_probing<7>{}, p, keys, queries);
+    test("lp7.mul_prime1 ", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<7>{}, p, keys, queries);
+    test("lp7.mul_prime2 ", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<7>{}, p, keys, queries);
+    test("lp7.mul_prime3 ", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<7>{}, p, keys, queries);
+    test("lp7.mix        ", mix,                                     hash::linear_probing<7>{}, p, keys, queries);
     
-    test("qp11.knuth",      mul_hash{2654435761ULL},                 hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp11.knuth     ", mul_hash{2654435761ULL},                 hash::quadratic_probing<>{}, p, keys, queries);
     test("qp11.mul_prime1", mul_hash{15'425'459'083'914'370'367ULL}, hash::quadratic_probing<>{}, p, keys, queries);
     test("qp11.mul_prime2", mul_hash{16'568'458'216'213'224'001ULL}, hash::quadratic_probing<>{}, p, keys, queries);
     test("qp11.mul_prime3", mul_hash{17'406'548'584'874'384'839ULL}, hash::quadratic_probing<>{}, p, keys, queries);
-    test("qp11.mix",        mix,                                     hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp11.mix       ", mix,                                     hash::quadratic_probing<>{}, p, keys, queries);
     
     return 0;
 }
