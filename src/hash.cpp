@@ -141,7 +141,7 @@ void test(
         << " mratio=" << mratio
         << " mpeak=" << mpeak
         << " size=" << h.size()
-        << " capacity=" << h.capacity()
+        << " cap=" << h.capacity()
         << " load=" << h.load()
         << " max_probe=" << h.max_probe()
         << " avg_probe=" << h.avg_probe()
