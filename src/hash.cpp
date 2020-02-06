@@ -136,8 +136,8 @@ void test(
     #endif
 
     std::cout
-        << " queries=" << p.num_queries
-        << " chksum=" << chksum
+        << " q=" << p.num_queries
+        << " chk=" << chksum
         << " mratio=" << mratio
         << " mpeak=" << mpeak
         << " size=" << h.size()
@@ -170,23 +170,17 @@ int main(int argc, char** argv) {
         p.capacity = keys.size();
     }
 
-    test("lp1.knuth      ", mul_hash{2654435761ULL},                 hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mul_prime1 ", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mul_prime2 ", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mul_prime3 ", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<>{}, p, keys, queries);
-    test("lp1.mix        ", mix,                                     hash::linear_probing<>{}, p, keys, queries);
+    test("lp.knuth     ", mul_hash{2654435761ULL},                 hash::linear_probing<>{}, p, keys, queries);
+    test("lp.mul_prime1", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<>{}, p, keys, queries);
+    test("lp.mul_prime2", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<>{}, p, keys, queries);
+    test("lp.mul_prime3", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<>{}, p, keys, queries);
+    test("lp.mix       ", mix,                                     hash::linear_probing<>{}, p, keys, queries);
     
-    test("lp7.knuth      ", mul_hash{2654435761ULL},                 hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mul_prime1 ", mul_hash{15'425'459'083'914'370'367ULL}, hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mul_prime2 ", mul_hash{16'568'458'216'213'224'001ULL}, hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mul_prime3 ", mul_hash{17'406'548'584'874'384'839ULL}, hash::linear_probing<7>{}, p, keys, queries);
-    test("lp7.mix        ", mix,                                     hash::linear_probing<7>{}, p, keys, queries);
-    
-    test("qp11.knuth     ", mul_hash{2654435761ULL},                 hash::quadratic_probing<>{}, p, keys, queries);
-    test("qp11.mul_prime1", mul_hash{15'425'459'083'914'370'367ULL}, hash::quadratic_probing<>{}, p, keys, queries);
-    test("qp11.mul_prime2", mul_hash{16'568'458'216'213'224'001ULL}, hash::quadratic_probing<>{}, p, keys, queries);
-    test("qp11.mul_prime3", mul_hash{17'406'548'584'874'384'839ULL}, hash::quadratic_probing<>{}, p, keys, queries);
-    test("qp11.mix       ", mix,                                     hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp.knuth     ", mul_hash{2654435761ULL},                 hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp.mul_prime1", mul_hash{15'425'459'083'914'370'367ULL}, hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp.mul_prime2", mul_hash{16'568'458'216'213'224'001ULL}, hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp.mul_prime3", mul_hash{17'406'548'584'874'384'839ULL}, hash::quadratic_probing<>{}, p, keys, queries);
+    test("qp.mix       ", mix,                                     hash::quadratic_probing<>{}, p, keys, queries);
     
     return 0;
 }
