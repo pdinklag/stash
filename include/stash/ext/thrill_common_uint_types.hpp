@@ -16,8 +16,43 @@
 #define THRILL_COMMON_UINT_TYPES_HEADER
 
 //#include <thrill/common/defines.hpp>
-#include <tlx/define/attribute_packed.hpp>
-#include <tlx/define/likely.hpp>
+
+//#include <tlx/define/attribute_packed.hpp>
+namespace tlx {
+
+//! \addtogroup tlx_define
+//! \{
+
+#if defined(__GNUC__) || defined(__clang__)
+#define TLX_LIKELY(c)   __builtin_expect((c), 1)
+#define TLX_UNLIKELY(c) __builtin_expect((c), 0)
+#else
+#define TLX_LIKELY(c)   c
+#define TLX_UNLIKELY(c) c
+#endif
+
+//! \}
+
+} // namespace tlx
+
+//#include <tlx/define/likely.hpp>
+namespace tlx {
+
+//! \addtogroup tlx_define
+//! \{
+
+/******************************************************************************/
+// __attribute__ ((packed))
+
+#if defined(__GNUC__) || defined(__clang__)
+#define TLX_ATTRIBUTE_PACKED __attribute__ ((packed))
+#else
+#define TLX_ATTRIBUTE_PACKED
+#endif
+
+//! \}
+
+} // namespace tlx
 
 #include <cassert>
 #include <limits>
