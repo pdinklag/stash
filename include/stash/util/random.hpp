@@ -5,6 +5,7 @@
 
 #include <stash/util/math.hpp>
 #include <stash/util/time.hpp>
+#include <stash/util/uint128.hpp>
 
 namespace stash {
     namespace random {
@@ -34,7 +35,7 @@ namespace stash {
                     return x;
                 } else {
                     // use quadratic residue
-                    uint64_t r = (x * x) % m_prime;
+                    uint64_t r = (uint64_t)(((uint128_t)x * (uint128_t)x) % (uint128_t)m_prime);
                     return (x <= (m_prime >> 1ULL)) ? r : m_prime - r;
                 }
             }
