@@ -16,7 +16,7 @@
 #include <stash/io/load_file.hpp>
 #include <stash/util/malloc_callback.hpp>
 #include <stash/util/time.hpp>
-#include <stash/util/uint_types.hpp>
+#include <stash/util/uint40.hpp>
 
 using namespace stash;
 
