@@ -62,11 +62,10 @@ inline constexpr uint64_t isqrt_ceil(const uint64_t x) {
 }
 
 // tests whether p is a prime
-// TODO: use wheel factorization, this is too slow!
 inline constexpr bool is_prime(const uint64_t p) {
     if(p % 2 == 0) return false;
     
-    const uint64_t m = p >> 1;
+    const uint64_t m = isqrt_ceil(p);
     for(size_t i = 2; i <= m; i ++) {
         if((p % i) == 0) {
             return false;
