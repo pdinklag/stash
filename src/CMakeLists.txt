@@ -44,11 +44,17 @@ add_executable(runs runs.cpp)
 target_include_directories(runs PUBLIC ${TLX_INCLUDE_DIRS})
 target_link_libraries(runs ${TLX_LIBRARIES})
 
-# runs
+# hash
 add_executable(hash hash.cpp malloc.cpp)
 
 target_include_directories(hash PUBLIC ${TLX_INCLUDE_DIRS} ${POWERCAP_INCLUDE_DIRS})
 target_link_libraries(hash ${TLX_LIBRARIES} ${POWERCAP_LIBRARIES})
+
+# numbers
+add_executable(numbers numbers.cpp)
+
+target_include_directories(numbers PUBLIC ${TLX_INCLUDE_DIRS})
+target_link_libraries(numbers ${TLX_LIBRARIES})
 
 # pred
 add_executable(pred pred.cpp malloc.cpp)

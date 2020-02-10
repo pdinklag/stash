@@ -161,4 +161,16 @@ inline uint64_t prime_successor(uint64_t p) {
     return p;
 }
 
+// finds the greatest prime smaller than or equal to p
+inline uint64_t prime_predecessor(uint64_t p) {
+    if(unlikely(p == 0)) return 0;
+    if(unlikely(p == 2)) return 2;
+    if(p % 2 == 0) --p; // all primes > 2 are odd
+
+    // linear search - the gap between two primes is hopefully very low
+    // in the worst case, because there must be a prime between p and 2p, this takes p steps
+    while(!is_prime(p)) p -= 2;
+    return p;
+}
+
 }
