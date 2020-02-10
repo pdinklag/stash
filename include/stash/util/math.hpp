@@ -27,23 +27,43 @@ constexpr uint64_t fib[] = {
     4660046610375530309ULL,7540113804746346429ULL,12200160415121876738ULL
 };
 
-inline constexpr uint64_t idiv_ceil(uint64_t a, uint64_t b) {
+inline constexpr uint64_t idiv_ceil(const uint64_t a, const uint64_t b) {
     const uint64_t q = a / b;
     return (a % b == 0) ? q : q + 1;
 }
 
-inline constexpr uint64_t log2_ceil(uint64_t x) {
+inline constexpr uint64_t log2_ceil(const uint64_t x) {
     return 64ULL - __builtin_clzll(x);
 }
 
-inline constexpr uint64_t log2_floor(uint64_t x) {
+inline constexpr uint64_t log2_floor(const uint64_t x) {
     if(unlikely(x == 0)) return 0;
     return 64ULL - __builtin_clzll(x) - 1ULL;
 }
 
+inline constexpr uint64_t isqrt_floor(const uint64_t x) {
+    if(unlikely(x < 4ULL)) return uint64_t(x > 0);
+    
+    uint64_t e = log2_floor(x) >> 1;
+    uint64_t r = 1ULL;
+
+    while(e--) {
+        const uint64_t cur = x >> (e << 1ULL);
+        const uint64_t sm = r << 1ULL;
+        const uint64_t lg = sm + 1ULL;
+        r = (sm + (lg * lg <= cur));
+    }
+    return r;
+}
+
+inline constexpr uint64_t isqrt_ceil(const uint64_t x) {
+    const uint64_t r = isqrt_floor(x);
+    return r + (r * r < x);
+}
+
 // tests whether p is a prime
 // TODO: use wheel factorization, this is too slow!
-inline constexpr bool is_prime(uint64_t p) {
+inline constexpr bool is_prime(const uint64_t p) {
     if(p % 2 == 0) return false;
     
     const uint64_t m = p >> 1;
