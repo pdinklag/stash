@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <bitset>
+#include <cassert>
 #include <iostream>
 #include <random>
 #include <vector>
@@ -23,6 +24,11 @@ int main(int argc, char** argv) {
 
     size_t seed = time_nanos();
     cp.add_size_t('s', "seed", seed, "The seed for random generation (default: timestamp).");
+	
+#ifndef NDEBUG
+	bool check = false;
+	cp.add_flag('c', "check", check, "Check that a permutation is generated (debug).");
+#endif
 
     if(!cp.process(argc, argv)) {
         return -1;
@@ -35,6 +41,18 @@ int main(int argc, char** argv) {
 
     // generate numbers
     auto perm = random::permutation(u, seed);
+	
+#ifndef NDEBUG
+	if(check) {
+		std::vector<bool> b(u);
+		for(uint64_t i = 0; i < u; i++) {
+			const uint64_t j = perm(i);
+			assert(!b[j]);
+			b[j] = 1;
+		}
+	}
+#endif
+	
     for(uint64_t i = 0; i < num; i++) {
         std::cout << perm(i) << std::endl;
     }

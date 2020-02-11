@@ -27,7 +27,6 @@ namespace stash {
             const uint64_t m_universe;
             const uint64_t m_seed;
             const uint64_t m_prime;
-            const uint64_t m_shuf1, m_shuf2;
 
             inline uint64_t permute(const uint64_t x) const {
                 if(x >= m_prime) {
@@ -44,8 +43,6 @@ namespace stash {
             permutation(uint64_t universe, uint64_t seed)
                 : m_universe(universe),
                   m_prime(prev_prime_3mod4(universe)),
-                  m_shuf1(SHUFFLE1 & ((1ULL << (log2_floor(universe)-2)) - 1ULL)),
-                  m_shuf2(SHUFFLE2 & ((1ULL << (log2_floor(universe)-2)) - 1ULL)),
                   m_seed((seed ^ SHUFFLE1) ^ SHUFFLE2) {
             }
 
@@ -53,7 +50,15 @@ namespace stash {
             }
 
             inline uint64_t operator()(uint64_t i) const {
-                return permute(((m_seed + (permute(i) ^ m_shuf1)) % m_universe)) ^ m_shuf2;
+                return permute((m_seed + permute(i)) % m_universe);
+            }
+			
+            inline std::vector<uint64_t> vector(size_t num) const {
+                std::vector<uint64_t> vec(num);
+                for(size_t i = 0; i < num; i++) {
+                    vec[i] = (*this)(i);
+                }
+                return vec;
             }
         };
     };
