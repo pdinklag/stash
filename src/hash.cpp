@@ -69,7 +69,9 @@ struct params {
     size_t capacity = 0;
     double load_factor = 1.0;
     double growth_factor = 2.0;
+    size_t num_keys = 1'000;
     size_t num_queries = 100'000;
+    uint64_t universe = UINT32_MAX;
 };
 
 template<typename hash_func_t, typename probe_func_t>
@@ -153,7 +155,8 @@ int main(int argc, char** argv) {
     tlx::CmdlineParser cp;
 
     params p;
-    cp.add_param_string("file", p.filename, "the integer keys to insert");
+    cp.add_bytes('u', "universe", p.universe, "the universe to draw hashtable entries from (default: 32 bit numbers)");
+    cp.add_bytes('n', "num", p.num_keys, "the number of hashtable entries to draw (default: 1024)");
     cp.add_bytes('c', "capacity", p.capacity, "the initial capacity (default: input size)");
     cp.add_double('l', "load-factor", p.load_factor, "the maximum load factor (default: 1)");
     cp.add_double('g', "growth-factor", p.growth_factor, "the growth factor (default: 2)");
@@ -163,8 +166,8 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    auto keys = io::load_file_lines_as_vector<uint64_t>(p.filename);
-    auto queries = random_vector<size_t>(p.num_queries, keys.size() - 1);
+    auto keys    = random::permutation(p.universe, 147).vector(p.num_keys);
+    auto queries = random::permutation(p.num_keys, 148).vector(p.num_queries);
 
     if(p.capacity == 0) {
         p.capacity = keys.size();
