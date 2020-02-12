@@ -90,15 +90,21 @@ test_result test_predecessor(
     size_t   m_ds = mem - m0;
 
     // do queries
+    const auto min = array[0];
     uint64_t t_queries;
     uint64_t sum = 0;
     {
         auto t0 = time();
         for(value_t x : queries) {
             auto r = q.predecessor(x);
-            assert(r.exists);
-            assert(x >= array[r.pos]);
-            sum += array[r.pos];
+
+            if(x >= min) {
+                assert(r.exists);
+                assert(x >= array[r.pos]);
+                sum += array[r.pos];
+            } else {
+                assert(!r.exists);
+            }
         }
         t_queries = time() - t0;
     }
@@ -119,15 +125,20 @@ test_result test_successor(
     size_t   m_ds = mem - m0;
 
     // do queries
+    const auto max = array[array.size()-1ULL];
     uint64_t t_queries;
     uint64_t sum = 0;
     {
         auto t0 = time();
         for(value_t x : queries) {
             auto r = q.successor(x);
-            assert(r.exists);
-            assert(x <= array[r.pos]);
-            sum += array[r.pos];
+            if(x <= max) {
+                assert(r.exists);
+                assert(x <= array[r.pos]);
+                sum += array[r.pos];
+            } else {
+                assert(!r.exists);
+            }
         }
         t_queries = time() - t0;
     }
