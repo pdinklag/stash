@@ -42,7 +42,7 @@ public:
         assert_sorted_ascending(array);
 
         // sample
-        const size_t num_samples = m_num / m_alpha;
+        const size_t num_samples = idiv_ceil(m_num, m_alpha);
 
         m_sample.reserve(num_samples);
         for(size_t i = 0; i < num_samples; i++) {
@@ -73,10 +73,9 @@ public:
         if(unlikely(x <= m_min)) return result { true, 0 };
         if(unlikely(x > m_max))  return result { false, 0 };
 
-        auto succ = m_idx.successor(x);
-        assert(succ.exists);
+        auto succ = m_idx.successor(x); // may not exist if not sampled!
 
-        const size_t q = succ.pos * m_alpha;
+        const size_t q = succ.exists ? (succ.pos * m_alpha) : m_num - 1;
         if(unlikely(x == m_sample[succ.pos])) {
             return result { true, q };
         } else {
