@@ -10,6 +10,10 @@
 namespace stash {
     namespace random {
         // generates a random permutation from 0 to u-1
+        // based on an article by Jeff Preshing
+        // https://preshing.com/20121224/how-to-generate-a-sequence-of-unique-random-integers/
+        //
+        // modified for any universe size (not just 32 bits)
         class permutation {
         private:
             // decent distribution of 64 bits
@@ -52,7 +56,7 @@ namespace stash {
             inline uint64_t operator()(uint64_t i) const {
                 return permute((m_seed + permute(i)) % m_universe);
             }
-			
+
             inline std::vector<uint64_t> vector(size_t num) const {
                 std::vector<uint64_t> vec(num);
                 for(size_t i = 0; i < num; i++) {
