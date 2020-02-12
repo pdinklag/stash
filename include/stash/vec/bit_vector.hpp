@@ -13,19 +13,22 @@ private:
     size_t m_size;
     std::vector<uint64_t> m_bits;
     
-    inline static size_t block(size_t i) {
+    inline static constexpr size_t block(size_t i) {
         return i >> 6ULL; // divide by 64
     }
 
-    inline static size_t offset(size_t i) {
+    inline static constexpr size_t offset(size_t i) {
         return i & 63ULL; // mod 64
     }
 
     inline bool bitread(size_t i) const {
-        const size_t q = block(i);
-        const size_t k = offset(i);
-        const size_t mask = (1ULL << k);
-        return bool(m_bits[q] & mask);
+        //~ const size_t q = block(i);
+        //~ const size_t k = offset(i);
+        //~ const uint64_t mask = (1ULL << k);
+        //~ return bool(m_bits[q] & mask);
+        
+        // more optimization-friendly:
+        return bool(m_bits[i >> 6ULL] & (1ULL << (i & 63ULL)));
     }
 
     inline void bitset(size_t i, bool b) {
